@@ -4,9 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:teragate_test/services/login_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
-import 'package:teragate_test/config/env.dart';
-
-import 'beacon_state.dart';
+import 'package:teragate_test/states/beacon_state.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
