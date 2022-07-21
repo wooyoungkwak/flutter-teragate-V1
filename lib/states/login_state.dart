@@ -1,16 +1,8 @@
-// ignore: unused_import
-import 'dart:developer';
-// ignore: unused_import
-import 'dart:convert';
-// ignore: unused_import
-import 'dart:async';
-// import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:teragate_test/services/login_service.dart';
-import 'package:teragate_test/config/permission.dart';
+import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 
 import 'beacon_state.dart';
