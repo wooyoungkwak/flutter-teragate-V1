@@ -13,7 +13,7 @@ import 'package:teragate_test/services/login_service.dart';
 import 'package:teragate_test/config/permission.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 
-import 'beacon.dart';
+import 'beacon_state.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -103,9 +103,7 @@ class _LoginState extends State<Login> {
                     child: MaterialButton(
                       //child - 버튼을 생성
                       onPressed: () {
-                        debugPrint("1111");
                         if (_formKey.currentState!.validate()) {
-                          debugPrint("2222");
                           loginCheck(_loginIdContoroller.text,_passwordContorller.text).then((data) {
                             if (data.success) {
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Beacon()));
