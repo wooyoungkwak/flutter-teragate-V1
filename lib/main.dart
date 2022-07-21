@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:teragate_test/states/login.dart';
-import 'package:teragate_test/states/beacon.dart';
+import 'package:teragate_test/states/login_state.dart';
+import 'package:teragate_test/states/beacon_state.dart';
 import 'package:teragate_test/services/login_service.dart';
-import 'package:teragate_test/utils/toast_util.dart';
 import 'package:teragate_test/config/env.dart';
+import 'package:teragate_test/utils/alarm_util.dart';
 
 void main() {
   runApp(const MyApp());
@@ -59,33 +59,25 @@ class _SplashPageState extends State<SplashPage> {
     if (allStorage.isNotEmpty) {
       allStorage.forEach((k, v) {
         if (Env.isDebug) debugPrint('k : $k, v : $v');
-        if (v == STATUS_LOGIN) statusUser = k;
+        if (v == Env.STATUS_LOGIN) statusUser = k;
 
         if (k == 'LOGIN_ID') loginId = v;
         if (k == 'LOGIN_PW') loginPw = v;
       });
     } else {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const Login()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
     }
         
     loginCheck(loginId, loginPw).then((data) {
       if (data.success) {
-        
         if (statusUser.isNotEmpty) {
-        
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => const Beacon()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Beacon()));
         } else {
-        
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => const Login()));
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
         }
       } else {
-        
         showSnackBar(context, data.message);
-        Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => const Login()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
       }
     });
   }

@@ -11,8 +11,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:teragate_test/services/login_service.dart';
 import 'package:teragate_test/config/permission.dart';
-import 'package:teragate_test/utils/toast_util.dart';
-import 'package:teragate_test/config/env.dart';
+import 'package:teragate_test/utils/alarm_util.dart';
 
 import 'beacon.dart';
 
@@ -71,8 +70,7 @@ class _LoginState extends State<Login> {
                   child: TextFormField(
                     //TextFormField
                     controller: _loginIdContoroller,
-                    validator: (value) =>
-                        (value!.isEmpty) ? " 아이디를 입력해 주세요" : null, //hint 역할
+                    validator: (value) => (value!.isEmpty) ? " 아이디를 입력해 주세요" : null, //hint 역할
                     style: style,
                     decoration: const InputDecoration(
                         //textfield안에 있는 이미지
@@ -87,9 +85,7 @@ class _LoginState extends State<Login> {
                   child: TextFormField(
                     obscureText: true,
                     controller: _passwordContorller,
-                    validator: (value) => (value!.isEmpty)
-                        ? "패스워드를 입력해 주세요"
-                        : null, //아무것도 누르지 않은 경우 이 글자 뜸.
+                    validator: (value) => (value!.isEmpty) ? "패스워드를 입력해 주세요" : null, //아무것도 누르지 않은 경우 이 글자 뜸.
                     style: style,
                     decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.lock),
@@ -107,13 +103,13 @@ class _LoginState extends State<Login> {
                     child: MaterialButton(
                       //child - 버튼을 생성
                       onPressed: () {
+                        debugPrint("1111");
                         if (_formKey.currentState!.validate()) {
+                          debugPrint("2222");
                           loginCheck(_loginIdContoroller.text,_passwordContorller.text).then((data) {
                             if (data.success) {
-                              if(Env.isDebug) debugPrint("로그인성공");
-                              _autoLoginCheck(_loginIdContoroller.text, _passwordContorller.text);
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Beacon()));
                             } else {
-                              if(Env.isDebug) debugPrint("로그인실패");
                               showSnackBar(context, data.message);
                             }
                           });
@@ -121,8 +117,7 @@ class _LoginState extends State<Login> {
                       },
                       child: Text(
                         "로그인",
-                        style: style.copyWith(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                        style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -134,37 +129,4 @@ class _LoginState extends State<Login> {
       ),
     );
   }
-
-  void _autoLoginCheck(loingId, password) async {
-    // ignore: constant_identifier_names
-    debugPrint(loingId);
-    debugPrint(password);
-
-    String? storagePass = await flutterSecureStorage.read(key: loingId);
-    if (storagePass != null && storagePass != '' && storagePass == password) {
-      debugPrint('storagePass : $storagePass');
-      String? userNickName =
-          await flutterSecureStorage.read(key: '${loingId}_$storagePass');
-      if (userNickName != null) {
-        flutterSecureStorage.write(key: userNickName, value: STATUS_LOGIN);
-      }
-      debugPrint('로그인 성공');
-      Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (BuildContext context) => const Beacon()));
-    } else {
-      debugPrint('로그인 실패');
-      showSnackBar(context, '아이디가 존재하지 않거나 비밀번호가  맞지않습니다.');
-    }
-  }
-}
-
-void showSnackBar(BuildContext context, String str) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    content: Text(
-      str,
-      textAlign: TextAlign.center,
-    ),
-    duration: const Duration(seconds: 2),
-    backgroundColor: Colors.grey[400],
-  ));
 }

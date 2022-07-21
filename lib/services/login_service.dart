@@ -5,19 +5,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/result_model.dart';
-import 'package:teragate_test/utils/toast_util.dart';
  
 Map<String, String> headers = {};
 
 // 로그인체크
 loginCheck(loginId, password) async {
   const flutterSecureStorage = FlutterSecureStorage();
-  /*
-  Map<String, String> param = {
-    "loginId": loginId,
-    "password": password,
-  }; 
-  */
 
   var data = {"loginId": loginId, "password": password};
   var body = json.encode(data);
@@ -29,10 +22,10 @@ loginCheck(loginId, password) async {
   if (response.statusCode == 200) {
     flutterSecureStorage.deleteAll();
     flutterSecureStorage.write(key: id, value: pw);
-    flutterSecureStorage.write(key: LOGIN_ID, value: id);
-    flutterSecureStorage.write(key: LOGIN_PW, value: pw);
-    flutterSecureStorage.write(key: '${id}_$pw', value: USER_NICK_NAME);
-    flutterSecureStorage.write(key: USER_NICK_NAME, value: STATUS_LOGIN);
+    flutterSecureStorage.write(key: Env.LOGIN_ID, value: id);
+    flutterSecureStorage.write(key: Env.LOGIN_PW, value: pw);
+    flutterSecureStorage.write(key: '${id}_$pw', value: Env.USER_NICK_NAME);
+    flutterSecureStorage.write(key: Env.USER_NICK_NAME, value: Env.STATUS_LOGIN);
 
     var result = utf8.decode(response.bodyBytes);
     Map<String, dynamic> keyMap = jsonDecode(result);

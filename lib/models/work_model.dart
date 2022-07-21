@@ -9,6 +9,7 @@ class AttendUser {
   userId = json['user_id'],
   krName = json['kr_name']
   ;
+  
   Map<String, dynamic> toJson() => {
         'user_id': userId,
         'kr_name': krName,

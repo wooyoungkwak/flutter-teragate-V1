@@ -17,8 +17,9 @@ import 'package:date_format/date_format.dart';
 import 'package:timer_builder/timer_builder.dart';
 
 import 'package:teragate_test/config/env.dart';
-import 'package:teragate_test/states/login.dart';
-import 'package:teragate_test/states/webview.dart';
+import 'package:teragate_test/states/login_state.dart';
+import 'package:teragate_test/states/webview_state.dart';
+import 'package:teragate_test/utils/alarm_util.dart';
 
 class Beacon extends StatefulWidget {
   const Beacon({Key? key}) : super(key: key);
@@ -211,7 +212,7 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
                   attend(userId, deviceip).then((data) {
                     //출근에 대한 정보 db저장
                     debugPrint(data);
-                    flutterDialog("출근하셨습니다 $name님!"); //다이얼로그창
+                    flutterDialog(context, "출근하셨습니다 $name님!"); //다이얼로그창
                     setState(() {
                       _results.add("msg: $name님 출근");
                       alert = DateTime.now().add(const Duration(seconds: 10));
@@ -222,14 +223,14 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
                 }
 /*                      else {
                       if(Env.isDebug) debugPrint(data.success);
-                      flutterDialog(" ${name}님 이미 출근하셨습니다."); //다이얼로그창
+                      flutterDialog(context, " ${name}님 이미 출근하셨습니다."); //다이얼로그창
                       setState(() {
                         _results.add("msg: ${name}님 이미 출근 하셨습니다");
                       });
                     } */
 
               } else {
-                flutterDialog("Key값이 다릅니다. 재시도 해주세요!"); //다이얼로그창
+                flutterDialog(context, "Key값이 다릅니다. 재시도 해주세요!"); //다이얼로그창
               }
               _nrMessagesReceived = 0;
               keySucces = false;
@@ -417,9 +418,9 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
     leave(userId, deviceip).then((data) {
       if (data.success) {
         if(Env.isDebug) debugPrint("#############퇴근진입############");
-        flutterDialog("퇴근하셨습니다 $name님!"); //다이얼로그창
+        flutterDialog(context, "퇴근하셨습니다 $name님!"); //다이얼로그창
       } else {
-        flutterDialog("퇴근처리가 안됩니다"); //다이얼로그창
+        flutterDialog(context, "퇴근처리가 안됩니다"); //다이얼로그창
       }
       setState(() {
         _results.add("msg: $name님 퇴근");
@@ -445,43 +446,43 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
     });
   }
 
-  void flutterDialog(String text) {
-    showDialog(
-        context: context,
-        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0)),
-            //Dialog Main Title
-            title: Column(
-              children: const <Widget>[
-                Text("Dialog Title"),
-              ],
-            ),
-            //
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  text,
-                ),
-              ],
-            ),
-            actions: <Widget>[
-              FlatButton(
-                child: const Text("확인"),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        });
-  }
+  // void flutterDialog(context, String text) {
+  //   showDialog(
+  //       context: context,
+  //       //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+  //       barrierDismissible: false,
+  //       builder: (BuildContext context) {
+  //         return AlertDialog(
+  //           // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+  //           shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(10.0)),
+  //           //Dialog Main Title
+  //           title: Column(
+  //             children: const <Widget>[
+  //               Text("Dialog Title"),
+  //             ],
+  //           ),
+  //           //
+  //           content: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: <Widget>[
+  //               Text(
+  //                 text,
+  //               ),
+  //             ],
+  //           ),
+  //           actions: <Widget>[
+  //             FlatButton(
+  //               child: const Text("확인"),
+  //               onPressed: () {
+  //                 Navigator.pop(context);
+  //               },
+  //             ),
+  //           ],
+  //         );
+  //       });
+  // }
 
   Widget _buildResultsList() {
     return Scrollbar(
