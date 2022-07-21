@@ -7,7 +7,7 @@ import 'package:teragate_test/models/result_model.dart';
 
 // key DB 가져오기
 keyCheck() async {
-  var url = Uri.parse("${Env.serverURL}/keyCheck");
+  var url = Uri.parse("${Env.SERVER_URL}/keyCheck");
   final response = await http.get(url);
   if (response.statusCode == 200) {
     final result = utf8.decode(response.bodyBytes);
@@ -21,7 +21,7 @@ keyCheck() async {
 }
 
 // 출근
-attend(id, ip) async {
+getIn(id, ip) async {
   if(Env.isDebug) debugPrint("#################출근##################");
   Map<String, String> param = {"user_id": id, "att_ip_in": ip};
   if(Env.isDebug) debugPrint(param.toString());
@@ -65,7 +65,7 @@ attend(id, ip) async {
   };
 
   var url =
-      Uri.parse("${Env.serverURL}/attendid").replace(queryParameters: param);
+      Uri.parse("${Env.SERVER_URL}/attendid").replace(queryParameters: param);
   final response = await http.get(url);
 
   if (response.statusCode == 200) {
@@ -80,11 +80,11 @@ attend(id, ip) async {
  */
 
 //출근 중복체크
-attendoverlapCheck(id) async {
+checkOverlapForGetIn(id) async {
   if(Env.isDebug) debugPrint("#################출근중복체크##################");
   Map<String, String> param = {"user_id": id};
   var url =
-      //Uri.parse("${Env.serverURL}/groupware/ajax_get_today_my_attend_data_v3")
+      //Uri.parse("${Env.SERVER_URL}/groupware/ajax_get_today_my_attend_data_v3")
       Uri.parse("http://http://192.168.0.164:3000/getTdyMyAtndData")
           .replace(queryParameters: param);
   var response = await http.get(url);
@@ -98,11 +98,11 @@ attendoverlapCheck(id) async {
 
 
 // 퇴근
-leave(id,ip) async {
+getOut(id,ip) async {
   if(Env.isDebug) debugPrint("#################퇴근##################");
   Map<String, String> param = {"user_id": id,"att_ip_out":ip};
 
-  var url = Uri.parse("${Env.serverURL}/leave").replace(queryParameters: param);
+  var url = Uri.parse("${Env.SERVER_URL}/leave").replace(queryParameters: param);
   final response = await http.get(url);
   
   if(Env.isDebug) debugPrint("###########################");

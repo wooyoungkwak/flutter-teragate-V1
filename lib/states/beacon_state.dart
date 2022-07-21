@@ -3,7 +3,6 @@ import 'dart:io' show Platform;
 import 'dart:math';
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:intl/intl.dart';
 
 import 'package:beacons_plugin/beacons_plugin.dart';
 import 'package:flutter/material.dart';
@@ -25,16 +24,15 @@ class Beacon extends StatefulWidget {
   const Beacon({Key? key}) : super(key: key);
 
   @override
-  _BeaconState createState() => _BeaconState();
+  BeaconState createState() => BeaconState();
 }
 
-class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
+class BeaconState extends State<Beacon> with WidgetsBindingObserver {
   // DateTime now = DateTime.now();
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  String _beaconResult = 'Not Scanned Yet.';
   int _nrMessagesReceived = 0;
-  List<String> _results = [];
+  final _results = [];
 
   final String _tag = "Beacons Plugin";
   var isRunning = false;
@@ -48,7 +46,6 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
   var workSucces = false;
 
   late DateTime alert;
-  final ScrollController _scrollController = ScrollController();
   final StreamController<String> beaconEventsController = StreamController<String>.broadcast();
 
   @override
@@ -150,7 +147,6 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
           if (data.isNotEmpty && isRunning) {
             //if (_nrMessagesReceived <= 2) {
               setState(() {
-                _beaconResult = data;
                 _results.add("출근 처리 중입니다");
                 _showNotification("출근 처리 중입니다.");
                 _nrMessagesReceived++;
@@ -181,7 +177,7 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
               bool keySucces = false; // key 일치여부 확인
 
               //DB에서 key 가져오기
-/*               var url = Uri.parse("${Env.serverURL}/keyCheck");
+/*               var url = Uri.parse("${Env.SERVER_URL}/keyCheck");
               var response = await http.get(url);
               var result = utf8.decode(response.bodyBytes);
               Map<String, dynamic> keyMap = jsonDecode(result);
@@ -203,13 +199,13 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
               }
 
               if (keySucces) {
-                attendoverlapCheck(userId);
+                checkOverlapForGetIn(userId);
                 //DB:출근 기록 확인
 
                 if (true) {
                   //출근
                   if(Env.isDebug) debugPrint("#############출근진입############");
-                  attend(userId, deviceip).then((data) {
+                  getIn(userId, deviceip).then((data) {
                     //출근에 대한 정보 db저장
                     debugPrint(data);
                     flutterDialog(context, "출근하셨습니다 $name님!"); //다이얼로그창
@@ -282,7 +278,6 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
           const SizedBox(
             height: 20.0,
             ),
-              //Expanded(child: _buildResultsList()), // 기존 리스트 출력
               Expanded(child: comuteItem()), // 변경 ui 출력 테스트
               TimerBuilder.periodic(
                 const Duration(seconds: 1),
@@ -415,7 +410,7 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
 
   //퇴근 기능
   void leaveWork() {
-    leave(userId, deviceip).then((data) {
+    getOut(userId, deviceip).then((data) {
       if (data.success) {
         if(Env.isDebug) debugPrint("#############퇴근진입############");
         flutterDialog(context, "퇴근하셨습니다 $name님!"); //다이얼로그창
@@ -483,39 +478,6 @@ class _BeaconState extends State<Beacon> with WidgetsBindingObserver {
   //         );
   //       });
   // }
-
-  Widget _buildResultsList() {
-    return Scrollbar(
-      isAlwaysShown: true,
-      controller: _scrollController,
-      child: ListView.separated(
-        shrinkWrap: true,
-        scrollDirection: Axis.vertical,
-        physics: const ScrollPhysics(),
-        controller: _scrollController,
-        itemCount: _results.length,
-        separatorBuilder: (BuildContext context, int index) => const Divider(
-          height: 1,
-          color: Colors.black,
-        ),
-        itemBuilder: (context, index) {
-          String formattedDate = DateFormat('yyyy-MM-dd – kk:mm:ss').format(DateTime.now());
-          final item = ListTile(
-              title: Text(
-                "시 간: $formattedDate\n${_results[index]}",
-                textAlign: TextAlign.justify,
-                style: Theme.of(context).textTheme.headline4?.copyWith(
-                      fontSize: 14,
-                      color: const Color(0xFF1A1B26),
-                      fontWeight: FontWeight.normal,
-                    ),
-              ),
-              onTap: () {});
-          return item;
-        },
-      ),
-    );
-  }
 
   Widget comuteItem() {
     return Scaffold(

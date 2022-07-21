@@ -20,7 +20,7 @@ class WebView extends StatefulWidget {
 
   final String id;
   final String pw;
-  const WebView(this.id, this.pw,  Key? key) : super(key: key);
+  const WebView(this.id, this.pw, Key? key) : super(key: key);
 
   @override
   WebViewState createState() => WebViewState();
@@ -29,7 +29,7 @@ class WebView extends StatefulWidget {
 class WebViewState extends State<WebView> {
   String? userId = "";
   String? userPassward = "";
-  String addres = Env.serverWebURL;
+  String addres = Env.SERVER_WEB_URL;
   Map<String, String> param = {
     "loginId": "asd",
     "password": "qwe",
@@ -132,11 +132,9 @@ class WebViewState extends State<WebView> {
                       "javascript",
                       "about"
                     ].contains(uri.scheme)) {
-                      if (await canLaunch(url)) {
+                      if (await canLaunchUrl(Uri.parse(url.toString()))) {
                         // Launch the App
-                        await launch(
-                          url,
-                        );
+                        await launchUrl(Uri.parse(url.toString()));
                         // and cancel the request
                         return NavigationActionPolicy.CANCEL;
                       }
@@ -160,7 +158,6 @@ class WebViewState extends State<WebView> {
                     }
                     setState(() {
                       this.progress = progress / 100;
-                      // urlController.text = this.url;
                       urlController.text = "";
                     });
                   },

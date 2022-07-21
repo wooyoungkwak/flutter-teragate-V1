@@ -40,7 +40,7 @@ void flutterDialog(BuildContext context, String text) {
             ],
           ),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: const Text("확인"),
               onPressed: () {
                 Navigator.pop(context);

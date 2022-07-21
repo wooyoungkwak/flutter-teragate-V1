@@ -19,10 +19,10 @@ import 'package:teragate_test/config/env.dart';
   if (statuses.values.every((element) => element.isGranted)) {
     if (Env.isDebug) debugPrint('권한획득');
     return 'success';
-  }
-  debugPrint('권한거절');
+  } 
+
+  if (Env.isDebug) debugPrint('권한거절');
 
   AppSettings.openAppSettings();
   return 'failed';
-  
 } 

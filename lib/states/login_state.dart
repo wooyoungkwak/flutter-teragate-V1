@@ -19,10 +19,10 @@ class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
   
   @override
-  _LoginState createState() => _LoginState();
+  LoginState createState() => LoginState();
 }
 
-class _LoginState extends State<Login> {
+class LoginState extends State<Login> {
   TextStyle style = const TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   late TextEditingController _loginIdContoroller;
   late TextEditingController _passwordContorller;

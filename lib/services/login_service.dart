@@ -18,7 +18,7 @@ loginCheck(loginId, password) async {
   String id = loginId;
   String pw = password;
 
-  var response = await http.post(Uri.parse(Env.serverLoginURL), headers: {"Content-Type": "application/json"}, body: body);
+  var response = await http.post(Uri.parse(Env.SERVER_LOGIN_URL), headers: {"Content-Type": "application/json"}, body: body);
   if (response.statusCode == 200) {
     flutterSecureStorage.deleteAll();
     flutterSecureStorage.write(key: id, value: pw);
