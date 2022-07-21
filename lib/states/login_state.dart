@@ -28,7 +28,7 @@ class LoginState extends State<Login> {
   void initState() {
     super.initState();
     final permissionResult = callPermissions();
-    if (Env.isDebug) debugPrint(permissionResult.toString());
+    permissionResult.then((data) => debugPrint(data));
     
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");
