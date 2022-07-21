@@ -8,7 +8,7 @@ import 'package:beacons_plugin/beacons_plugin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:teragate_test/models/beacon_model.dart';
-import 'package:teragate_test/services/ip_service.dart';
+import 'package:teragate_test/services/network_service.dart';
 import 'package:teragate_test/services/work_service.dart';
 
 //현재시간
@@ -67,11 +67,9 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
 
   Future init() async {
     //사용하는 기기의 IP 가져오기
-    final ipAddress = await IpInfoApi.getIPAddress();
-
+    final Map<String, dynamic> wifiInfo = await WifiInfo.getIPAddress();
     if (!mounted) return;
-
-    deviceip = ipAddress;
+    deviceip = wifiInfo["ip"];
     if(Env.isDebug) debugPrint(deviceip);
   }
 

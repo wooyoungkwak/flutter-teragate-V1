@@ -46,7 +46,7 @@ class KeyInfo  {
   KeyInfo.fromJson(Map<String, dynamic> json)
       : commuteKey = json['commute_key'];
   Map<String, dynamic> toJson() => {
-        'commute_key': commuteKey,
-      };
+      'commute_key': commuteKey,
+    };
 }
 
