@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:teragate_test/services/login_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
+import 'package:teragate_test/config/env.dart';
 
 import 'beacon_state.dart';
 
@@ -26,7 +27,9 @@ class LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    callPermissions();
+    final permissionResult = callPermissions();
+    if (Env.isDebug) debugPrint(permissionResult.toString());
+    
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");
   }
