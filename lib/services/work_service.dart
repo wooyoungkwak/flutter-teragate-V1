@@ -22,7 +22,6 @@ keyCheck() async {
 
 // 출근
 getIn(id, ip) async {
-  if(Env.isDebug) debugPrint("#################출근##################");
   Map<String, String> param = {"user_id": id, "att_ip_in": ip};
   if(Env.isDebug) debugPrint(param.toString());
   var url =
@@ -81,9 +80,9 @@ getIn(id, ip) async {
 
 //출근 중복체크
 checkOverlapForGetIn(id) async {
-  if(Env.isDebug) debugPrint("#################출근중복체크##################");
   Map<String, String> param = {"user_id": id};
-  var url =
+  if(Env.isDebug) debugPrint(param.toString());
+  var url = 
       //Uri.parse("${Env.SERVER_URL}/groupware/ajax_get_today_my_attend_data_v3")
       Uri.parse("http://http://192.168.0.164:3000/getTdyMyAtndData")
           .replace(queryParameters: param);
@@ -99,13 +98,10 @@ checkOverlapForGetIn(id) async {
 
 // 퇴근
 getOut(id,ip) async {
-  if(Env.isDebug) debugPrint("#################퇴근##################");
   Map<String, String> param = {"user_id": id,"att_ip_out":ip};
-
   var url = Uri.parse("${Env.SERVER_URL}/leave").replace(queryParameters: param);
   final response = await http.get(url);
   
-  if(Env.isDebug) debugPrint("###########################");
   if(Env.isDebug) debugPrint(response.body);
 
   if (response.statusCode == 200) {

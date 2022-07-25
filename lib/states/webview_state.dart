@@ -16,17 +16,17 @@ Future main() async {
  
 }
 
-class WebView extends StatefulWidget {
+class WebViews extends StatefulWidget {
 
   final String id;
   final String pw;
-  const WebView(this.id, this.pw, Key? key) : super(key: key);
+  const WebViews(this.id, this.pw, Key? key) : super(key: key);
 
   @override
   WebViewState createState() => WebViewState();
 }
 
-class WebViewState extends State<WebView> {
+class WebViewState extends State<WebViews> {
   String? userId = "";
   String? userPassward = "";
   String addres = Env.SERVER_WEB_URL;
@@ -51,7 +51,7 @@ class WebViewState extends State<WebView> {
       ));
 
   late PullToRefreshController pullToRefreshController;
-  String url = "";
+  String currentUrl = "";
   double progress = 0;
   final urlController = TextEditingController();
 
@@ -108,21 +108,17 @@ class WebViewState extends State<WebView> {
                   onLoadStart: (controller, url) {
                     setState(() {
                       //검색창 text 변경
-                      this.url = url.toString();
-                      urlController.text = this.url;
+                      currentUrl = url.toString();
+                      urlController.text = currentUrl;
                     });
                   },
-
-                  androidOnPermissionRequest:
-                      (controller, origin, resources) async {
+                  androidOnPermissionRequest: (controller, origin, resources) async {
                     return PermissionRequestResponse(
                         resources: resources,
                         action: PermissionRequestResponseAction.GRANT);
-                  },
-                  shouldOverrideUrlLoading:
-                      (controller, navigationAction) async {
-                    var uri = navigationAction.request.url!;
-
+                  }, 
+                  shouldOverrideUrlLoading: (controller, navigationAction) async {
+                    Uri url = navigationAction.request.url!;
                     if (![
                       "http",
                       "https",
@@ -131,7 +127,7 @@ class WebViewState extends State<WebView> {
                       "data",
                       "javascript",
                       "about"
-                    ].contains(uri.scheme)) {
+                    ].contains(url.scheme)) {
                       if (await canLaunchUrl(Uri.parse(url.toString()))) {
                         // Launch the App
                         await launchUrl(Uri.parse(url.toString()));
@@ -145,8 +141,8 @@ class WebViewState extends State<WebView> {
                   onLoadStop: (controller, url) async {
                     pullToRefreshController.endRefreshing();
                     setState(() {
-                      this.url = url.toString();
-                      urlController.text = this.url;
+                      currentUrl = url.toString();
+                      urlController.text = currentUrl;
                     });
                   },
                   onLoadError: (controller, url, code, message) {
