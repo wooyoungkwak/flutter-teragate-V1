@@ -10,7 +10,7 @@ import 'package:teragate_test/states/setting_state.dart';
 import 'package:timer_builder/timer_builder.dart';
 
 import 'package:teragate_test/services/network_service.dart';
-import 'package:teragate_test/services/work_service.dart';
+import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/beacon_service.dart';
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/states/login_state.dart';
@@ -294,7 +294,7 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
 
   // 출근 등록
   void setForGetIn() {
-    getIn(userId, deviceip).then((data) {
+    getIn(deviceip).then((data) {
       showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
       setResult("msg: $name님 출근", true);
     });
@@ -302,7 +302,7 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
   
   // 퇴근 등록
   void setForGetOut() {
-    getOut(userId, deviceip).then((data) {
+    getOut(deviceip).then((data) {
       if (data.success) {
         showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
         setResult("msg: $name님 퇴근", false);

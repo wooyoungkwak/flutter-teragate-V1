@@ -46,3 +46,36 @@ Future<LoginInfo> login(String id, String pw) async {
     throw Exception('Failed to load album');
   }
 }
+
+// 출근
+Future<LoginInfo> getIn(ip) async {
+  var url = Uri.parse(Env.SERVER_GET_IN_URL);
+  var data = {"attIpIn": ip};
+  var body = json.encode(data);
+  var response = await http.post(url, headers: {"Content-Type": "application/json"}, body: body);
+
+  if (response.statusCode == 200) {
+    return LoginInfo.fromJson(json.decode(response.body));
+  } else {
+    LoginInfo loginInfo = LoginInfo.fromJson(json.decode(response.body));
+    debugPrint(loginInfo.message);
+    throw Exception(loginInfo.message);
+  }
+}
+
+// 퇴근
+Future<LoginInfo> getOut(ip) async {
+  var url = Uri.parse(Env.SERVER_GET_OUT_URL);
+  var data = {"attIpIn": ip};
+  var body = json.encode(data);
+  final response = await http.post(url, headers: {"Content-Type": "application/json"}, body: body);
+  
+  if (response.statusCode == 200) {
+    return LoginInfo.fromJson(json.decode(response.body));
+  } else {
+    LoginInfo loginInfo = LoginInfo.fromJson(json.decode(response.body));
+    debugPrint(loginInfo.message);
+    throw Exception(loginInfo.message);
+  }
+}
+

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:teragate_test/services/login_service.dart';
+import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 import 'package:teragate_test/states/main_state.dart';

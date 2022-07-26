@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/services/work_service.dart';
 
 import '../models/beacon_model.dart';
 
@@ -58,17 +57,6 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
           String beaconKey = iBeacon.minor; // 비콘의 key 값
           bool keySucces = false; // key 일치여부 확인
 
-          //DB에서 key 가져오기
-          /*
-          var url = Uri.parse("${Env.SERVER_URL}/keyCheck");
-          var response = await http.get(url);
-          var result = utf8.decode(response.bodyBytes);
-          Map<String, dynamic> keyMap = jsonDecode(result);
-          var cheak_key = keyinfo.fromJson(keyMap);
-          if(Env.isDebug) debugPrint('DB key :' + '${cheak_key.commute_key}');
-          String dbKey = '${cheak_key.commute_key}'; 임시제거 
-          */
-
           String dbKey = '50000'; //임시로 고정
 
           String? userId = await secureStorage.read('user_id');
@@ -85,11 +73,11 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
           }
 
           if (keySucces) {
-            checkOverlapForGetIn(userId);
 
             if (true) {
               setForGetIn();
             }
+
             /*
             else {
               if(Env.isDebug) debugPrint(data.success);

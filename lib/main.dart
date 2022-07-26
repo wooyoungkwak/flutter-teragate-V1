@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/services/login_service.dart';
+import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/main_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
