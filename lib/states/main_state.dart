@@ -242,23 +242,6 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
     flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
   }
 
-  
-  // 비콘 초기화
-  // Future<void> setBeacon() async {
-    
-  //   /* 
-  //   BeaconsPlugin.addRegion("myBeacon", "01022022-f88f-0000-00ae-9605fd9bb620");
-  //   BeaconsPlugin.addRegion("iBeacon", "12345678-1234-5678-8f0c-720eaf059935");
-  //   */
-
-  //   await BeaconsPlugin.addRegion("Teraenergy", "12345678-1234-5678-8f0c-720eaf059935");
-
-  //   BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
-  //   BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24");
-  //   BeaconsPlugin.setForegroundScanPeriodForAndroid(foregroundScanPeriod: 2200, foregroundBetweenScanPeriod: 10);
-  //   BeaconsPlugin.setBackgroundScanPeriodForAndroid(backgroundScanPeriod: 2200, backgroundBetweenScanPeriod: 10);
-  // }
-
   void setNotification(String message) {
     showNotification(flutterLocalNotificationsPlugin, Env.BEACON_NOTIFICATION_TITLE, message);
   }
