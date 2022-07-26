@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 //현재시간
 import 'package:date_format/date_format.dart';
+import 'package:teragate_test/states/setting_state.dart';
 import 'package:timer_builder/timer_builder.dart';
 
 import 'package:teragate_test/services/network_service.dart';
@@ -169,18 +170,9 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    moveWebview(context, id!, pw!);
+                    moveSetting(context);
                   },
-                  child: const Text('시작 ', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    moveWebview(context, id!, pw!);
-                  },
-                  child: const Text('중지 ', style: TextStyle(fontSize: 20)),
+                  child: const Text('환경 설정 ', style: TextStyle(fontSize: 20)),
                 ),
               ),
             ],
@@ -286,6 +278,16 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
       context,
       MaterialPageRoute(
         builder: (context) => WebViews(id!, pw!, null)
+      )
+    );
+  }
+
+  //환경 설정 화면으로 이동
+  void moveSetting(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Setting(null)
       )
     );
   }
