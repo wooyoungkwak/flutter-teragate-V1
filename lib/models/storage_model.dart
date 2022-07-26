@@ -49,7 +49,6 @@ class SharedStorage {
         sharedPreferences.setStringList(key, values);
         break;
     }
-
   }
 
   int? readToInt(String key) {

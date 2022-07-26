@@ -6,7 +6,7 @@ import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/result_model.dart';
 
 // key DB 가져오기
-keyCheck() async {
+Future<String> keyCheck() async {
   var url = Uri.parse("${Env.SERVER_URL}/keyCheck");
   final response = await http.get(url);
   if (response.statusCode == 200) {
@@ -21,7 +21,7 @@ keyCheck() async {
 }
 
 // 출근
-getIn(id, ip) async {
+Future<void> getIn(id, ip) async {
   Map<String, String> param = {"user_id": id, "att_ip_in": ip};
   if(Env.isDebug) debugPrint(param.toString());
   var url =
@@ -32,15 +32,14 @@ getIn(id, ip) async {
       headers: {"Content-Type": "application/json"}, body: body);
 
   if(Env.isDebug) debugPrint(response.body);
-  if (response.statusCode == 200) {
-    return "TEST";
-  } else {
+
+  if (response.statusCode != 200) {
     throw Exception('Failed to load album');
   }
 }
 
 //출근 중복체크
-checkOverlapForGetIn(id) async {
+Future<LoginInfo> checkOverlapForGetIn(id) async {
   Map<String, String> param = {"user_id": id};
   if(Env.isDebug) debugPrint(param.toString());
   var url = 
@@ -58,7 +57,7 @@ checkOverlapForGetIn(id) async {
 
 
 // 퇴근
-getOut(id,ip) async {
+Future<LoginInfo> getOut(id,ip) async {
   Map<String, String> param = {"user_id": id,"att_ip_out":ip};
   var url = Uri.parse("${Env.SERVER_URL}/leave").replace(queryParameters: param);
   final response = await http.get(url);
