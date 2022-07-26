@@ -10,7 +10,8 @@ class Env {
   static const String LOGIN_ID = 'LOGIN_ID';
   static const String LOGIN_PW = 'LOGIN_PW';
 
-  static const String DIALOG_TITLE = "알림";
-  static const String BEACON_NOTIFICATION_TITLE = "Beacons Set";
+  static const String TITLE_DIALOG = "알림";
+  static const String TITLE_BEACON_NOTIFICATION = "Beacons Set";
+  
   static var isDebug = true;
 }

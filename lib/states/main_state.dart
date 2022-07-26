@@ -243,7 +243,7 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
   }
 
   void setNotification(String message) {
-    showNotification(flutterLocalNotificationsPlugin, Env.BEACON_NOTIFICATION_TITLE, message);
+    showNotification(flutterLocalNotificationsPlugin, Env.TITLE_BEACON_NOTIFICATION, message);
   }
 
   void setRunning(bool state){
@@ -293,7 +293,7 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
   // 출근 등록
   void setForGetIn() {
     getIn(userId, deviceip).then((data) {
-      showConfirmDialog(context, Env.DIALOG_TITLE, "출근하셨습니다 $name님!");
+      showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
       setResult("msg: $name님 출근", true);
     });
   }
@@ -302,10 +302,10 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
   void setForGetOut() {
     getOut(userId, deviceip).then((data) {
       if (data.success) {
-        showConfirmDialog(context, Env.DIALOG_TITLE, "퇴근하셨습니다 $name님!");
+        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
         setResult("msg: $name님 퇴근", false);
       } else {
-        showConfirmDialog(context, Env.DIALOG_TITLE, "퇴근처리가 되지 않았습니다. ");
+        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근처리가 되지 않았습니다. ");
       }
     });
   }
