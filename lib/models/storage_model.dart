@@ -24,10 +24,10 @@ class SharedStorage {
   late SharedPreferences sharedPreferences;
   
   SharedStorage() {
-    create();
+    _create();
   }
 
-  void create() async{
+  void _create() async{
      sharedPreferences = await SharedPreferences.getInstance();
   }
 
