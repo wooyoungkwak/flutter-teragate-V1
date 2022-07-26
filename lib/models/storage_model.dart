@@ -67,4 +67,8 @@ class SharedStorage {
   bool? readToBool(String key) {
     return sharedPreferences.getBool(key);
   }
+
+  List<String>? readList(String key) {
+    return sharedPreferences.getStringList(key);
+  }
 }
