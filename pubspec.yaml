@@ -62,6 +62,7 @@ dependencies:
   #시계
   timer_builder: ^2.0.0
   date_format: ^2.0.6
+  bottom_picker: ^1.9.1
 
 dev_dependencies:
   flutter_test:
