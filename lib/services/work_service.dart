@@ -39,45 +39,6 @@ getIn(id, ip) async {
   }
 }
 
-//user_id 가져오기
-/* attendidCheck() async {
-  if(Env.isDebug) debugPrint("############유저id#############");
-  const flutterSecureStorage = FlutterSecureStorage();
-  debugPrint('autulogin :${await flutterSecureStorage.readAll()}');
-  Map<String, String> allStorage = await flutterSecureStorage.readAll();
-  String statusUser = '';
-  String loginId = '';
-  String loginPw = '';
-  if (allStorage.isNotEmpty) {
-    allStorage.forEach((k, v) {
-      debugPrint('k : $k, v : $v');
-      if (v == STATUS_LOGIN) statusUser = k;
-
-      if (k == 'LOGIN_ID') loginId = v;
-      if (k == 'LOGIN_PW') loginPw = v;
-    });
-  }
-
-  Map<String, String> param = {
-    "loginId": loginId,
-    "password": loginPw,
-  };
-
-  var url =
-      Uri.parse("${Env.SERVER_URL}/attendid").replace(queryParameters: param);
-  final response = await http.get(url);
-
-  if (response.statusCode == 200) {
-    if(Env.isDebug) debugPrint("#########################RESPONSE");
-    debugPrint("body:" + response.body);
-
-    return response;
-  } else {
-    throw Exception('Failed to load album');
-  }
-}
- */
-
 //출근 중복체크
 checkOverlapForGetIn(id) async {
   Map<String, String> param = {"user_id": id};

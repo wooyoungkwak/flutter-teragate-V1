@@ -18,8 +18,6 @@ class LoginState extends State<Login> {
   late TextEditingController _loginIdContoroller;
   late TextEditingController _passwordContorller;
 
-  final flutterSecureStorage = const FlutterSecureStorage();
-
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -97,7 +95,7 @@ class LoginState extends State<Login> {
                       //child - 버튼을 생성
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          loginCheck(_loginIdContoroller.text,_passwordContorller.text).then((data) {
+                          login(_loginIdContoroller.text,_passwordContorller.text).then((data) {
                             if (data.success) {
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Beacon()));
                             } else {

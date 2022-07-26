@@ -3,10 +3,10 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:beacons_plugin/beacons_plugin.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import 'package:teragate_test/services/work_service.dart';
 import 'package:teragate_test/config/env.dart';
+import 'package:teragate_test/models/storage_model.dart';
+import 'package:teragate_test/services/work_service.dart';
 
 import '../models/beacon_model.dart';
 
@@ -14,7 +14,7 @@ import '../models/beacon_model.dart';
 Future<void> initBeacon(Function setNotification, Function setRunning, Function setResult, Function setGlovalVariable, Function setForGetIn, 
   Function getIsRunning, Function getWorkSucces, StreamController<String> beaconStreamController) async {
 
-  var flutterSecureStorage = const FlutterSecureStorage();
+  SecureStorage secureStorage = SecureStorage();
 
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(
@@ -71,10 +71,10 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
 
           String dbKey = '50000'; //임시로 고정
 
-          String? userId = await flutterSecureStorage.read(key: 'user_id');
-          String? name = await flutterSecureStorage.read(key: 'kr_name');
-          String? id = await flutterSecureStorage.read(key: 'LOGIN_ID');
-          String? pw = await flutterSecureStorage.read(key: 'LOGIN_PW');
+          String? userId = await secureStorage.read('user_id');
+          String? name = await secureStorage.read('kr_name');
+          String? id = await secureStorage.read('LOGIN_ID');
+          String? pw = await secureStorage.read('LOGIN_PW');
 
           setGlovalVariable(userId, name, id, pw);
 

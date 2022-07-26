@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'package:teragate_test/config/env.dart';
+import 'package:teragate_test/models/storage_model.dart';
+import 'package:teragate_test/services/login_service.dart';
 import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/beacon_state.dart';
-import 'package:teragate_test/services/login_service.dart';
-import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 
 void main() {
@@ -50,9 +50,8 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void _checkUser(context) async {
-    const flutterSecureStorage = FlutterSecureStorage();
-
-    Map<String, String> allStorage = await flutterSecureStorage.readAll();
+    SecureStorage secureStorage = SecureStorage();
+    Map<String, String> allStorage = await secureStorage.getFlutterSecureStorage().readAll();
     String statusUser = '';
     String loginId = '';
     String loginPw = '';
@@ -68,7 +67,7 @@ class _SplashPageState extends State<SplashPage> {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
     }
         
-    loginCheck(loginId, loginPw).then((data) {
+    login(loginId, loginPw).then((data) {
       if (data.success) {
         if (statusUser.isNotEmpty) {
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Beacon()));

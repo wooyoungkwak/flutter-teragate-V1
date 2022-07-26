@@ -40,7 +40,7 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
 
   var isRunning = false;
   bool isInForeground = true;
-  var flutterSecureStorage = const FlutterSecureStorage();
+  // var flutterSecureStorage = const FlutterSecureStorage();
   var workSucces = false;
 
   late DateTime alertTime;
@@ -55,7 +55,7 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
     
-    WifiInfo.getIPAddress().then((map) => deviceip = map["ip"]);
+    getIPAddress().then((map) => deviceip = map["ip"]);
     const duration = Duration(seconds: 10);
     alertTime = DateTime.now().add(duration);
     

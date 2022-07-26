@@ -1,31 +1,28 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/result_model.dart';
- 
+ import 'package:teragate_test/models/storage_model.dart';
+
 Map<String, String> headers = {};
 
 // 로그인체크
-loginCheck(loginId, password) async {
-  const flutterSecureStorage = FlutterSecureStorage();
+Future<LoginInfo> login(String id, String pw) async {
+  SecureStorage secureStorage = SecureStorage();
 
-  var data = {"loginId": loginId, "password": password};
+  var data = {"loginId": id, "password": pw};
   var body = json.encode(data);
-
-  String id = loginId;
-  String pw = password;
 
   var response = await http.post(Uri.parse(Env.SERVER_LOGIN_URL), headers: {"Content-Type": "application/json"}, body: body);
   if (response.statusCode == 200) {
-    flutterSecureStorage.deleteAll();
-    flutterSecureStorage.write(key: id, value: pw);
-    flutterSecureStorage.write(key: Env.LOGIN_ID, value: id);
-    flutterSecureStorage.write(key: Env.LOGIN_PW, value: pw);
-    flutterSecureStorage.write(key: '${id}_$pw', value: Env.USER_NICK_NAME);
-    flutterSecureStorage.write(key: Env.USER_NICK_NAME, value: Env.STATUS_LOGIN);
+    secureStorage.getFlutterSecureStorage().deleteAll();
+    secureStorage.write(id, pw);
+    secureStorage.write(Env.LOGIN_ID, id);
+    secureStorage.write(Env.LOGIN_PW, pw);
+    secureStorage.write('${id}_$pw', Env.USER_NICK_NAME);
+    secureStorage.write(Env.USER_NICK_NAME, Env.STATUS_LOGIN);
 
     var result = utf8.decode(response.bodyBytes);
     Map<String, dynamic> keyMap = jsonDecode(result);
@@ -41,8 +38,8 @@ loginCheck(loginId, password) async {
        if(Env.isDebug) debugPrint(loginInfo.message);
     }
 
-    flutterSecureStorage.write(key: 'user_id', value: '${loginInfo.data['userId']}');
-    flutterSecureStorage.write(key: 'kr_name', value: '${loginInfo.data['krName']}');
+    secureStorage.write('user_id', '${loginInfo.data['userId']}');
+    secureStorage.write('kr_name', '${loginInfo.data['krName']}');
     return LoginInfo.fromJson(json.decode(response.body));
 
   } else {
