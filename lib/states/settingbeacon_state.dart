@@ -63,7 +63,6 @@ class SettingBeaconState extends State<SettingBeacon> {
   }
   void Setuuid(int index) async{
     SharedStorage shared = await SharedStorage();
-    shared.create();
     shared.write("key", index);
     print(shared.readToInt("key"));
 Route route = MaterialPageRoute(builder: (context) => Setting(null));
