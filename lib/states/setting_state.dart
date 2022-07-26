@@ -206,8 +206,8 @@ class SettingState extends State<Setting>  {
   }
 
   Future<int?> test() async{
-    SharedStorage shared = await SharedStorage();
-    print(shared.readToInt("key"));
-    return  shared.readToInt("key");
+    SharedStorage shared = SharedStorage();
+    debugPrint(shared.readToInt("key").toString());
+    return shared.readToInt("key");
   }
 }
