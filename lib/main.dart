@@ -54,7 +54,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void initSet() async{
-
+    secureStorage = SecureStorage();
     await _checkUser(context).then((data) => move(data["loginId"], data["loginPw"]));
   }
 

@@ -3,9 +3,9 @@ import 'package:app_settings/app_settings.dart';
 
 Future<String> callPermissions() async {
   Map<Permission, PermissionStatus> statuses = await [
-    Permission.bluetoothScan,
-    Permission.bluetoothConnect,
-    Permission.bluetooth,
+    // Permission.bluetoothScan,
+    // Permission.bluetoothConnect,
+    // Permission.bluetooth,
     Permission.location,
     Permission.locationAlways,
     Permission.locationWhenInUse

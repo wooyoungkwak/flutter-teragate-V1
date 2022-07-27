@@ -60,6 +60,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     alertTime = DateTime.now().add(duration);
     
     initNotification();
+    secureStorage = SecureStorage();
   }
 
   @override
