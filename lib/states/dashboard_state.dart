@@ -126,17 +126,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    // if (isRunning) {
-                    //   await stopBeacon();
-                    // } else {
-                    //   await restartBeacon();
-                    // }
-                    // setRunning(!isRunning);
-                    String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-                    getIn(deviceip!, accessToken!).then((loginInfo) {
-                      debugPrint("출근 .... ");
-                      debugPrint(loginInfo.success.toString());
-                    });
+                    if (isRunning) {
+                      await stopBeacon();
+                    } else {
+                      await restartBeacon();
+                    }
+                    setRunning(!isRunning);
                   },
                   child: Text(isRunning ? '출근 처리중' : '출 근', style: const TextStyle(fontSize: 20)),
                 ),
@@ -147,13 +142,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                   padding: const EdgeInsets.all(2.0),
                   child: ElevatedButton(
                     onPressed: () async {
-                      // setForGetOut();
-
-                      String? accssToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-                      getOut(deviceip!, accssToken!).then((loginInfo) {
-                         debugPrint("퇴근 .... ");
-                         debugPrint(loginInfo.success.toString());
-                      });
+                      setForGetOut();
                     },
                     child: const Text("퇴 근", style: TextStyle(fontSize: 20)),
                   ),
@@ -163,15 +152,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    // moveWebview(context, id!, pw!);
-
-                    debugPrint("login =======================");
-                    login(id!, pw!).then((loginInfo) { 
-                      debugPrint(loginInfo.tokenInfo?.getAccessToken());
-                      secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
-                      secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
-                    });
-                    debugPrint("login =======================");
+                    moveWebview(context, id!, pw!);
                   },
                   child: const Text('그룹웨어 ', style: TextStyle(fontSize: 20)),
                 ),
@@ -180,15 +161,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    // showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
-
-                    String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
-                    getTokenByRefreshToken(refreshToken!).then((tokenInfo) {
-                      secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
-                      secureStorage.write(Env.KEY_REFRESH_TOKEN, tokenInfo.getRefreshToken());
-                      if( Env.isDebug ) (tokenInfo.getAccessToken());
-                    });
-                    
+                    showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
                   },
                   child: const Text('로그아웃 ', style: TextStyle(fontSize: 20)),
                 ),
