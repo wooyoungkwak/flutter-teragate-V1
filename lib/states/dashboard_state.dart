@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 
@@ -16,6 +17,7 @@ import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/webview_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 
+import 'package:teragate_test/models/storage_model.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -27,6 +29,7 @@ class Dashboard extends StatefulWidget {
 class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  late SecureStorage secureStorage;
 
   int nrMessagesReceived = 0;
   final results = [];
@@ -122,12 +125,17 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    if (isRunning) {
-                      await stopBeacon();
-                    } else {
-                      await restartBeacon();
-                    }
-                    setRunning(!isRunning);
+                    // if (isRunning) {
+                    //   await stopBeacon();
+                    // } else {
+                    //   await restartBeacon();
+                    // }
+                    // setRunning(!isRunning);
+                    String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+                    getIn(deviceip!, accessToken!).then((loginInfo) {
+                      debugPrint("출근 .... ");
+                      debugPrint(loginInfo.success.toString());
+                    });
                   },
                   child: Text(isRunning ? '출근 처리중' : '출 근', style: const TextStyle(fontSize: 20)),
                 ),
@@ -138,7 +146,13 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                   padding: const EdgeInsets.all(2.0),
                   child: ElevatedButton(
                     onPressed: () async {
-                      setForGetOut();
+                      // setForGetOut();
+
+                      String? accssToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+                      getOut(deviceip!, accssToken!).then((loginInfo) {
+                         debugPrint("퇴근 .... ");
+                         debugPrint(loginInfo.success.toString());
+                      });
                     },
                     child: const Text("퇴 근", style: TextStyle(fontSize: 20)),
                   ),
@@ -148,7 +162,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    moveWebview(context, id!, pw!);
+                    // moveWebview(context, id!, pw!);
+
+                    debugPrint("login =======================");
+                    login(id!, pw!).then((loginInfo) { 
+                      debugPrint(loginInfo.tokenInfo?.getAccessToken());
+                      secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
+                      secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
+                    });
+                    debugPrint("login =======================");
                   },
                   child: const Text('그룹웨어 ', style: TextStyle(fontSize: 20)),
                 ),
@@ -157,7 +179,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+                    // showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+
+                    String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
+                    getTokenByRefreshToken(refreshToken!).then((tokenInfo) {
+                      secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
+                      secureStorage.write(Env.KEY_REFRESH_TOKEN, tokenInfo.getRefreshToken());
+                      if( Env.isDebug ) (tokenInfo.getAccessToken());
+                    });
+                    
                   },
                   child: const Text('로그아웃 ', style: TextStyle(fontSize: 20)),
                 ),
@@ -282,22 +312,22 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   // 출근 등록
   void setForGetIn() {
-    getIn(deviceip).then((data) {
-      showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
-      setResult("msg: $name님 출근", true);
-    });
+    // getIn(deviceip).then((data) {
+    //   showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
+    //   setResult("msg: $name님 출근", true);
+    // });
   }
   
   // 퇴근 등록
   void setForGetOut() {
-    getOut(deviceip).then((data) {
-      if (data.success) {
-        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
-        setResult("msg: $name님 퇴근", false);
-      } else {
-        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근처리가 되지 않았습니다. ");
-      }
-    });
+    // getOut(deviceip).then((data) {
+    //   if (data.success) {
+    //     showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
+    //     setResult("msg: $name님 퇴근", false);
+    //   } else {
+    //     showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근처리가 되지 않았습니다. ");
+    //   }
+    // });
   }
 
 }

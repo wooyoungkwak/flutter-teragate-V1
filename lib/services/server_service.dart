@@ -10,35 +10,25 @@ Map<String, String> headers = {};
 
 // 로그인체크
 Future<LoginInfo> login(String id, String pw) async {
-  SecureStorage secureStorage = SecureStorage();
+  // SharedStorage sharedStorage = SharedStorage();
 
   var data = {"loginId": id, "password": pw};
   var body = json.encode(data);
 
   var response = await http.post(Uri.parse(Env.SERVER_LOGIN_URL), headers: {"Content-Type": "application/json"}, body: body);
   if (response.statusCode == 200) {
-
     String result = utf8.decode(response.bodyBytes);
     Map<String, dynamic> resultMap = jsonDecode(result);
-    
+
     LoginInfo loginInfo;
 
     if (resultMap.values.first) {
       //로그인 성공 실패 체크해서 Model 다르게 설정
       loginInfo = LoginInfo.fromJson(resultMap);
 
-      secureStorage.getFlutterSecureStorage().deleteAll();
-      // secureStorage.write(id, pw);
-      secureStorage.write(Env.LOGIN_ID, id);
-      secureStorage.write(Env.LOGIN_PW, pw);
 
-      secureStorage.write('krName', '${loginInfo.data['krName']}');
-      secureStorage.write('accessToken', '${loginInfo.tokenInfo?.getAccessToken()}');
-      secureStorage.write('refreshToken', '${loginInfo.tokenInfo?.getRefreshToken()}');
-      if(Env.isDebug) debugPrint(loginInfo.tokenInfo?.getAccessToken());
     } else {
       loginInfo = LoginInfo.fromJsonByFail(resultMap);
-      if(Env.isDebug) debugPrint(loginInfo.message);
     }
 
     return loginInfo;
@@ -48,34 +38,57 @@ Future<LoginInfo> login(String id, String pw) async {
 }
 
 // 출근
-Future<LoginInfo> getIn(ip) async {
-  var url = Uri.parse(Env.SERVER_GET_IN_URL);
+Future<LoginInfo> getIn(String ip, String accessToken) async {
   var data = {"attIpIn": ip};
   var body = json.encode(data);
-  var response = await http.post(url, headers: {"Content-Type": "application/json"}, body: body);
+  var response = await http.post(
+    Uri.parse(Env.SERVER_GET_IN_URL), 
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": accessToken
+    }, 
+    body: body
+  );
 
   if (response.statusCode == 200) {
     return LoginInfo.fromJson(json.decode(response.body));
   } else {
-    LoginInfo loginInfo = LoginInfo.fromJson(json.decode(response.body));
-    debugPrint(loginInfo.message);
-    throw Exception(loginInfo.message);
+    throw Exception(response.body);
   }
 }
 
 // 퇴근
-Future<LoginInfo> getOut(ip) async {
-  var url = Uri.parse(Env.SERVER_GET_OUT_URL);
+Future<LoginInfo> getOut(String ip, String accessToken) async {
   var data = {"attIpIn": ip};
   var body = json.encode(data);
-  final response = await http.post(url, headers: {"Content-Type": "application/json"}, body: body);
-  
+  final response = await http.post(
+    Uri.parse(Env.SERVER_GET_OUT_URL), 
+    headers: {
+      "Content-Type": "application/json",
+        "Authorization": accessToken
+    }, 
+    body: body
+  );
+
   if (response.statusCode == 200) {
     return LoginInfo.fromJson(json.decode(response.body));
   } else {
-    LoginInfo loginInfo = LoginInfo.fromJson(json.decode(response.body));
-    debugPrint(loginInfo.message);
-    throw Exception(loginInfo.message);
+    throw Exception(response.body);
   }
 }
 
+// 토큰 재요청
+Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
+  var data = {"refreshToken": refreshToken};
+  var body = json.encode(data);
+  var response = await http.post(Uri.parse(Env.SERVER_REFRESH_TOKEN_URL), headers: {"Content-Type": "application/json"}, body: body);
+
+  if (response.statusCode == 200) {
+    Map<String, dynamic> data = json.decode(response.body);
+    TokenInfo tokenInfo = TokenInfo(accessToken: data[Env.KEY_ACCESS_TOKEN], refreshToken: data[Env.KEY_REFRESH_TOKEN]);
+
+    return tokenInfo;
+  } else {
+    throw Exception(response.body);
+  }
+}

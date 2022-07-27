@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
@@ -31,11 +32,13 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+
+  late SecureStorage secureStorage;
+
   @override
   void initState() {
     super.initState();
-    // Future.delayed(const Duration(seconds: 2), () => _checkUser(context));
-    _checkUser(context).then((data) => move(data["loginId"], data["loginPw"]));
+    initSet();
   }
 
   @override
@@ -50,30 +53,15 @@ class _SplashPageState extends State<SplashPage> {
     );
   }
 
+  void initSet() async{
+
+    await _checkUser(context).then((data) => move(data["loginId"], data["loginPw"]));
+  }
+
   Future<Map<String, String?>> _checkUser(context) async {
-    SecureStorage secureStorage = SecureStorage();
-    Map<String, String> allStorage = await secureStorage.getFlutterSecureStorage().readAll();
-    String? loginId;
-    String? loginPw;
+    String? loginId = await secureStorage.read(Env.LOGIN_ID);
+    String? loginPw = await secureStorage.read(Env.LOGIN_PW);
 
-    if (allStorage.isNotEmpty) {
-      allStorage.forEach((k, v) {
-        if (k == Env.LOGIN_ID) loginId = v;
-        if (k == Env.LOGIN_PW) loginPw = v;
-      });
-
-      // login(loginId, loginPw).then((data) {
-      //   if (data.success) {
-      //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
-      //   } else {
-      //     showSnackBar(context, data.message);
-      //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
-      //   }
-      // });
-    // } else {
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
-    }
-    
     return {
       "loginId": loginId,
       "loginPw": loginPw
@@ -82,17 +70,22 @@ class _SplashPageState extends State<SplashPage> {
 
   void move(String? id, String? password) {
     if (id != null && password != null ) {
-      debugPrint(" move ..... id & password exist ..... ");
-      login(id, password).then((data) {
-        if (data.success) {
+      login(id, password).then((loginInfo) {
+        if (loginInfo.success) {
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
+
+          secureStorage.deleteAll();
+          secureStorage.write(Env.LOGIN_ID, id);
+          secureStorage.write(Env.LOGIN_PW, password);
+          secureStorage.write('krName', '${loginInfo.data['krName']}');
+          secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
+          secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
         } else {
-          showSnackBar(context, data.message);
+          showSnackBar(context, loginInfo.message);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
         }
       });
     } else {
-      debugPrint(" move ..... id & password not !!!!!!!! ");
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
     }
   }
