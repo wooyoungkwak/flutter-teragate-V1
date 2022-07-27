@@ -206,7 +206,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 label: '출근(임시용)',
                 backgroundColor: Colors.blue,
                 onTap: () async {
-                  print("이벤트 클릭시 생성되는 메세지");
                   if (isRunning) {
                     await stopBeacon();
                   } else {
@@ -216,24 +215,20 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 }),
             SpeedDialChild(
                 child: Icon(Icons.copy),
-                label: '로그아웃',
+                label: '퇴근',
                 onTap: () {
-                  print('Mail Tapped');
-                  showOkCancelDialog(
-                      context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+                  setForGetOut();
                 }),
             SpeedDialChild(
                 child: Icon(Icons.copy),
                 label: '그룹웨어',
                 onTap: () {
-                  print('Copy Tapped');
                   moveWebview(context, id!, pw!);
                 }),
             SpeedDialChild(
                 child: Icon(Icons.copy),
                 label: '환경설정',
                 onTap: () {
-                  print('Copy Tapped');
                   moveSetting(context);
                 }),
           ],
