@@ -6,23 +6,38 @@ import 'package:flutter/material.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
+import 'package:teragate_test/states/setting_state.dart';
 
 import '../models/beacon_model.dart';
 
 // 비콘 초기화
-Future<void> initBeacon(Function setNotification, Function setRunning, Function setResult, Function setGlovalVariable, Function setForGetIn, 
-  Function getIsRunning, Function getWorkSucces, StreamController<String> beaconStreamController) async {
 
+final StreamController<String> beaconEventsController =
+    StreamController<String>.broadcast();
+
+Future<void> initBeacon(
+    Function setNotification,
+    Function setRunning,
+    Function setResult,
+    Function setGlovalVariable,
+    Function setForGetIn,
+    Function getIsRunning,
+    Function getWorkSucces,
+    StreamController<String> beaconStreamController) async {
   SecureStorage secureStorage = SecureStorage();
+
+  BeaconsPlugin.setDebugLevel(2);
+
+  //리슨투비콘을 최상단으로 올렸음, 해당사항이 변경점임.
+  BeaconsPlugin.listenToBeacons(beaconStreamController);
 
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(
         title: "Need Location Permission",
-        message: "This app collects location data to work with beacons."
-    );
+        message: "This app collects location data to work with beacons.");
 
     BeaconsPlugin.channel.setMethodCallHandler((call) async {
-      if(Env.isDebug) debugPrint(" ********* Call Method: ${call.method}");
+      if (Env.isDebug) debugPrint(" ********* Call Method: ${call.method}");
 
       if (call.method == 'scannerReady') {
         startBeacon();
@@ -30,9 +45,7 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
       } else if (call.method == 'isPermissionDialogShown') {
         setNotification("Beacon 을 스켄할 수 없습니다. ??? ");
       }
-
     });
-
   } else if (Platform.isIOS) {
     startBeacon();
     setRunning(true);
@@ -41,43 +54,41 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
   //Send 'true' to run in background
   await BeaconsPlugin.runInBackground(true);
 
-  BeaconsPlugin.listenToBeacons(beaconStreamController);
+  //Valid values: 0 = no messages, 1 = errors, 2 = all messages
 
   beaconStreamController.stream.listen(
-    (data) async {
-      if (data.isNotEmpty && getIsRunning()) {
+      (data) async {
+        if (data.isNotEmpty && getIsRunning()) {
+          setResult("출근 처리 중입니다", false);
 
-        setResult("출근 처리 중입니다", false);
+          if (!getWorkSucces()) {
+            BeaconsPlugin.stopMonitoring(); //모니터링 종료
+            setRunning(!getIsRunning());
+            Map<String, dynamic> userMap = jsonDecode(data);
+            var iBeacon = BeaconData.fromJson(userMap);
+            String beaconKey = iBeacon.minor; // 비콘의 key 값
+            bool keySucces = false; // key 일치여부 확인
 
-        if (!getWorkSucces()) {
-          BeaconsPlugin.stopMonitoring(); //모니터링 종료
-          setRunning(!getIsRunning());
-          Map<String, dynamic> userMap = jsonDecode(data);
-          var iBeacon = BeaconData.fromJson(userMap);
-          String beaconKey = iBeacon.minor; // 비콘의 key 값
-          bool keySucces = false; // key 일치여부 확인
+            String dbKey = '50000'; //임시로 고정
 
-          String dbKey = '50000'; //임시로 고정
+            String? name = await secureStorage.read('krName');
+            String? id = await secureStorage.read('LOGIN_ID');
+            String? pw = await secureStorage.read('LOGIN_PW');
 
-          String? name = await secureStorage.read('krName');
-          String? id = await secureStorage.read('LOGIN_ID');
-          String? pw = await secureStorage.read('LOGIN_PW');
+            setGlovalVariable(name, id, pw);
 
-          setGlovalVariable(name, id, pw);
-
-          if (beaconKey == dbKey) {
-            keySucces = true;
-          } else {
-            keySucces = false;
-          }
-
-          if (keySucces) {
-
-            if (true) {
-              setForGetIn();
+            if (beaconKey == dbKey) {
+              keySucces = true;
+            } else {
+              keySucces = false;
             }
 
-            /*
+            if (keySucces) {
+              if (true) {
+                setForGetIn();
+              }
+
+              /*
             else {
               if(Env.isDebug) debugPrint(data.success);
               showConfirmDialog(context, " ${name}님 이미 출근하셨습니다."); //다이얼로그창
@@ -87,36 +98,40 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
             } 
             */
 
-          } else {
-            setNotification("Key값이 다릅니다. 재시도 해주세요!"); //다이얼로그창
+            } else {
+              setNotification("Key값이 다릅니다. 재시도 해주세요!"); //다이얼로그창
+            }
+            keySucces = false;
           }
-          keySucces = false;
         }
-      }
-    },
-    onDone: () {},
-    onError: (error) {
-      if(Env.isDebug) debugPrint("Error: $error");
-    }
-
-  );
-    
+      },
+      onDone: () {},
+      onError: (error) {
+        if (Env.isDebug) debugPrint("Error: $error");
+      });
 }
 
 // 비콘 기본 정보 설정
 Future<void> setBeacon() async {
-  
   /* 
   BeaconsPlugin.addRegion("myBeacon", "01022022-f88f-0000-00ae-9605fd9bb620");
   BeaconsPlugin.addRegion("iBeacon", "12345678-1234-5678-8f0c-720eaf059935");
   */
 
-  await BeaconsPlugin.addRegion("Teraenergy", "12345678-1234-5678-8f0c-720eaf059935");
+  await BeaconsPlugin.addRegion(
+      "Teraenergy", "12345678-1234-5678-8f0c-720eaf059935");
 
-  BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
-  BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24");
-  BeaconsPlugin.setForegroundScanPeriodForAndroid(foregroundScanPeriod: 2200, foregroundBetweenScanPeriod: 10);
-  BeaconsPlugin.setBackgroundScanPeriodForAndroid(backgroundScanPeriod: 2200, backgroundBetweenScanPeriod: 10);
+  BeaconsPlugin.addBeaconLayoutForAndroid(
+      "m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
+  BeaconsPlugin.addBeaconLayoutForAndroid(
+      "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24");
+  BeaconsPlugin.setForegroundScanPeriodForAndroid(
+      foregroundScanPeriod: 2200, foregroundBetweenScanPeriod: 10);
+  BeaconsPlugin.setBackgroundScanPeriodForAndroid(
+      backgroundScanPeriod: 2200, backgroundBetweenScanPeriod: 10);
+
+  BeaconsPlugin.addRegionForIOS(
+      "74278bdb-b644-4520-8f0c-720eeaffffff", 65504, 46263, "iBeacon");
 }
 
 // 비콘 시작

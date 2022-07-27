@@ -19,6 +19,9 @@ import 'package:teragate_test/utils/alarm_util.dart';
 
 import 'package:teragate_test/models/storage_model.dart';
 
+//플러터 플로팅버튼용
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
 
@@ -27,7 +30,6 @@ class Dashboard extends StatefulWidget {
 }
 
 class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
-
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late SecureStorage secureStorage;
 
@@ -44,21 +46,23 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   var workSucces = false;
 
   late DateTime alertTime;
-  final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
+  final StreamController<String> beaconStreamController =
+      StreamController<String>.broadcast();
 
   @override
   void initState() {
     super.initState();
-    
-    initBeacon(setNotification, setRunning, setResult, setGlovalVariable, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
+
+    initBeacon(setNotification, setRunning, setResult, setGlovalVariable,
+        setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
     setBeacon();
 
     WidgetsBinding.instance.addObserver(this);
-    
+
     getIPAddress().then((map) => deviceip = map["ip"]);
     const duration = Duration(seconds: 10);
     alertTime = DateTime.now().add(duration);
-    
+
     initNotification();
     secureStorage = SecureStorage();
   }
@@ -86,7 +90,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           actions: <Widget>[
             IconButton(
               onPressed: () {
-                showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+                showOkCancelDialog(
+                    context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
               },
               icon: const Icon(
                 Icons.logout_rounded,
@@ -98,17 +103,21 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[              
-           Container(
-            child: const Text("근태 확인", style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: Colors.blue,) ,),
-            margin: const EdgeInsets.all(8.0),
-          ),
-          const SizedBox(
-            height: 20.0,
-            ),
+            children: <Widget>[
+              Container(
+                child: const Text(
+                  "근태 확인",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.blue,
+                  ),
+                ),
+                margin: const EdgeInsets.all(8.0),
+              ),
+              const SizedBox(
+                height: 20.0,
+              ),
               Expanded(child: comuteItem()), // 변경 ui 출력 테스트
               TimerBuilder.periodic(
                 const Duration(seconds: 1),
@@ -116,12 +125,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                   return Text(
                     formatDate(DateTime.now(), [hh, ':', nn, ':', ss, ' ', am]),
                     style: const TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w200
-                    ),
+                        fontSize: 30, fontWeight: FontWeight.w200),
                   );
                 },
               ),
+
+              /*
               Padding(
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
@@ -133,7 +142,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     }
                     setRunning(!isRunning);
                   },
-                  child: Text(isRunning ? '출근 처리중' : '출 근', style: const TextStyle(fontSize: 20)),
+                  child: Text(isRunning ? '출근 처리중' : '출 근',
+                      style: const TextStyle(fontSize: 20)),
                 ),
               ),
               Visibility(
@@ -148,6 +158,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                   ),
                 ),
               ),
+           
               Padding(
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
@@ -161,7 +172,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 padding: const EdgeInsets.all(2.0),
                 child: ElevatedButton(
                   onPressed: () async {
-                    showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+                    showOkCancelDialog(
+                        context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
                   },
                   child: const Text('로그아웃 ', style: TextStyle(fontSize: 20)),
                 ),
@@ -175,8 +187,56 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                   child: const Text('환경 설정 ', style: TextStyle(fontSize: 20)),
                 ),
               ),
+
+              */
             ],
           ),
+        ),
+        //플로팅 버튼 추가하기. - 해당 버튼 변경시키기.
+
+        floatingActionButton: SpeedDial(
+          animatedIcon: AnimatedIcons.menu_close,
+          backgroundColor: Colors.redAccent,
+          overlayColor: Colors.grey,
+          overlayOpacity: 0.5,
+          closeManually: true,
+          children: [
+            SpeedDialChild(
+                child: Icon(Icons.copy),
+                label: '출근(임시용)',
+                backgroundColor: Colors.blue,
+                onTap: () async {
+                  print("이벤트 클릭시 생성되는 메세지");
+                  if (isRunning) {
+                    await stopBeacon();
+                  } else {
+                    await restartBeacon();
+                  }
+                  setRunning(!isRunning);
+                }),
+            SpeedDialChild(
+                child: Icon(Icons.copy),
+                label: '로그아웃',
+                onTap: () {
+                  print('Mail Tapped');
+                  showOkCancelDialog(
+                      context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+                }),
+            SpeedDialChild(
+                child: Icon(Icons.copy),
+                label: '그룹웨어',
+                onTap: () {
+                  print('Copy Tapped');
+                  moveWebview(context, id!, pw!);
+                }),
+            SpeedDialChild(
+                child: Icon(Icons.copy),
+                label: '환경설정',
+                onTap: () {
+                  print('Copy Tapped');
+                  moveSetting(context);
+                }),
+          ],
         ),
       ),
     );
@@ -185,53 +245,65 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Widget comuteItem() {
     return Scaffold(
       body: Column(
-      crossAxisAlignment:  CrossAxisAlignment.start,
-
-        children: <Widget>[
-                    Container(
-            child: Text("이름 : $name", style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.blue,) ,),
-            margin: const EdgeInsets.all(8.0),
-          ),
-          Container(
-            child: Text("디바이스 아이피 : $deviceip", style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.blue,) ,),
-            margin: const EdgeInsets.all(8.0),
-          ),
-          Container(
-            child: Text("접속시간 : $alertTime", style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.blue,) ,),
-            margin: const EdgeInsets.all(8.0),
-          )
-      ]),
-
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              child: Text(
+                "이름 : $name",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.blue,
+                ),
+              ),
+              margin: const EdgeInsets.all(8.0),
+            ),
+            Container(
+              child: Text(
+                "디바이스 아이피 : $deviceip",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.blue,
+                ),
+              ),
+              margin: const EdgeInsets.all(8.0),
+            ),
+            Container(
+              child: Text(
+                "접속시간 : $alertTime",
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.blue,
+                ),
+              ),
+              margin: const EdgeInsets.all(8.0),
+            )
+          ]),
     );
   }
 
   // Notifcation 알람 초기화
   Future<void> initNotification() async {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-      var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
-      var initializationSettingsIOS = const IOSInitializationSettings(onDidReceiveLocalNotification: null);
-      var initializationSettings = InitializationSettings( 
-      android: initializationSettingsAndroid, 
-      iOS: initializationSettingsIOS
-    );
+    var initializationSettingsAndroid =
+        const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS =
+        const IOSInitializationSettings(onDidReceiveLocalNotification: null);
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: null);
   }
 
   void setNotification(String message) {
-    showNotification(flutterLocalNotificationsPlugin, Env.TITLE_BEACON_NOTIFICATION, message);
+    showNotification(flutterLocalNotificationsPlugin,
+        Env.TITLE_BEACON_NOTIFICATION, message);
   }
 
-  void setRunning(bool state){
+  void setRunning(bool state) {
     setState(() {
       isRunning = state;
     });
@@ -239,13 +311,13 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   void setResult(String message, bool workSucces) {
     results.add(message);
-    if ( workSucces ) {
+    if (workSucces) {
       workSucces = true;
       alertTime = DateTime.now().add(const Duration(seconds: 10));
     }
   }
 
-  void setGlovalVariable(String _name, String _id, String _pw){
+  void setGlovalVariable(String _name, String _id, String _pw) {
     name = _name;
     id = _id;
     pw = _pw;
@@ -260,28 +332,20 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   // 로그인 화면으로 이동
-  void moveLogin(){
+  void moveLogin() {
     Navigator.push(context, MaterialPageRoute(builder: (_) => const Login()));
   }
 
   // 웹 뷰 화면으로 이동
   void moveWebview(BuildContext context, String? id, String? pw) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => WebViews(id!, pw!, null)
-      )
-    );
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => WebViews(id!, pw!, null)));
   }
 
   //환경 설정 화면으로 이동
   void moveSetting(BuildContext context) {
     Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Setting(null)
-      )
-    );
+        context, MaterialPageRoute(builder: (context) => const Setting(null)));
   }
 
   // 출근 등록
@@ -291,7 +355,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     //   setResult("msg: $name님 출근", true);
     // });
   }
-  
+
   // 퇴근 등록
   void setForGetOut() {
     // getOut(deviceip).then((data) {
@@ -303,6 +367,4 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     //   }
     // });
   }
-
 }
-
