@@ -6,36 +6,23 @@ String resultInfoToJson(LoginInfo loginInfo) => json.encode(loginInfo.toJson());
 
 class LoginInfo {
   LoginInfo(
-    {
-      required this.success, 
-      required this.data, 
-      required this.message,
+      this.success, 
+      this.data, 
+      this.message,
       this.tokenInfo
-    }
   );
 
-  bool success;
-  String message;
-  Map<String, dynamic> data = {};
+  bool? success;
+  String? message;
+  Map<String, dynamic>? data = {};
   TokenInfo? tokenInfo;
 
   static LoginInfo fromJson(Map<String, dynamic> json) {
     TokenInfo tokenInfo = TokenInfo(accessToken: json["accessToken"], refreshToken: json["refreshToken"]);
-    return LoginInfo(
-        success: json["success"], 
-        data: json["data"],
-        message: "",
-        tokenInfo: tokenInfo
-    ); 
+    return LoginInfo( json["success"], json["data"], "", tokenInfo ); 
   }
 
-  static LoginInfo fromJsonByFail(Map<String, dynamic> json) =>
-    LoginInfo(
-      success: json["success"], 
-      data: {},
-      message: "",
-      tokenInfo: null
-    ); 
+  static LoginInfo fromJsonByFail(Map<String, dynamic> json) => LoginInfo(json["success"], {}, "", null); 
 
   Map<String, dynamic> toJson() => 
     {
@@ -48,17 +35,22 @@ class WorkInfo {
   bool success;
   String message;
 
-  WorkInfo(
-    {
+  WorkInfo({
       required this.success, 
       required this.message
-    }
-  );
+  });
 
-  static fromJson(Map<String, dynamic> json) {
-    WorkInfo(
+  static WorkInfo fromJson(Map<String, dynamic> json) {
+    return WorkInfo(
         success: json["success"], 
         message: ""
+    ); 
+  }
+
+  static WorkInfo fromJsonByFail(Map<String, dynamic> json) {
+    return WorkInfo(
+        success: json["success"], 
+        message: json["message"]
     ); 
   }
 

@@ -71,17 +71,17 @@ class _SplashPageState extends State<SplashPage> {
   void move(String? id, String? password) {
     if (id != null && password != null ) {
       login(id, password).then((loginInfo) {
-        if (loginInfo.success) {
+        if (loginInfo.success!) {
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
 
           secureStorage.deleteAll();
           secureStorage.write(Env.LOGIN_ID, id);
           secureStorage.write(Env.LOGIN_PW, password);
-          secureStorage.write('krName', '${loginInfo.data['krName']}');
+          secureStorage.write('krName', '${loginInfo.data?['krName']}');
           secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
           secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
         } else {
-          showSnackBar(context, loginInfo.message);
+          showSnackBar(context, loginInfo.message!);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
         }
       });

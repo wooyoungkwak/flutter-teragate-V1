@@ -344,22 +344,28 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   // 출근 등록
-  void setForGetIn() {
-    // getIn(deviceip).then((data) {
-    //   showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
-    //   setResult("msg: $name님 출근", true);
-    // });
+  void setForGetIn() async{
+    String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+    getIn(deviceip!, accessToken!).then((workInfo) {
+      if (workInfo.success) {
+        showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
+        setResult("msg: $name님 출근", true);
+      } else {
+        showConfirmDialog(context, Env.TITLE_DIALOG, "출근처리가 되지 않았습니다. ");
+      }
+    });
   }
 
   // 퇴근 등록
-  void setForGetOut() {
-    // getOut(deviceip).then((data) {
-    //   if (data.success) {
-    //     showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
-    //     setResult("msg: $name님 퇴근", false);
-    //   } else {
-    //     showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근처리가 되지 않았습니다. ");
-    //   }
-    // });
+  void setForGetOut() async{
+    String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+    getOut(deviceip!, accessToken!).then((workInfo) {
+      if (workInfo.success) {
+        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
+        setResult("msg: $name님 퇴근", false);
+      } else {
+        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근처리가 되지 않았습니다. ");
+      }
+    });
   }
 }

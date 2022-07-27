@@ -109,10 +109,10 @@ class LoginState extends State<Login> {
                           secureStorage.write(Env.ID_CHECK, checkValue);
 
                           login(_loginIdContoroller.text,_passwordContorller.text).then((data) {
-                            if (data.success) {
+                            if (data.success!) {
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
                             } else {
-                              showSnackBar(context, data.message);
+                              showSnackBar(context, data.message!);
                             }
                           });
                         }

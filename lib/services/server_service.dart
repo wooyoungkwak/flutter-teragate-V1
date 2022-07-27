@@ -4,13 +4,11 @@ import 'package:http/http.dart' as http;
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/result_model.dart';
-import 'package:teragate_test/models/storage_model.dart';
 
 Map<String, String> headers = {};
 
 // 로그인체크
 Future<LoginInfo> login(String id, String pw) async {
-  // SharedStorage sharedStorage = SharedStorage();
 
   var data = {"loginId": id, "password": pw};
   var body = json.encode(data);
@@ -25,8 +23,6 @@ Future<LoginInfo> login(String id, String pw) async {
     if (resultMap.values.first) {
       //로그인 성공 실패 체크해서 Model 다르게 설정
       loginInfo = LoginInfo.fromJson(resultMap);
-
-
     } else {
       loginInfo = LoginInfo.fromJsonByFail(resultMap);
     }
@@ -38,7 +34,7 @@ Future<LoginInfo> login(String id, String pw) async {
 }
 
 // 출근
-Future<LoginInfo> getIn(String ip, String accessToken) async {
+Future<WorkInfo> getIn(String ip, String accessToken) async {
   var data = {"attIpIn": ip};
   var body = json.encode(data);
   var response = await http.post(
@@ -49,29 +45,32 @@ Future<LoginInfo> getIn(String ip, String accessToken) async {
     }, 
     body: body
   );
+  
+  debugPrint("response body =================");
+  debugPrint(response.body);
 
   if (response.statusCode == 200) {
-    return LoginInfo.fromJson(json.decode(response.body));
+    return WorkInfo.fromJson(json.decode(response.body));
   } else {
     throw Exception(response.body);
   }
 }
 
 // 퇴근
-Future<LoginInfo> getOut(String ip, String accessToken) async {
+Future<WorkInfo> getOut(String ip, String accessToken) async {
   var data = {"attIpIn": ip};
   var body = json.encode(data);
   final response = await http.post(
     Uri.parse(Env.SERVER_GET_OUT_URL), 
     headers: {
       "Content-Type": "application/json",
-        "Authorization": accessToken
+      "Authorization": accessToken
     }, 
     body: body
   );
 
   if (response.statusCode == 200) {
-    return LoginInfo.fromJson(json.decode(response.body));
+    return WorkInfo.fromJson(json.decode(response.body));
   } else {
     throw Exception(response.body);
   }
@@ -86,9 +85,14 @@ Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
   if (response.statusCode == 200) {
     Map<String, dynamic> data = json.decode(response.body);
     TokenInfo tokenInfo = TokenInfo(accessToken: data[Env.KEY_ACCESS_TOKEN], refreshToken: data[Env.KEY_REFRESH_TOKEN]);
-
     return tokenInfo;
   } else {
     throw Exception(response.body);
   }
 }
+
+// String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+// getIn(deviceip!, accessToken!).then((workInfo) => debugPrint(workInfo.success.toString()));
+
+// String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+// getOut(deviceip!, accessToken!).then((workInfo) => debugPrint(workInfo.success.toString()));

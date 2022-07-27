@@ -42,57 +42,61 @@ class SecureStorage {
 }
 
 class SharedStorage {
+  
+  static Future<void> write(String key, var values) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-  SharedPreferences? sharedPreferences;
-
-  // 초기화
-  SharedStorage(this.sharedPreferences);
-
-  void write(String key, var values) {
     switch (values.runtimeType.toString()) {
       case "int":
-        sharedPreferences?.setInt(key, values);
+        sharedPreferences.setInt(key, values);
         break;
       case "String":
-        sharedPreferences?.setString(key, values);
+        sharedPreferences.setString(key, values);
         break;
       case "double":
-        sharedPreferences?.setDouble(key, values);
+        sharedPreferences.setDouble(key, values);
         break;
       case "Bool":
-        sharedPreferences?.setBool(key, values);
+        sharedPreferences.setBool(key, values);
         break;
       case "List":
-        sharedPreferences?.setStringList(key, values);
+        sharedPreferences.setStringList(key, values);
         break;
     }
   }
 
-  int? readToInt(String key) {
-    return sharedPreferences?.getInt(key);
+  static Future<int?> readToInt(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getInt(key);
   }
 
-  String? readToString(String key) {
-    return sharedPreferences?.getString(key);
+  static Future<String?> readToString(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(key);
   }
 
-  double? readToDouble(String key) {
-    return sharedPreferences?.getDouble(key);
+  static Future<double?> readToDouble(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getDouble(key);
   }
 
-  bool? readToBool(String key) {
-    return sharedPreferences?.getBool(key);
+  static Future<bool?> readToBool(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getBool(key);
   }
 
-  List<String>? readList(String key) {
-    return sharedPreferences?.getStringList(key);
+  static Future<List<String>?> readList(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getStringList(key);
   }
 
-  void delete(String key) {
-    sharedPreferences?.remove(key);
+  static Future<void> delete(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove(key);
   }
 
-  void deleteAll() {
-    sharedPreferences?.clear();
+  static Future<void> deleteAll() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.clear();
   }
 }
