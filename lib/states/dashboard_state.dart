@@ -55,7 +55,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
     initBeacon(setNotification, setRunning, setResult, setGlovalVariable,
         setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
-    setBeacon();
 
     WidgetsBinding.instance.addObserver(this);
 
@@ -129,66 +128,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                   );
                 },
               ),
-
-              /*
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (isRunning) {
-                      await stopBeacon();
-                    } else {
-                      await restartBeacon();
-                    }
-                    setRunning(!isRunning);
-                  },
-                  child: Text(isRunning ? '출근 처리중' : '출 근',
-                      style: const TextStyle(fontSize: 20)),
-                ),
-              ),
-              Visibility(
-                visible: results.isNotEmpty,
-                child: Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      setForGetOut();
-                    },
-                    child: const Text("퇴 근", style: TextStyle(fontSize: 20)),
-                  ),
-                ),
-              ),
-           
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    moveWebview(context, id!, pw!);
-                  },
-                  child: const Text('그룹웨어 ', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    showOkCancelDialog(
-                        context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
-                  },
-                  child: const Text('로그아웃 ', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: ElevatedButton(
-                  onPressed: () async {
-                    moveSetting(context);
-                  },
-                  child: const Text('환경 설정 ', style: TextStyle(fontSize: 20)),
-                ),
-              ),
-
-              */
             ],
           ),
         ),
@@ -209,9 +148,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                   if (isRunning) {
                     await stopBeacon();
                   } else {
-                    await restartBeacon();
+                    await startBeacon();
                   }
                   setRunning(!isRunning);
+                  setForGetIn();
                 }),
             SpeedDialChild(
                 child: Icon(Icons.copy),

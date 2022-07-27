@@ -46,9 +46,6 @@ Future<WorkInfo> getIn(String ip, String accessToken) async {
     body: body
   );
   
-  debugPrint("response body =================");
-  debugPrint(response.body);
-
   if (response.statusCode == 200) {
     return WorkInfo.fromJson(json.decode(response.body));
   } else {
@@ -90,9 +87,3 @@ Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
     throw Exception(response.body);
   }
 }
-
-// String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-// getIn(deviceip!, accessToken!).then((workInfo) => debugPrint(workInfo.success.toString()));
-
-// String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-// getOut(deviceip!, accessToken!).then((workInfo) => debugPrint(workInfo.success.toString()));
