@@ -27,7 +27,6 @@ class WebViews extends StatefulWidget {
 }
 
 class WebViewState extends State<WebViews> {
-  String? userId = "";
   String? userPassward = "";
   String addres = Env.SERVER_GROUPWARE_URL;
   Map<String, String> param = {

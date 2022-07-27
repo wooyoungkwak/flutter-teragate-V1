@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/result_model.dart';
- import 'package:teragate_test/models/storage_model.dart';
+import 'package:teragate_test/models/storage_model.dart';
 
 Map<String, String> headers = {};
 
@@ -17,33 +17,33 @@ Future<LoginInfo> login(String id, String pw) async {
 
   var response = await http.post(Uri.parse(Env.SERVER_LOGIN_URL), headers: {"Content-Type": "application/json"}, body: body);
   if (response.statusCode == 200) {
-    secureStorage.getFlutterSecureStorage().deleteAll();
-    secureStorage.write(id, pw);
-    secureStorage.write(Env.LOGIN_ID, id);
-    secureStorage.write(Env.LOGIN_PW, pw);
-    secureStorage.write('${id}_$pw', Env.USER_NICK_NAME);
-    secureStorage.write(Env.USER_NICK_NAME, Env.STATUS_LOGIN);
 
-    var result = utf8.decode(response.bodyBytes);
-    Map<String, dynamic> keyMap = jsonDecode(result);
-
+    String result = utf8.decode(response.bodyBytes);
+    Map<String, dynamic> resultMap = jsonDecode(result);
+    
     LoginInfo loginInfo;
 
-    if (keyMap.values.first) {
+    if (resultMap.values.first) {
       //로그인 성공 실패 체크해서 Model 다르게 설정
-       loginInfo = LoginInfo.fromJson(keyMap);
-       if(Env.isDebug) debugPrint(loginInfo.data.toString());
+      loginInfo = LoginInfo.fromJson(resultMap);
+
+      secureStorage.getFlutterSecureStorage().deleteAll();
+      // secureStorage.write(id, pw);
+      secureStorage.write(Env.LOGIN_ID, id);
+      secureStorage.write(Env.LOGIN_PW, pw);
+
+      secureStorage.write('krName', '${loginInfo.data['krName']}');
+      secureStorage.write('accessToken', '${loginInfo.tokenInfo?.getAccessToken()}');
+      secureStorage.write('refreshToken', '${loginInfo.tokenInfo?.getRefreshToken()}');
+      if(Env.isDebug) debugPrint(loginInfo.tokenInfo?.getAccessToken());
     } else {
-       loginInfo = LoginInfo.fromJsonByFail(keyMap);
-       if(Env.isDebug) debugPrint(loginInfo.message);
+      loginInfo = LoginInfo.fromJsonByFail(resultMap);
+      if(Env.isDebug) debugPrint(loginInfo.message);
     }
 
-    secureStorage.write('user_id', '${loginInfo.data['userId']}');
-    secureStorage.write('kr_name', '${loginInfo.data['krName']}');
-    return LoginInfo.fromJson(json.decode(response.body));
-
+    return loginInfo;
   } else {
-    throw Exception('Failed to load album');
+    throw Exception('로그인 서버 오류');
   }
 }
 

@@ -3,7 +3,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SecureStorage {
   
-  var flutterSecureStorage = const FlutterSecureStorage();
+  static final SecureStorage _secureStorage= SecureStorage._interal();
+
+  late FlutterSecureStorage flutterSecureStorage;
+
+  factory SecureStorage() {
+    return _secureStorage;
+  }
+
+  // 초기화 
+  SecureStorage._interal() {
+    _create();
+  }
+
+  // 
+  void _create() async {
+    flutterSecureStorage = const FlutterSecureStorage();
+  }
 
   Future<String?> read(String key) async {
     return await flutterSecureStorage.read(key: key);
@@ -11,6 +27,10 @@ class SecureStorage {
 
   void write(String key, String value) {
     flutterSecureStorage.write(key: key, value: value);
+  }
+
+  void delete(String key) {
+    flutterSecureStorage.delete(key: key);
   }
 
   FlutterSecureStorage getFlutterSecureStorage() {
@@ -21,9 +41,17 @@ class SecureStorage {
 
 class SharedStorage {
 
+  static final SharedStorage _sharedStorage = SharedStorage._interal();
+
   late SharedPreferences sharedPreferences;
   
-  SharedStorage() {
+  // Singleton 패턴
+  factory SharedStorage() {
+    return _sharedStorage;
+  }
+
+  // 초기화 
+  SharedStorage._interal() {
     _create();
   }
 
@@ -70,4 +98,6 @@ class SharedStorage {
   List<String>? readList(String key) {
     return sharedPreferences.getStringList(key);
   }
+
+
 }

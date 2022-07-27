@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 
@@ -18,22 +17,20 @@ import 'package:teragate_test/states/webview_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 
 
-class Beacon extends StatefulWidget {
-  const Beacon({Key? key}) : super(key: key);
+class Dashboard extends StatefulWidget {
+  const Dashboard({Key? key}) : super(key: key);
 
   @override
-  BeaconState createState() => BeaconState();
+  DashboardState createState() => DashboardState();
 }
 
-class BeaconState extends State<Beacon> with WidgetsBindingObserver {
-  // DateTime now = DateTime.now();
+class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 
   int nrMessagesReceived = 0;
   final results = [];
 
-  String? userId = "1";
   String? name = "test";
   String? id = "test1"; //id
   String? pw = "test2"; //pw
@@ -41,7 +38,6 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
 
   var isRunning = false;
   bool isInForeground = true;
-  // var flutterSecureStorage = const FlutterSecureStorage();
   var workSucces = false;
 
   late DateTime alertTime;
@@ -196,13 +192,6 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
             margin: const EdgeInsets.all(8.0),
           ),
           Container(
-            child: Text("유저아이디 : $userId", style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.blue,) ,),
-            margin: const EdgeInsets.all(8.0),
-          ),
-          Container(
             child: Text("디바이스 아이피 : $deviceip", style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -252,8 +241,7 @@ class BeaconState extends State<Beacon> with WidgetsBindingObserver {
     }
   }
 
-  void setGlovalVariable(String _userId, String _name, String _id, String _pw){
-    userId = _userId;
+  void setGlovalVariable(String _name, String _id, String _pw){
     name = _name;
     id = _id;
     pw = _pw;

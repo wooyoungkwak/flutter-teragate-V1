@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
-import 'package:teragate_test/states/main_state.dart';
+import 'package:teragate_test/states/dashboard_state.dart';
+
+import 'package:teragate_test/config/env.dart';
+import 'package:teragate_test/models/storage_model.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -19,6 +22,8 @@ class LoginState extends State<Login> {
 
   final _formKey = GlobalKey<FormState>();
 
+  SecureStorage secureStorage = SecureStorage();
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +32,8 @@ class LoginState extends State<Login> {
     
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");
+    
+    // TODO : 체크 확인 후 ID 값 셋팅
   }
 
   @override
@@ -94,9 +101,16 @@ class LoginState extends State<Login> {
                       //child - 버튼을 생성
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
+
+                          // TODO : ID CHECK 확인 후 
+                          String checkValue = "true";
+
+                          SecureStorage secureStorage = SecureStorage();
+                          secureStorage.write(Env.ID_CHECK, checkValue);
+
                           login(_loginIdContoroller.text,_passwordContorller.text).then((data) {
                             if (data.success) {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Beacon()));
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
                             } else {
                               showSnackBar(context, data.message);
                             }

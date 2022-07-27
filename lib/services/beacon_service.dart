@@ -25,7 +25,7 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
       if(Env.isDebug) debugPrint(" ********* Call Method: ${call.method}");
 
       if (call.method == 'scannerReady') {
-        await BeaconsPlugin.startMonitoring();
+        startBeacon();
         setRunning(true);
       } else if (call.method == 'isPermissionDialogShown') {
         setNotification("Beacon 을 스켄할 수 없습니다. ??? ");
@@ -34,7 +34,7 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
     });
 
   } else if (Platform.isIOS) {
-    await BeaconsPlugin.startMonitoring();
+    startBeacon();
     setRunning(true);
   }
 
@@ -59,12 +59,11 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
 
           String dbKey = '50000'; //임시로 고정
 
-          String? userId = await secureStorage.read('user_id');
-          String? name = await secureStorage.read('kr_name');
+          String? name = await secureStorage.read('krName');
           String? id = await secureStorage.read('LOGIN_ID');
           String? pw = await secureStorage.read('LOGIN_PW');
 
-          setGlovalVariable(userId, name, id, pw);
+          setGlovalVariable(name, id, pw);
 
           if (beaconKey == dbKey) {
             keySucces = true;

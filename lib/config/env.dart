@@ -12,8 +12,7 @@ class Env {
   static const String SERVER_REFRESH_TOKEN_URL = '$TEST_SERVER:3000/teragate/refreshToken';
 
   static const String USER_NICK_NAME = 'USER_NICK_NAME';
-  static const String STATUS_LOGIN = 'STATUS_LOGIN';
-  static const String STATUS_LOGOUT = 'STATUS_LOGOUT';
+  static const String ID_CHECK = 'ID_CHECK';
   static const String LOGIN_ID = 'LOGIN_ID';
   static const String LOGIN_PW = 'LOGIN_PW';
 

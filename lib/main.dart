@@ -4,7 +4,7 @@ import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/states/login_state.dart';
-import 'package:teragate_test/states/main_state.dart';
+import 'package:teragate_test/states/dashboard_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 
 void main() {
@@ -34,7 +34,8 @@ class _SplashPageState extends State<SplashPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 2), () => _checkUser(context));
+    // Future.delayed(const Duration(seconds: 2), () => _checkUser(context));
+    _checkUser(context).then((data) => move(data["loginId"], data["loginPw"]));
   }
 
   @override
@@ -49,35 +50,51 @@ class _SplashPageState extends State<SplashPage> {
     );
   }
 
-  void _checkUser(context) async {
+  Future<Map<String, String?>> _checkUser(context) async {
     SecureStorage secureStorage = SecureStorage();
     Map<String, String> allStorage = await secureStorage.getFlutterSecureStorage().readAll();
-    String statusUser = '';
-    String loginId = '';
-    String loginPw = '';
+    String? loginId;
+    String? loginPw;
+
     if (allStorage.isNotEmpty) {
       allStorage.forEach((k, v) {
-        if (Env.isDebug) debugPrint('k : $k, v : $v');
-        if (v == Env.STATUS_LOGIN) statusUser = k;
-
-        if (k == 'LOGIN_ID') loginId = v;
-        if (k == 'LOGIN_PW') loginPw = v;
+        if (k == Env.LOGIN_ID) loginId = v;
+        if (k == Env.LOGIN_PW) loginPw = v;
       });
-    } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+
+      // login(loginId, loginPw).then((data) {
+      //   if (data.success) {
+      //       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
+      //   } else {
+      //     showSnackBar(context, data.message);
+      //     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+      //   }
+      // });
+    // } else {
+      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
     }
-        
-    login(loginId, loginPw).then((data) {
-      if (data.success) {
-        if (statusUser.isNotEmpty) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Beacon()));
+    
+    return {
+      "loginId": loginId,
+      "loginPw": loginPw
+    };
+  }
+
+  void move(String? id, String? password) {
+    if (id != null && password != null ) {
+      debugPrint(" move ..... id & password exist ..... ");
+      login(id, password).then((data) {
+        if (data.success) {
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
         } else {
+          showSnackBar(context, data.message);
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
         }
-      } else {
-        showSnackBar(context, data.message);
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
-      }
-    });
+      });
+    } else {
+      debugPrint(" move ..... id & password not !!!!!!!! ");
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+    }
   }
+  
 }
