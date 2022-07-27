@@ -10,7 +10,7 @@ import 'package:teragate_test/models/storage_model.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
-  
+
   @override
   LoginState createState() => LoginState();
 }
@@ -21,7 +21,6 @@ class LoginState extends State<Login> {
   late TextEditingController _passwordContorller;
 
   final _formKey = GlobalKey<FormState>();
-
   SecureStorage secureStorage = SecureStorage();
 
   @override
@@ -29,10 +28,10 @@ class LoginState extends State<Login> {
     super.initState();
     final permissionResult = callPermissions();
     permissionResult.then((data) => debugPrint(data));
-    
+
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");
-    
+
     // TODO : 체크 확인 후 ID 값 셋팅
   }
 
@@ -67,13 +66,9 @@ class LoginState extends State<Login> {
                   child: TextFormField(
                     //TextFormField
                     controller: _loginIdContoroller,
-                    validator: (value) => (value!.isEmpty) ? " 아이디를 입력해 주세요" : null, //hint 역할
+                    validator: (value) => (value!.isEmpty) ? " 아이디를 입력해 주세요" : null,
                     style: style,
-                    decoration: const InputDecoration(
-                        //textfield안에 있는 이미지
-                        prefixIcon: Icon(Icons.person),
-                        labelText: "Id", //hint
-                        border: OutlineInputBorder()), //클릭시 legend 효과
+                    decoration: const InputDecoration(prefixIcon: Icon(Icons.person), labelText: "Id", border: OutlineInputBorder()), //클릭시 legend 효과
                   ),
                 ),
                 Padding(
@@ -84,10 +79,7 @@ class LoginState extends State<Login> {
                     controller: _passwordContorller,
                     validator: (value) => (value!.isEmpty) ? "패스워드를 입력해 주세요" : null, //아무것도 누르지 않은 경우 이 글자 뜸.
                     style: style,
-                    decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.lock),
-                        labelText: "Password",
-                        border: OutlineInputBorder()),
+                    decoration: const InputDecoration(prefixIcon: Icon(Icons.lock), labelText: "Password", border: OutlineInputBorder()),
                   ),
                 ),
                 Padding(
@@ -101,18 +93,24 @@ class LoginState extends State<Login> {
                       //child - 버튼을 생성
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-
-                          // TODO : ID CHECK 확인 후 
+                          
+                          // TODO : ID CHECK 확인 후
                           String checkValue = "true";
 
-                          SecureStorage secureStorage = SecureStorage();
                           secureStorage.write(Env.ID_CHECK, checkValue);
 
-                          login(_loginIdContoroller.text,_passwordContorller.text).then((data) {
-                            if (data.success!) {
+                          login(_loginIdContoroller.text, _passwordContorller.text).then((loginInfo) {
+                            if (loginInfo.success!) {
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
+
+                              secureStorage.write(Env.LOGIN_ID, _loginIdContoroller.text);
+                              secureStorage.write(Env.LOGIN_PW, _passwordContorller.text);
+                              secureStorage.write('krName', '${loginInfo.data?['krName']}');
+                              secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
+                              secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
+                              
                             } else {
-                              showSnackBar(context, data.message!);
+                              showSnackBar(context, loginInfo.message!);
                             }
                           });
                         }

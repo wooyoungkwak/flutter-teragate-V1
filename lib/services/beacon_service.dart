@@ -16,8 +16,7 @@ final StreamController<String> beaconEventsController = StreamController<String>
 Future<void> initBeacon(Function setNotification, Function setRunning, Function setResult, Function setGlovalVariable, Function setForGetIn, Function getIsRunning, Function getWorkSucces, StreamController<String> beaconStreamController) async {
   SecureStorage secureStorage = SecureStorage();
 
-  //리슨투비콘을 최상단으로 올렸음, 해당사항이 변경점임.
-  BeaconsPlugin.listenToBeacons(beaconStreamController);
+  
 
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
@@ -32,7 +31,13 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
         setNotification("Beacon 을 스켄할 수 없습니다. ??? ");
       }
     });
+
+    //리슨투비콘을 최상단으로 올렸음, 해당사항이 변경점임.
+    BeaconsPlugin.listenToBeacons(beaconStreamController);
   } else if (Platform.isIOS) {
+    //리슨투비콘을 최상단으로 올렸음, 해당사항이 변경점임.
+    BeaconsPlugin.listenToBeacons(beaconStreamController);
+
     startBeacon();
     setRunning(true);
   }
@@ -41,13 +46,18 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
   await BeaconsPlugin.runInBackground(true);
 
   //Valid values: 0 = no messages, 1 = errors, 2 = all messages
+  beaconStreamController.stream.listen((data) async {
 
-  beaconStreamController.stream.listen(
-      (data) async {
+        debugPrint(data.isNotEmpty.toString() );
+        debugPrint("==============================");
+        debugPrint(getIsRunning().toString() );
+        debugPrint("============");
+
         if (data.isNotEmpty && getIsRunning()) {
-          setResult("출근 처리 중입니다", false);
+          setResult("출근 처리 중입니다.", false);
 
           if (!getWorkSucces()) {
+
             BeaconsPlugin.stopMonitoring(); //모니터링 종료
             setRunning(!getIsRunning());
             Map<String, dynamic> userMap = jsonDecode(data);
@@ -70,20 +80,7 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
             }
 
             if (keySucces) {
-              if (true) {
-                setForGetIn();
-              }
-
-              /*
-            else {
-              if(Env.isDebug) debugPrint(data.success);
-              showConfirmDialog(context, " ${name}님 이미 출근하셨습니다."); //다이얼로그창
-              setState(() {
-                results.add("msg: ${name}님 이미 출근 하셨습니다");
-              });
-            } 
-            */
-
+              setForGetIn();
             } else {
               setNotification("Key값이 다릅니다. 재시도 해주세요!"); //다이얼로그창
             }
