@@ -1,7 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/states/settingalarm_state.dart';
 import 'package:teragate_test/states/settingbeacon_state.dart';
@@ -21,22 +19,29 @@ class Setting extends StatefulWidget {
 }
 
 class SettingState extends State<Setting>  {
-  var flutterSecureStorage = const FlutterSecureStorage();
+
+  late SecureStorage strage;
   //스위치 true/false
-  var switchListTileValue1 = true;
-  var switchListTileValue2 = true;
+  bool switchListTileValue1 = true;
+  bool switchListTileValue2 = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  String beaconuuid= "";
   
+  @override
+  void initState() {
+    super.initState();
+    
+    strage = SecureStorage();
+  }
+
   @override
   Widget build(BuildContext context) {
 
-    
-    
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
           leading: IconButton(
-    icon: Icon(Icons.arrow_back, color: Colors.black),
+    icon: const Icon(Icons.arrow_back, color: Colors.black),
     onPressed: () => Navigator.of(context).pop(),
   ), 
         backgroundColor: const Color(0x0fff5f5f),
@@ -124,7 +129,7 @@ class SettingState extends State<Setting>  {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => SettingWork()));
+                            builder: (context) => const SettingWork(0,null)));
                     },
                     style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
                     ]),
@@ -155,7 +160,7 @@ class SettingState extends State<Setting>  {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                           builder: (context) => SettingWork()));
+                           builder: (context) => const SettingWork(1,null)));
                               },
                             style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
                       ]),
@@ -199,15 +204,22 @@ class SettingState extends State<Setting>  {
 
 
   void onTap() {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SettingBeacon("testuuid",null)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+      builder: (context) => SettingBeacon("testuuid",null)));
   }
 
-  Future<int?> test() async{
-    SharedStorage shared = SharedStorage();
-    debugPrint(shared.readToInt("key").toString());
-    return shared.readToInt("key");
+  Future<void> test() async{
+    String? chek = await strage.read("uuid");
+    debugPrint("test 진입");
+    if (chek == null){
+      chek = "UUID가 설정 안 되어있습니다.";
+          debugPrint(chek);
+          strage.write("uuid", "123123123123123123");
+      beaconuuid = chek;
+    }else{
+      beaconuuid = chek;
+    }
   }
 }

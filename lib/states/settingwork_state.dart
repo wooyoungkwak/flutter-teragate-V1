@@ -1,15 +1,19 @@
 
 import 'dart:convert';
-
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:teragate_test/models/storage_model.dart';
+import 'package:intl/intl.dart';
 
 
 class SettingWork extends StatelessWidget {
 
+  
+  final  int getstate;
+
+
+  const SettingWork(this.getstate,Key? key) : super(key: key);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -18,8 +22,8 @@ class SettingWork extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blueGrey,
       ),
-      home: Scaffold(
-        body: SettingWorkTime(null),
+      home:  Scaffold(
+        body: SettingWorkTime(getstate,null),
       ),
     );
   }
@@ -28,35 +32,41 @@ class SettingWork extends StatelessWidget {
   
   class SettingWorkTime extends StatefulWidget {
     
+    final  int getstate;
   
-  const SettingWorkTime(Key? key) : super(key: key);
+  const SettingWorkTime(this.getstate ,Key? key) : super(key: key);
 
   @override
   SettingWorkTimeState createState() => SettingWorkTimeState();
 }
 
-class SettingWorkTimeState extends State<SettingWorkTime> {
-  var flutterSecureStorage = const FlutterSecureStorage();
-  
-  String time2 = "08:30";
-  String time1 = "     AM";
-  List<String> day = ["월요일","화요일","수요일","목요일","금요일","토요일","일요일",];
-  List<bool> switchday = [true,true,true,true,true,false,false];
-  //스위치 true/false
-  var switchListTileValue1 = true;
-  var switchListTileValue2 = true;
-  
+class SettingWorkTimeState extends State<SettingWorkTime> {  
 
+  late SecureStorage strage;
+
+  //
+  List<String> timeGetIn = ["08:30","08:30","08:30","08:30","08:30","08:30","08:30"];
+  List<String> timeGetOut = ["18:30","18:30","18:30","18:30","18:30","18:30","18:30"];
+  List<String> week = ["월요일","화요일","수요일","목요일","금요일","토요일","일요일"];
+  List<String> weekEN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+  List<String> timetext = ["TimeGetIn","TimeGetOut"];
+
+  List<bool> switchday = [true,true,true,true,true,false,false]; //스위치 true/false
   final scaffoldKey = GlobalKey<ScaffoldState>();
+
+    @override
+  void initState() {
+    super.initState();
+    
+    strage = SecureStorage();
+  }
   
   @override
-  Widget build(BuildContext context) {
-        flutterSecureStorage.write(key: "dayTime", value: time1+time2);
-    
+  Widget build(BuildContext context) {    
     return Scaffold(
       appBar: AppBar(
   leading: IconButton(
-    icon: Icon(Icons.arrow_back, color: Colors.black),
+    icon: const Icon(Icons.arrow_back, color: Colors.black),
     onPressed: () => Navigator.of(context).pop(),
   ), 
         backgroundColor: const Color(0x0fff5f5f),
@@ -74,14 +84,14 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
       body: ListView.separated(
         
             padding: const EdgeInsets.symmetric(vertical: 30),
-            itemCount: day.length,
+            itemCount: week.length,
             separatorBuilder: (BuildContext context, int index) =>
             	const Divider(thickness: 3),
             itemBuilder: (BuildContext context, int index) {
               return GestureDetector(
                 onTap: (){
                   
-                openTimePicker(context);
+                openTimePicker(context, index);
                   //Scaffold.of(context).showSnackBar(SnackBar(content: Text(index.toString())));
                 
                 }, 
@@ -104,20 +114,23 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
                     //return Text(snapshot.data.toString());
 
                  return Container(
-      color: Color(0xffF6F2F2),
+      color: const Color(0xffF6F2F2),
       width: double.infinity,
       child: Row(
-             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+             mainAxisAlignment: MainAxisAlignment.spaceAround,
         crossAxisAlignment: CrossAxisAlignment.center,
         
         children: [
-          Text(snapshot.data.toString(), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300),),
-          Text(day[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300),),
+          if(widget.getstate==0)Text(timeGetIn[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+          if(widget.getstate==1)Text(timeGetOut[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+          Text(week[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
           Align(                                          
           child: Switch(
           value: switchday[index],
-          onChanged: (newValue) =>
-          setState(() => switchday[index] = newValue),
+          onChanged: (newValue) {
+            strage.write(weekEN[index], newValue.toString());
+            setState(() => switchday[index] = newValue);
+          }
           ),
           ),
           ],
@@ -133,7 +146,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     
   }
 
-    void openTimePicker(BuildContext context)  {
+    void openTimePicker(BuildContext context, int weekindex)  {
       
     BottomPicker.time(      title:  "Set your next meeting time",
       titleStyle: const TextStyle(
@@ -142,10 +155,16 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
         color: Colors.orange
       ),
       onSubmit: (index) async {
-    flutterSecureStorage.write(key: "dayTime", value: index.toString());
-    debugPrint(await flutterSecureStorage.read(key: "dayTime").toString());
+        String formattedDate = DateFormat('kk:mm').format(index).toString();
+        //stage에 저장 (키값:요일+text[출근/퇴근], 선택 날짜+시간);
+        debugPrint(formattedDate);
+        strage.write(weekEN[weekindex]+timetext[widget.getstate],formattedDate);
     setState(() {
-      time2 = index;
+      if(widget.getstate==0){
+        timeGetIn[weekindex] = formattedDate;
+      }else {
+        timeGetOut[weekindex] = formattedDate;
+      }
     });
       },
       onClose: () {
@@ -160,11 +179,9 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     prefs.setString("day", json.encode(week));
     String? userPref = prefs.getString('day');
     Map<String,dynamic> Info = jsonDecode(userPref!) as Map<String, dynamic>;
-//    debugPrint(Info.dayWeek);
 
 
-    await Future.delayed(Duration(seconds: 1)); // 비동기 과정을 보여주기 위해 시간을 딜레이 시킨다.
-    return await flutterSecureStorage.read(key: 'dayTime');
+    return await "test";
   }
 }
 

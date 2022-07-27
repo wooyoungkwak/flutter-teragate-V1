@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:teragate_test/models/storage_model.dart';
 
 
 
@@ -12,13 +13,21 @@ class SettingAlarm extends StatefulWidget {
 }
 
 class SettingAlarmState extends State<SettingAlarm> {
+
+   late SecureStorage strage;
   //스위치 true/false
-  var switchListTileValue1 = true;
-  var switchListTileValue2 = true;
+  bool switchListTileValue1 = true;
+  bool switchListTileValue2 = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   
   get children => null;
-  
+
+  @override
+  void initState() {
+    super.initState();
+    
+    strage = SecureStorage();
+  }
   @override
   Widget build(BuildContext context) {
     
@@ -27,7 +36,7 @@ class SettingAlarmState extends State<SettingAlarm> {
       key: scaffoldKey,
       appBar: AppBar(
           leading: IconButton(
-    icon: Icon(Icons.arrow_back, color: Colors.black),
+    icon: const Icon(Icons.arrow_back, color: Colors.black),
     onPressed: () => Navigator.of(context).pop(),
   ), 
         backgroundColor: const Color(0x0fff5f5f),
@@ -40,7 +49,7 @@ class SettingAlarmState extends State<SettingAlarm> {
         centerTitle: true,
         elevation: 4,
       ),
-      backgroundColor: Color.fromARGB(255, 99, 84, 84),
+      backgroundColor: const Color.fromARGB(255, 99, 84, 84),
       body: SafeArea(
         child: Column( children: <Widget>[
           Container(
@@ -65,8 +74,10 @@ class SettingAlarmState extends State<SettingAlarm> {
                     Align(                                          
                     child: Switch(
                       value: switchListTileValue1 ,
-                      onChanged: (newValue) =>
-                      setState(() => switchListTileValue1 = newValue),
+                      onChanged: (newValue){
+                      strage.write("Alarm", switchListTileValue1.toString());
+                      setState(() => switchListTileValue1 = newValue);
+                      },
                       ),
                       ),
                       ],
@@ -91,9 +102,11 @@ class SettingAlarmState extends State<SettingAlarm> {
                   ),
                   Switch(
                     value: switchListTileValue2 ,
-                    onChanged: (newValue) =>
-                    setState(() => switchListTileValue2 = newValue),
-            ),
+                    onChanged: (newValue){
+                    strage.write("VIBRATE", switchListTileValue2.toString());
+                    setState(() => switchListTileValue2 = newValue);
+                    },
+                  ),  
                 ],
               ),
           ),
