@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 
@@ -76,7 +77,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return WillPopScope(    
+      onWillPop: () {
+          SystemNavigator.pop();
+          return Future(() => false);
+        },
+    child: MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: const Text('TERA GATE 출퇴근'),
@@ -184,7 +190,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           ],
         ),
       ),
-    );
+    )
+   );
   }
 
   Widget comuteItem() {

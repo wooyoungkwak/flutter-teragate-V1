@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
@@ -17,9 +18,13 @@ class Login extends StatefulWidget {
 }
 
 class LoginState extends State<Login> {
+
+  late SecureStorage strage;
   TextStyle style = const TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   late TextEditingController _loginIdContoroller;
   late TextEditingController _passwordContorller;
+  bool checkBoxValue = false;
+  late bool initcheck;
 
   final _formKey = GlobalKey<FormState>();
   SecureStorage secureStorage = SecureStorage();
@@ -32,6 +37,9 @@ class LoginState extends State<Login> {
 
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");
+
+    strage = SecureStorage();
+    initcheck =true;
 
     // TODO : 체크 확인 후 ID 값 셋팅
   }
@@ -46,7 +54,12 @@ class LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     //Widget 여기서 UI화면 작성
-    return Scaffold(
+    return WillPopScope(    
+      onWillPop: () {
+          SystemNavigator.pop();
+          return Future(() => false);
+        },
+    child: Scaffold(
       appBar: AppBar(
         title: const Text('로그인'), //APP BAR 만들기
         automaticallyImplyLeading: false,
@@ -62,6 +75,7 @@ class LoginState extends State<Login> {
               //ListView - children으로 여러개 padding설정
               shrinkWrap: true,
               children: <Widget>[
+
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: TextFormField(
@@ -83,6 +97,42 @@ class LoginState extends State<Login> {
                     decoration: const InputDecoration(prefixIcon: Icon(Icons.lock), labelText: "Password", border: OutlineInputBorder()),
                   ),
                 ),
+                 FutureBuilder(
+                  future: setsaveid(),
+                  builder: (context, snapshot) {  
+                    if (snapshot.hasData == false) {
+                      return const CircularProgressIndicator();
+                    }
+                  else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}'); 
+                  }
+                  else { return 
+                  Padding(
+                    //체크 박스
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        const Text('아이디 저장    '),
+                        Transform.scale(
+                          scale: 1.5,
+                          child: Checkbox(
+                            activeColor: Colors.white,
+                            checkColor: Colors.blue,
+                            value: checkBoxValue,
+                            onChanged: (value) {
+                              setState(() {
+                                checkBoxValue = value!;
+                              });
+                              strage.write("IdStorageCheck", checkBoxValue.toString());
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                  }
+                  }),
                 Padding(
                   //세번째 padding
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -123,11 +173,36 @@ class LoginState extends State<Login> {
                     ),
                   ),
                 ),
+                
               ],
             ),
           ),
         ),
       ),
+    )
     );
   }
+  
+    Future<String> setsaveid() async{
+      if(initcheck){
+      String? chek = await strage.read("IdStorageCheck");
+      if(chek==null){
+      setState(() {
+        checkBoxValue = false; 
+      });
+      }
+      if(chek=="true"){
+        checkBoxValue= true;
+        String? sevedid = await strage.read(Env.LOGIN_ID);
+        if(sevedid!=null){
+          setState(() {
+            _loginIdContoroller = TextEditingController(text: sevedid);  
+          });
+        }
+        }
+      if(chek=="false")checkBoxValue= false;
+      initcheck=false;
+      }
+      return "re";
+    }
 }
