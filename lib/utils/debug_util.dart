@@ -8,7 +8,7 @@ class Log {
   }
 
   static void debug(var message) {
-    if(Env.isDebug) message.debugPrint(message);
+    if(Env.isDebug) debugPrint(message);
   }
 
 }
