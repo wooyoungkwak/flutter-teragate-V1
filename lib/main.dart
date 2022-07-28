@@ -7,6 +7,7 @@ import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/dashboard_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
+import 'package:teragate_test/utils/debug_util.dart';
 
 void main() {
   runApp(const MyApp());
