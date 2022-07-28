@@ -4,15 +4,11 @@ import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/states/settingalarm_state.dart';
 import 'package:teragate_test/states/settingbeacon_state.dart';
 import 'package:teragate_test/states/settingwork_state.dart';
-
-
-
+import 'package:teragate_test/config/env.dart';
 
 class Setting extends StatefulWidget {
   
   const Setting(Key? key) : super(key: key);
-  
-
 
   @override
   SettingState createState() => SettingState();
@@ -141,7 +137,7 @@ class SettingState extends State<Setting>  {
                       value: switchgetin,
                       onChanged: (newValue) {
                       setState(() => switchgetin = newValue);
-                      secureStorage.write("Alarmgetin", switchgetin.toString());
+                      secureStorage.write(Env.KEY_SETTING_GI_ON_OFF, switchgetin.toString());
                       }
                       ),
                       ),
@@ -182,7 +178,7 @@ class SettingState extends State<Setting>  {
                                       value: switchgetout,
                                       onChanged: (newValue) {
                                       setState(() => switchgetout = newValue);
-                                      secureStorage.write("Alarmgetout", switchgetout.toString());
+                                      secureStorage.write(Env.KEY_SETTING_GO_ON_OFF, switchgetout.toString());
                                       }
                                     ),
                               ],
@@ -257,8 +253,8 @@ class SettingState extends State<Setting>  {
     setState(() {
       beaconuuid = chek.toString();
     });
-    String? getin = await secureStorage.read("Alarmgetin");
-    String? getout = await secureStorage.read("Alarmgetout");
+    String? getin = await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF);
+    String? getout = await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF);
      
     if(getin==null){
     setState(() {

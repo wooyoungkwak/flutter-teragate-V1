@@ -150,7 +150,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                         // await restartBeacon(initBeacon(setNotification, setRunning, setResult, setGlovalVariable, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController, secureStorage));
                       }
                       setRunning(!isRunning);
-                      setForGetIn();
+                      
+                      // setForGetIn();
                     }),
                 SpeedDialChild(
                     child: const Icon(Icons.copy),
@@ -246,7 +247,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   // 로그인 화면으로 이동
   void moveLogin() async{
-    String? isChecked = await secureStorage.read(Env.ID_CHECK);
+    String? isChecked = await secureStorage.read(Env.KEY_ID_CHECK);
     if ( isChecked == null && isChecked == "false") {
       secureStorage.write(Env.LOGIN_ID, "");
     }

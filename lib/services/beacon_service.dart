@@ -30,11 +30,9 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
 
   } else if (Platform.isIOS) {
     BeaconsPlugin.listenToBeacons(beaconStreamController);
-    // startBeacon();
+    startBeacon();
     setRunning(true);
   }
-
-  setBeacon();
 
   //Send 'true' to run in background
   await BeaconsPlugin.runInBackground(true);
@@ -92,7 +90,7 @@ Future<void> setBeacon() async {
   BeaconsPlugin.setBackgroundScanPeriodForAndroid(
       backgroundScanPeriod: 2200, backgroundBetweenScanPeriod: 10);
 
-  BeaconsPlugin.addRegionForIOS("74278bdb-b644-4520-8f0c-720eeaffffff", 65504, 46263, "iBeacon");
+  BeaconsPlugin.addRegionForIOS("74278bdb-b644-4520-8f0c-720eeaffffff", 65504, 5000, "iBeacon");
 }
 
 Future<void> initBeaconBySetting() async {
@@ -105,8 +103,9 @@ Future<void> startBeacon() async {
   await BeaconsPlugin.startMonitoring();
 }
 
-Future<void> restartBeacon(Function initBeacons) async {
-  initBeacons();
+Future<void> restartBeacon() async {
+  // initBeacons();
+  setBeacon();
   await startBeacon();
 }
 

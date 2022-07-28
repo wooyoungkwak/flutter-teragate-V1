@@ -12,10 +12,10 @@ class Env {
   static const String SERVER_GROUPWARE_URL = '$SERVER_GROUPWARE_TEST/signInapp';
 
   static const String USER_NICK_NAME = 'USER_NICK_NAME';
-  static const String ID_CHECK = 'ID_CHECK';
   static const String LOGIN_ID = 'LOGIN_ID';
   static const String LOGIN_PW = 'LOGIN_PW';
 
+  static const String KEY_ID_CHECK = 'KEY_ID_CHECK';
   static const String KEY_SUCCESS = "sucess";
   static const String KEY_MESSAGE = "message";
   static const String KEY_ACCESS_TOKEN = "accessToken";
@@ -25,12 +25,33 @@ class Env {
   static const String KEY_UUID = "uuid";
   static const String KEY_LOGIN_STATE = "loginState";
 
+  static const String KEY_SETTING_MON_GI = "MondayGi";
+  static const String KEY_SETTING_TUE_GI = "TuesdayGi";
+  static const String KEY_SETTING_WED_GI = "WednesdayGi";
+  static const String KEY_SETTING_THU_GI = "ThursdayGi";
+  static const String KEY_SETTING_FRI_GI = "FridayGi";
+  static const String KEY_SETTING_SAT_GI = "SaturdayGi";
+  static const String KEY_SETTING_SUN_GI = "mondayGi";
+
+  static const String KEY_SETTING_MON_GO = "MondayGO";
+  static const String KEY_SETTING_TUE_GO = "TuesdayGO";
+  static const String KEY_SETTING_WED_GO = "WednesdayGO";
+  static const String KEY_SETTING_THU_GO = "ThursdayGO";
+  static const String KEY_SETTING_FRI_GO = "FridayGO";
+  static const String KEY_SETTING_SAT_GO = "SaturdayGO";
+  static const String KEY_SETTING_SUN_GO = "mondayGO";
+
+  static const String KEY_SETTING_VIBRATE = "VIBRATE";
+  static const String KEY_SETTING_ALARM = "ALARM";
+
+  static const String KEY_SETTING_GI_ON_OFF = "GIONOFF";
+  static const String KEY_SETTING_GO_ON_OFF = "GOONOFF";
+
   static const String MSG_GET_IN_EXIST = "exist";
   static const String MSG_GET_IN_SUCCESS = "출근 등록 되었습니다.";
   static const String MSG_GET_OUT_SUCCESS = "퇴근 등록 되었습니다.";
   static const String MSG_GET_IN_FAIL = "출근 등록을 실패 하였습니다.";
   static const String MSG_GET_OUT_FAIL = "퇴근 등록을 실패 하였습니다.";
-
 
   static const String TITLE_DIALOG = "알림";
   static const String TITLE_BEACON_NOTIFICATION = "Beacons Set";

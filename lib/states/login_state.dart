@@ -121,7 +121,7 @@ class LoginState extends State<Login> {
                             setState(() {
                               checkBoxValue = value!;
                             });
-                            strage.write("IdStorageCheck", checkBoxValue.toString());
+                            strage.write(Env.KEY_ID_CHECK, checkBoxValue.toString());
                           },
                         ),
                         const Text('아이디 저장    '),
@@ -145,11 +145,6 @@ class LoginState extends State<Login> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           
-                          // TODO : ID CHECK 확인 후
-                          String checkValue = "true";
-
-                          secureStorage.write(Env.ID_CHECK, checkValue);
-
                           login(_loginIdContoroller.text, _passwordContorller.text).then((loginInfo) {
                             if (loginInfo.success!) {
                               secureStorage.write(Env.LOGIN_ID, _loginIdContoroller.text);
@@ -184,7 +179,7 @@ class LoginState extends State<Login> {
   
     Future<String> setsaveid() async{
       if(initcheck){
-      String? chek = await strage.read("IdStorageCheck");
+      String? chek = await strage.read(Env.KEY_ID_CHECK);
       if(chek==null){
       setState(() {
         checkBoxValue = false; 

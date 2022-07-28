@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teragate_test/models/storage_model.dart';
-
-
+import 'package:teragate_test/config/env.dart';
 
 class SettingAlarm extends StatefulWidget {
   
@@ -95,7 +94,7 @@ class SettingAlarmState extends State<SettingAlarm> {
                       value: switchval ,
                       onChanged: (newValue){
                       setState(() => switchval = newValue);
-                      secureStorage.write("VIBRATE", switchval.toString());
+                      secureStorage.write(Env.KEY_SETTING_VIBRATE, switchval.toString());
                       },
                       ),
                       ),
@@ -128,7 +127,7 @@ class SettingAlarmState extends State<SettingAlarm> {
                     onChanged: (newValue){
                     setState(() => switchval2 = newValue);
 
-                    secureStorage.write("Alarm", switchval2.toString());
+                    secureStorage.write(Env.KEY_SETTING_ALARM, switchval2.toString());
                     },
                   ),  
                 ],
@@ -143,8 +142,8 @@ class SettingAlarmState extends State<SettingAlarm> {
   }
   
   Future<String> setuuid() async{
-     String? vibrate = await secureStorage.read("VIBRATE");
-     String? alarm = await secureStorage.read("Alarm");
+     String? vibrate = await secureStorage.read(Env.KEY_SETTING_VIBRATE);
+     String? alarm = await secureStorage.read(Env.KEY_SETTING_ALARM);
      
      if(vibrate==null){
       setState(() {
