@@ -59,12 +59,12 @@ class SettingState extends State<Setting>  {
         child: Column( children: <Widget>[
           GestureDetector(          
                 onTap: () { 
-                  onTap();
+                  onTapuuid();
 
     },
             child: Container(
-              padding: const EdgeInsets.all(10),
               height: 100,
+              padding: const EdgeInsets.all(10),
               margin: const EdgeInsets.all(8.0),
               decoration: const BoxDecoration(
                 color: Color(0xFFEEEEEE),
@@ -72,23 +72,19 @@ class SettingState extends State<Setting>  {
               child: Stack(
                 children: [
                   FutureBuilder(
-                    future: test(),
+                    future: setuuid(),
                     builder: (context, snapshot) {
-  
                   // 해당 부분은 data를 아직 받아 오지 못했을 때 실행되는 부분
                   if (snapshot.hasData == false) {
-                    return CircularProgressIndicator(); // CircularProgressIndicator : 로딩 에니메이션
+                    return const CircularProgressIndicator(); // CircularProgressIndicator : 로딩 에니메이션
                   }
-
                   // error가 발생하게 될 경우 반환하게 되는 부분
                   else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}'); // 에러명을 텍스트에 뿌려줌
                   }
-
                   // 데이터를 정상적으로 받아오게 되면 다음 부분을 실행하게 되는 부분
                   else {
                     //return Text(snapshot.data.toString());
-
                  return Align(
                     alignment: const AlignmentDirectional(0.07, 0.21),
                     child :RichText( 
@@ -97,24 +93,30 @@ class SettingState extends State<Setting>  {
                             text: 'UUID:   ',
                             style: TextStyle(color: Colors.black)),
                         TextSpan(                        
-                          text: snapshot.data.toString(),
-                          //텍스트를 클릭시 이벤트를 발생시키기 위함
-                          style: const TextStyle(color: Colors.red)),
+                          text:beaconuuid,
+                        style: const TextStyle(color: Colors.red)),
                       ]),
                   )
 
                   );
                   }
                 }),
-                  
                 ],
               ),
-              
             ),
           ),
+          GestureDetector(          
+                onTap: () { 
+                  onTapWorkIn();
 
-          Container(
+    },
+            child:
+          Container(            
             padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.all(8.0),
+            decoration: const BoxDecoration(
+              color: Color(0xFFEEEEEE),
+            ),
             child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -129,7 +131,7 @@ class SettingState extends State<Setting>  {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const SettingWork(0,null)));
+                            builder: (context) => const SettingWorkTime(0,null)));
                     },
                     style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
                     ]),
@@ -137,65 +139,80 @@ class SettingState extends State<Setting>  {
                     Align(                                          
                     child: Switch(
                       value: switchListTileValue1,
-                      onChanged: (newValue) =>
-                      setState(() => switchListTileValue1 = newValue),
+                      onChanged: (newValue) {
+                      setState(() => switchListTileValue1 = newValue);
+                      strage.write("AlarmGetIn", switchListTileValue1.toString());
+                      }
                       ),
                       ),
                       ],
                       ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(10),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  RichText( 
-                    text: TextSpan(children: [
-                        TextSpan(
-                            text: '퇴근 일정',
-                            //텍스트를 클릭시 이벤트를 발생시키기 위함
-                            recognizer: TapGestureRecognizer()
-                            //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
-                              ..onTapDown = (details) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                           builder: (context) => const SettingWork(1,null)));
-                              },
-                            style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
-                      ]),
-                  ),
-                  Switch(
-                    value: switchListTileValue2,
-                    onChanged: (newValue) =>
-                    setState(() => switchListTileValue2 = newValue),
-            ),
-                ],
-              ),
+                      ),
+                      GestureDetector(          
+                        onTap: () { 
+                          onTapWorkOut();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(8.0),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEEEEEE),
+                          ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            RichText( 
+                              text: TextSpan(children: [
+                                TextSpan(
+                                  text: '퇴근 일정',
+                                  //텍스트를 클릭시 이벤트를 발생시키기 위함
+                                  recognizer: TapGestureRecognizer()
+                                  //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
+                                  ..onTapDown = (details) {
+                                      Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                      builder: (context) => const SettingWorkTime(1,null)));
+                                    },
+                                    style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
+                                    ]), 
+                                    ),
+                                    Switch(
+                                      value: switchListTileValue2,
+                                      onChanged: (newValue) {
+                                      setState(() => switchListTileValue2 = newValue);
+                                      strage.write("AlarmGetOut", switchListTileValue2.toString());
+                                      }
+                                    ),
+                              ],
+                        ),
+                        ),
+                      ),
+                      GestureDetector(          
+                        onTap: () { 
+                          onTapAlarm();
+                        },  
+                        child:
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(8.0),
+                          decoration: const BoxDecoration(
+                          color: Color(0xFFEEEEEE),
+                        ),
+                        child: Row(
+                          children: [
+                            RichText( 
+                              text: const TextSpan(children: [
+                              TextSpan(
+                                text: '알람 설정',
+                                style: TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
+                              ]),
+                            ),
+                          ],
+                        ),
           ),
-                    Container(
-                      padding: const EdgeInsets.all(10),
-              child: Row(
-                children: [
-                  RichText( 
-                    text: TextSpan(children: [
-                        TextSpan(
-                            text: '알람 설정',
-                            //텍스트를 클릭시 이벤트를 발생시키기 위함
-                            recognizer: TapGestureRecognizer()
-                            //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
-                              ..onTapDown = (details) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SettingAlarm('setset',null)));
-                              },
-                            style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
-                      ]),
-                  ),
-                ],
-              ),
-          ),
+        )
         ],
       ),
       ),
@@ -203,23 +220,43 @@ class SettingState extends State<Setting>  {
   }
 
 
-  void onTap() {
+  void onTapuuid() {
     Navigator.push(
       context,
       MaterialPageRoute(
-      builder: (context) => SettingBeacon("testuuid",null)));
+      builder: (context) => const SettingBeacon("testuuid",null)));
+  }
+    void onTapWorkIn() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+      builder: (context) => const SettingWorkTime(0,null)));
+  }
+    void onTapWorkOut() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+      builder: (context) => const SettingWorkTime(1,null)));
+  }
+    void onTapAlarm() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+      builder: (context) => const SettingAlarm(null)));
   }
 
-  Future<void> test() async{
+  Future<String> setuuid() async{
     String? chek = await strage.read("uuid");
-    debugPrint("test 진입");
+
     if (chek == null){
-      chek = "UUID가 설정 안 되어있습니다.";
-          debugPrint(chek);
-          strage.write("uuid", "123123123123123123");
+      chek = "UUID가 설정XXXXXXXXXX";
       beaconuuid = chek;
     }else{
       beaconuuid = chek;
     }
+    setState(() {
+      beaconuuid = chek.toString();
+    });
+    return chek;
   }
 }

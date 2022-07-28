@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/states/setting_state.dart';
 
 
 class SettingBeacon extends StatefulWidget {
@@ -65,8 +64,6 @@ class SettingBeaconState extends State<SettingBeacon> {
   }
   void setuuid(String index) async{
     strage.write("uuid", index);
-    Route route = MaterialPageRoute(builder: (context) => const Setting(null));
-    Navigator.pushReplacement(context, route);
-    //Navigator.pop(context);
+    Navigator.pop(context);
   }
 }

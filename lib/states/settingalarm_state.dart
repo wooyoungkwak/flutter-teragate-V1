@@ -1,12 +1,11 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:teragate_test/models/storage_model.dart';
 
 
 
 class SettingAlarm extends StatefulWidget {
-  final String uuiddata;
-  const SettingAlarm(this.uuiddata, Key? key) : super(key: key);
+  
+  const SettingAlarm( Key? key) : super(key: key);
 
   @override
   SettingAlarmState createState() => SettingAlarmState();
@@ -14,10 +13,9 @@ class SettingAlarm extends StatefulWidget {
 
 class SettingAlarmState extends State<SettingAlarm> {
 
-   late SecureStorage strage;
-  //스위치 true/false
-  bool switchListTileValue1 = true;
-  bool switchListTileValue2 = true;
+  late SecureStorage strage;
+  bool switchval = true;
+  bool switchval2 = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   
   get children => null;
@@ -49,71 +47,121 @@ class SettingAlarmState extends State<SettingAlarm> {
         centerTitle: true,
         elevation: 4,
       ),
-      backgroundColor: const Color.fromARGB(255, 99, 84, 84),
-      body: SafeArea(
+      backgroundColor: const Color(0xFFF5F5F5),
+      body: 
+      FutureBuilder(
+        future: setuuid(),
+        builder: (context, snapshot) {
+        if (snapshot.hasData == false) {
+          return const CircularProgressIndicator(); 
+        }
+        else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}'); 
+        }
+        else { 
+        return 
+        SafeArea(
         child: Column( children: <Widget>[
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: Row(
+          GestureDetector(          
+                onTap: () { 
+                  Switch(
+                    value: switchval2 ,
+                    onChanged: (newValue){
+                    setState(() => switchval2 = newValue);
+                    strage.write("Alarm", switchval2.toString());
+                    },
+                  );
+
+    },
+            child: Container(
+              height: 100,
+              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.all(8.0),
+              decoration: const BoxDecoration(
+                color: Color(0xFFEEEEEE),
+              ),
+            child:  Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RichText( 
-                text: TextSpan(children: [
+                text: const TextSpan(children: [
                   TextSpan(
                     text: '진 동',
-                    //텍스트를 클릭시 이벤트를 발생시키기 위함
-                    recognizer: TapGestureRecognizer()
-                    //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
-                    ..onTapDown = (details) {
-                    //onTapDown에서 반환되는 값으로 터치한 Screen 위치를 알 수 있다.
-                    print(details.globalPosition);
-                    },
-                    style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
+                    style: TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400)),
                     ]),
                     ),
                     Align(                                          
                     child: Switch(
-                      value: switchListTileValue1 ,
+                      value: switchval ,
                       onChanged: (newValue){
-                      strage.write("Alarm", switchListTileValue1.toString());
-                      setState(() => switchListTileValue1 = newValue);
+                      setState(() => switchval = newValue);
+                      strage.write("VIBRATE", switchval.toString());
                       },
                       ),
                       ),
                       ],
                       ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.all(10),
+        ),
+          GestureDetector(          
+              onTap: () { 
+              },
+            child: Container(
+              height: 100,
+              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.all(8.0),
+              decoration: const BoxDecoration(
+                color: Color(0xFFEEEEEE),
+              ),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   RichText( 
-                    text: TextSpan(children: [
+                    text: const TextSpan(children: [
                         TextSpan(
                             text: '알람음' ,
-                            //텍스트를 클릭시 이벤트를 발생시키기 위함
-                            recognizer: TapGestureRecognizer()
-                            //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
-                              ..onTapDown = (details) {
-                              },
-                            style: const TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400), ),
+                            style: TextStyle(color: Colors.red,fontSize: 20, fontWeight: FontWeight.w400), ),
                       ]),
                   ),
                   Switch(
-                    value: switchListTileValue2 ,
+                    value: switchval2 ,
                     onChanged: (newValue){
-                    strage.write("VIBRATE", switchListTileValue2.toString());
-                    setState(() => switchListTileValue2 = newValue);
+                    setState(() => switchval2 = newValue);
+
+                    strage.write("Alarm", switchval2.toString());
                     },
                   ),  
                 ],
               ),
           ),
+          )
         ],
       ),
-      ),
+      );
+      }})
     );
   }
-
+  
+  Future<String> setuuid() async{
+     String? vibrate = await strage.read("VIBRATE");
+     String? alarm = await strage.read("Alarm");
+     
+     if(vibrate==null){
+      setState(() {
+        switchval = false; 
+      });
+     }
+     if(alarm== null){
+      setState(() {
+       switchval2 = false; 
+      });
+     }
+     if(vibrate=="true")switchval= true;
+     if(vibrate=="false")switchval= false;
+     if(alarm=="true")switchval2= true;
+     if(alarm=="false")switchval2= false; 
+     
+     // 리턴 값이 있어야 감지가 됩니다!
+     return "re";
+  }
 }

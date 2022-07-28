@@ -1,33 +1,8 @@
 
-import 'dart:convert';
 import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:intl/intl.dart';
-
-
-class SettingWork extends StatelessWidget {
-
-  
-  final  int getstate;
-
-
-  const SettingWork(this.getstate,Key? key) : super(key: key);
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blueGrey,
-      ),
-      home:  Scaffold(
-        body: SettingWorkTime(getstate,null),
-      ),
-    );
-  }
-}
 
   
   class SettingWorkTime extends StatefulWidget {
@@ -50,6 +25,8 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
   List<String> week = ["월요일","화요일","수요일","목요일","금요일","토요일","일요일"];
   List<String> weekEN = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   List<String> timetext = ["TimeGetIn","TimeGetOut"];
+  List<String> weekAlarmIn = ["MondayAlarmIn","TuesdayAlarmIn","WednesdayAlarmIn","ThursdayAlarmIn","FridayAlarmIn","SaturdayAlarmIN","SundayAlarmIn"];
+  List<String> weekAlarmOut = ["MondayAlarmOut","TuesdayAlarmOut","WednesdayAlarmOut","ThursdayAlarmOut","FridayAlarmOut","SaturdayAlarmOut","SundayAlarmOut"];
 
   List<bool> switchday = [true,true,true,true,true,false,false]; //스위치 true/false
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -67,12 +44,12 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
       appBar: AppBar(
   leading: IconButton(
     icon: const Icon(Icons.arrow_back, color: Colors.black),
-    onPressed: () => Navigator.of(context).pop(),
+    onPressed: () => Navigator.pop(context),
   ), 
         backgroundColor: const Color(0x0fff5f5f),
         automaticallyImplyLeading: true,
         title: const Text(
-          'Beacon Scan', 
+          '알람 설정 ', 
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)
         ),
         actions: const [],
@@ -90,52 +67,47 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
             itemBuilder: (BuildContext context, int index) {
               return GestureDetector(
                 onTap: (){
-                  
-                openTimePicker(context, index);
-                  //Scaffold.of(context).showSnackBar(SnackBar(content: Text(index.toString())));
-                
+                  openTimePicker(context, index);
                 }, 
-                                child:  FutureBuilder(
+                  child:  FutureBuilder(
                     future: test(),
                     builder: (context, snapshot) {
-  
-                  // 해당 부분은 data를 아직 받아 오지 못했을 때 실행되는 부분
                   if (snapshot.hasData == false) {
-                    return CircularProgressIndicator(); // CircularProgressIndicator : 로딩 에니메이션
+                    return const CircularProgressIndicator();
                   }
-
-                  // error가 발생하게 될 경우 반환하게 되는 부분
                   else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}'); // 에러명을 텍스트에 뿌려줌
+                    return Text('Error: ${snapshot.error}'); 
                   }
-
-                  // 데이터를 정상적으로 받아오게 되면 다음 부분을 실행하게 되는 부분
                   else {
-                    //return Text(snapshot.data.toString());
-
                  return Container(
-      color: const Color(0xffF6F2F2),
-      width: double.infinity,
-      child: Row(
-             mainAxisAlignment: MainAxisAlignment.spaceAround,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        
-        children: [
-          if(widget.getstate==0)Text(timeGetIn[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-          if(widget.getstate==1)Text(timeGetOut[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-          Text(week[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-          Align(                                          
-          child: Switch(
-          value: switchday[index],
-          onChanged: (newValue) {
-            strage.write(weekEN[index], newValue.toString());
-            setState(() => switchday[index] = newValue);
-          }
-          ),
-          ),
-          ],
-          ),
-          );
+                  color: const Color(0xffF6F2F2),
+                  width: double.infinity,
+                  child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    
+                    children: [
+                      if(widget.getstate==0)Text(timeGetIn[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+                      if(widget.getstate==1)Text(timeGetOut[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+                      Text(week[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+                      Align(                                          
+                      child: Switch(
+                      value: switchday[index],
+                      onChanged: (newValue) {
+                        if(widget.getstate==0){
+                        setState(() => switchday[index] = newValue);
+                        strage.write(weekAlarmIn[index], newValue.toString());
+                        }
+                        if(widget.getstate==1){
+                        setState(() => switchday[index] = newValue);
+                        strage.write(weekAlarmOut[index], newValue.toString());
+                        }
+                      }
+                      ),
+                      ),
+                      ],
+                      ),
+                      );
                   }
                 }),
                 
@@ -172,16 +144,40 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
       use24hFormat:  true
     ).show(context);
      }
-  Future<String?> test() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map<String, dynamic> week = 
-    {'dayWeek':'월요일좋아','alarm':'ON' , 'workingTime':'08:30', 'quittingTime':'18:00'};
-    prefs.setString("day", json.encode(week));
-    String? userPref = prefs.getString('day');
-    Map<String,dynamic> Info = jsonDecode(userPref!) as Map<String, dynamic>;
-
-
-    return await "test";
+  Future<String> test() async{
+    //getstate가 0 이면 출근
+    if(widget.getstate==0){
+    for(int i=0; i<7; i++){
+     String? cheak = await strage.read(weekEN[i]+timetext[widget.getstate]);
+     if(cheak!=null){
+      timeGetIn[i] = cheak.toString();
+     }
+    }
+    }
+    //getstate가 1 이면 퇴근
+    if(widget.getstate==1){
+    for(int i=0; i<7; i++){
+     String? cheak = await strage.read(weekEN[i]+timetext[widget.getstate]);
+     if(cheak!=null){
+      timeGetOut[i] = cheak.toString();
+     }
+    }
+    }
+    for(int i=0; i<7; i++){
+      if(widget.getstate==0){
+      String? change = await strage.read(weekAlarmIn[i]);
+      if(change == null) switchday[i] = false;
+      if(change=="true")switchday[i]= true;
+      if(change=="false")switchday[i]= false;
+      }
+      if(widget.getstate==1){
+      String? change = await strage.read(weekAlarmOut[i]);
+      if(change == null) switchday[i] = false;
+      if(change=="true")switchday[i]= true;
+      if(change=="false")switchday[i]= false;
+      }
+    }
+    return "re";
   }
 }
 
