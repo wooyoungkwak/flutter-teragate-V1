@@ -51,7 +51,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   void initState() {
     super.initState();
 
-    // initBeacon(setNotification, setRunning, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController, secureStorage);
+    secureStorage = SecureStorage();
+    initBeacon(setNotification, setRunning, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController, secureStorage);
     
     WidgetsBinding.instance.addObserver(this);
 
@@ -59,7 +60,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     const duration = Duration(seconds: 10);
 
     initNotification();
-    secureStorage = SecureStorage();
   }
 
   @override
@@ -147,7 +147,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                       if (isRunning) {
                         await stopBeacon();
                       } else {
-                        // await restartBeacon(initBeacon(setNotification, setRunning, setResult, setGlovalVariable, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController, secureStorage));
+                        await restartBeacon();
                       }
                       setRunning(!isRunning);
                       

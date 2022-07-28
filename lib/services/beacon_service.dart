@@ -11,8 +11,7 @@ import 'package:teragate_test/utils/time_util.dart';
 import '../models/beacon_model.dart';
 
 // 비콘 초기화
-Future<void> initBeacon(Function setNotification, Function setRunning, Function setResult, Function setGlovalVariable, Function setForGetIn, Function getIsRunning, Function getWorkSucces, StreamController<String> beaconStreamController, SecureStorage secureStorage) async {
-
+Future<void> initBeacon(Function setNotification, Function setRunning, Function setForGetIn, Function getIsRunning, Function getWorkSucces, StreamController<String> beaconStreamController, SecureStorage secureStorage) async {
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
 
@@ -20,17 +19,18 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
       if (Env.isDebug) Log.debug(" ********* Call Method: ${call.method}");
 
       if (call.method == 'scannerReady') {
-        startBeacon();
+        setBeacon();
+        await startBeacon();
         setRunning(true);
       } else if (call.method == 'isPermissionDialogShown') {
         setNotification("Beacon 을 스켄할 수 없습니다. ??? ");
       }
     });
     BeaconsPlugin.listenToBeacons(beaconStreamController);
-
   } else if (Platform.isIOS) {
     BeaconsPlugin.listenToBeacons(beaconStreamController);
-    startBeacon();
+    setBeacon();
+    await startBeacon();
     setRunning(true);
   }
 
@@ -38,13 +38,10 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
   await BeaconsPlugin.runInBackground(true);
 
   //Valid values: 0 = no messages, 1 = errors, 2 = all messages
-  beaconStreamController.stream.listen((data) async {
-
+  beaconStreamController.stream.listen(
+      (data) async {
         if (data.isNotEmpty && getIsRunning()) {
-          setResult("출근 처리 중입니다.", false);
-
           if (!getWorkSucces()) {
-
             String? uuid = await secureStorage.read(Env.KEY_UUID);
 
             BeaconsPlugin.stopMonitoring(); //모니터링 종료
@@ -52,7 +49,7 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
             Map<String, dynamic> userMap = jsonDecode(data);
             var iBeacon = BeaconData.fromJson(userMap);
 
-            if ( iBeacon.uuid != uuid ) {
+            if (iBeacon.uuid != uuid) {
               return;
             }
 
@@ -73,29 +70,15 @@ Future<void> initBeacon(Function setNotification, Function setRunning, Function 
 }
 
 Future<void> setBeacon() async {
-  /* 
-  BeaconsPlugin.addRegion("myBeacon", "01022022-f88f-0000-00ae-9605fd9bb620");
-  BeaconsPlugin.addRegion("iBeacon", "12345678-1234-5678-8f0c-720eaf059935");
-  */
-
-  // await BeaconsPlugin.addRegion(
-  //     "Teraenergy", "12345678-1234-5678-8f0c-720eaf059935");
-
-  BeaconsPlugin.addBeaconLayoutForAndroid(
-      "m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
-  BeaconsPlugin.addBeaconLayoutForAndroid(
-      "m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24");
-  BeaconsPlugin.setForegroundScanPeriodForAndroid(
-      foregroundScanPeriod: 2200, foregroundBetweenScanPeriod: 10);
-  BeaconsPlugin.setBackgroundScanPeriodForAndroid(
-      backgroundScanPeriod: 2200, backgroundBetweenScanPeriod: 10);
-
-  BeaconsPlugin.addRegionForIOS("74278bdb-b644-4520-8f0c-720eeaffffff", 65504, 5000, "iBeacon");
+  await BeaconsPlugin.addRegion("iBeacon", "74278bdb-b644-4520-8f0c-720eeaffffff");
+  BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
+  BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24");
+  BeaconsPlugin.setForegroundScanPeriodForAndroid(foregroundScanPeriod: 2200, foregroundBetweenScanPeriod: 10);
+  BeaconsPlugin.setBackgroundScanPeriodForAndroid(backgroundScanPeriod: 2200, backgroundBetweenScanPeriod: 10);
 }
 
 Future<void> initBeaconBySetting() async {
   final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
-
 }
 
 // 비콘 시작
@@ -104,7 +87,6 @@ Future<void> startBeacon() async {
 }
 
 Future<void> restartBeacon() async {
-  // initBeacons();
   setBeacon();
   await startBeacon();
 }
