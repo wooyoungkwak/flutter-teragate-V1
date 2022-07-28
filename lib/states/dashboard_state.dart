@@ -147,7 +147,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
                   String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
                   String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
-                  processGetIn(accessToken!, refreshToken!, deviceip!, secureStorage).then((workInfo) {
+                  processGetIn(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
                     if(workInfo.success) {
                       setNotification("출근 등록이 완료 되었습니다.");
                     } else {
@@ -161,7 +161,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 onTap: () async{
                   String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
                   String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
-                  processGetOut(accessToken!, refreshToken!, deviceip!, secureStorage).then((workInfo) {
+                  processGetOut(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
                     if(workInfo.success) {
                       setNotification("출근 등록이 완료 되었습니다.");
                     } else {

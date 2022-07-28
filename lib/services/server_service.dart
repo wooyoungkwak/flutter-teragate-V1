@@ -75,15 +75,15 @@ Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
 }
 
 // 출근 요청 처리
-Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip, SecureStorage secureStorage) async {
+Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
   String? isGetInCheck = await secureStorage.read(Env.KEY_GET_IN_CHECK);
   TokenInfo tokenInfo;
   WorkInfo workInfo;
-  
+
   if (isGetInCheck != null && isGetInCheck == getDateToStringForYYYYMMDDInNow()) {
     // 출근 처리 가 이미 된 경우
     workInfo = WorkInfo(success: false, message: "exist");
-  } else { 
+  } else {
     workInfo = await getIn(accessToken, ip);
     if (workInfo.success) {
       // 정상 등록 된 경우
@@ -91,14 +91,17 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
       secureStorage.write(Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
     } else {
       if (workInfo.message == "expired") {
-       // 만료 인 경우 재 요청 경우  
+        // 만료 인 경우 재 요청 경우
         tokenInfo = await getTokenByRefreshToken(refreshToken);
 
         // Token 저장
         secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
         secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
 
-        return await processGetIn(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage);
+        repeat++;
+        if (repeat < 2) {
+          return await processGetIn(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
+        }
       }
     }
   }
@@ -107,7 +110,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
 }
 
 // 퇴근 요청 처리
-Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String ip, SecureStorage secureStorage) async {
+Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
   WorkInfo workInfo = await getOut(accessToken, ip);
   TokenInfo tokenInfo;
 
@@ -123,7 +126,10 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
       secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
       secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
 
-      return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage);
+      repeat++;
+      if (repeat < 2) {
+        return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
+      }
     }
   }
 
