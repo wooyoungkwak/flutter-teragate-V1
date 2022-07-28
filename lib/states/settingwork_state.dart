@@ -2,7 +2,6 @@ import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:intl/intl.dart';
-import 'package:teragate_test/utils/debug_util.dart';
 import 'package:teragate_test/config/env.dart';
 
 class SettingWorkTime extends StatefulWidget {
@@ -16,13 +15,12 @@ class SettingWorkTime extends StatefulWidget {
 
 class SettingWorkTimeState extends State<SettingWorkTime> {
   late SecureStorage secureStorage;
-
-  //
+  
   List<String> initTimeGetIn = ["08:30", "08:30", "08:30", "08:30", "08:30", "08:30", "08:30"];
   List<String> initTimeGetOut = ["18:30", "18:30", "18:30", "18:30", "18:30", "18:30", "18:30"];
   List<String> weekKR = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-  List<String> weekEN = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  List<String> timetext = ["TimeGetIn", "TimeGetOut"];
+  List<String> weekAlarmInTime = [Env.KEY_SETTING_MON_GI_TIME, Env.KEY_SETTING_TUE_GI_TIME, Env.KEY_SETTING_WED_GI_TIME, Env.KEY_SETTING_THU_GI_TIME, Env.KEY_SETTING_FRI_GI_TIME, Env.KEY_SETTING_SAT_GI_TIME, Env.KEY_SETTING_SUN_GI];
+  List<String> weekAlarmOutTime = [Env.KEY_SETTING_MON_GO_TIME, Env.KEY_SETTING_TUE_GO_TIME, Env.KEY_SETTING_WED_GO_TIME, Env.KEY_SETTING_THU_GO_TIME, Env.KEY_SETTING_FRI_GO_TIME, Env.KEY_SETTING_SAT_GO_TIME, Env.KEY_SETTING_SUN_GO];
   List<String> weekAlarmIn = [Env.KEY_SETTING_MON_GI, Env.KEY_SETTING_TUE_GI, Env.KEY_SETTING_WED_GI, Env.KEY_SETTING_THU_GI, Env.KEY_SETTING_FRI_GI, Env.KEY_SETTING_SAT_GI, Env.KEY_SETTING_SUN_GI];
   List<String> weekAlarmOut = [Env.KEY_SETTING_MON_GO, Env.KEY_SETTING_TUE_GO, Env.KEY_SETTING_WED_GO, Env.KEY_SETTING_THU_GO, Env.KEY_SETTING_FRI_GO, Env.KEY_SETTING_SAT_GO, Env.KEY_SETTING_SUN_GO];
 
@@ -108,8 +106,8 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
             titleStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.orange),
             onSubmit: (index) async {
               String formattedDate = DateFormat('kk:mm').format(index).toString();
-              //stage에 저장 (키값:요일+text[출근/퇴근], 선택 날짜+시간);
-              secureStorage.write(weekEN[weekindex] + timetext[widget.getstate], formattedDate);
+              if (widget.getstate == 0) secureStorage.write(weekAlarmInTime[weekindex], formattedDate);
+              if (widget.getstate == 1) secureStorage.write(weekAlarmOutTime[weekindex], formattedDate);
               setState(() {
                 if (widget.getstate == 0) {
                   initTimeGetIn[weekindex] = formattedDate;
@@ -127,7 +125,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     //getstate가 0 이면 출근
     if (widget.getstate == 0) {
       for (int i = 0; i < 7; i++) {
-        String? cheak = await secureStorage.read(weekEN[i] + timetext[widget.getstate]);
+        String? cheak = await secureStorage.read(weekAlarmInTime[i]);
         if (cheak != null) {
           initTimeGetIn[i] = cheak.toString();
         }
@@ -136,7 +134,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     //getstate가 1 이면 퇴근
     if (widget.getstate == 1) {
       for (int i = 0; i < 7; i++) {
-        String? cheak = await secureStorage.read(weekEN[i] + timetext[widget.getstate]);
+        String? cheak = await secureStorage.read(weekAlarmOutTime[i]);
         if (cheak != null) {
           initTimeGetOut[i] = cheak.toString();
         }
