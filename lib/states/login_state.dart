@@ -152,14 +152,13 @@ class LoginState extends State<Login> {
 
                           login(_loginIdContoroller.text, _passwordContorller.text).then((loginInfo) {
                             if (loginInfo.success!) {
-                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
-
                               secureStorage.write(Env.LOGIN_ID, _loginIdContoroller.text);
                               secureStorage.write(Env.LOGIN_PW, _passwordContorller.text);
                               secureStorage.write('krName', '${loginInfo.data?['krName']}');
                               secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
                               secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
                               
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
                             } else {
                               showSnackBar(context, loginInfo.message!);
                             }

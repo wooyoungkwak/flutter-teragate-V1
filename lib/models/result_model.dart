@@ -18,7 +18,7 @@ class LoginInfo {
   TokenInfo? tokenInfo;
 
   static LoginInfo fromJson(Map<String, dynamic> json) {
-    TokenInfo tokenInfo = TokenInfo(accessToken: json["accessToken"], refreshToken: json["refreshToken"]);
+    TokenInfo tokenInfo = TokenInfo(accessToken: json["accessToken"], refreshToken: json["refreshToken"], isUpdated: true);
     return LoginInfo( json["success"], json["data"], "", tokenInfo ); 
   }
 
@@ -41,17 +41,17 @@ class WorkInfo {
   });
 
   static WorkInfo fromJson(Map<String, dynamic> json) {
-    return WorkInfo(
-        success: json["success"], 
-        message: ""
-    ); 
-  }
-
-  static WorkInfo fromJsonByFail(Map<String, dynamic> json) {
-    return WorkInfo(
+    if (json["success"]) {
+      return WorkInfo(
+          success: json["success"], 
+          message: ""
+      ); 
+    } else {
+      return WorkInfo(
         success: json["success"], 
         message: json["message"]
     ); 
+    }
   }
 
   Map<String, dynamic> toJson() => 
@@ -61,15 +61,17 @@ class WorkInfo {
 }
 
 class TokenInfo {
-  bool? refreshAble;
+  bool isUpdated;
   String accessToken;
   String refreshToken;
+  String? message;
 
   TokenInfo(
     {
       required this.accessToken, 
       required this.refreshToken,
-      this.refreshAble
+      this.message,
+      required this.isUpdated
     }
   );
 
@@ -80,9 +82,9 @@ class TokenInfo {
   String getRefreshToken() {
     return refreshToken;
   }
- 
-  bool? isRefresh() {
-    return refreshAble;
+
+  String? getMessage() {
+    return message;
   }
 
   void setAccessToken(String accessToken){

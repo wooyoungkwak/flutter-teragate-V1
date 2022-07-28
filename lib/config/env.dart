@@ -16,10 +16,18 @@ class Env {
   static const String LOGIN_ID = 'LOGIN_ID';
   static const String LOGIN_PW = 'LOGIN_PW';
 
+  static const String KEY_SUCCESS = "sucess";
+  static const String KEY_MESSAGE = "message";
   static const String KEY_ACCESS_TOKEN = "accessToken";
   static const String KEY_REFRESH_TOKEN = "refreshToken";
   static const String KEY_GET_IN_CHECK = "getInCheck";
   static const String KEY_GET_OUT_CHECK = "getOutCheck";
+
+  static const String MSG_GET_IN_EXIST = "exist";
+  static const String MSG_GET_IN_SUCCESS = "출근 등록 되었습니다.";
+  static const String MSG_GET_OUT_SUCCESS = "퇴근 등록 되었습니다.";
+  static const String MSG_GET_IN_FAIL = "출근 등록을 실패 하였습니다.";
+  static const String MSG_GET_OUT_FAIL = "퇴근 등록을 실패 하였습니다.";
 
 
   static const String TITLE_DIALOG = "알림";

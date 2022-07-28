@@ -51,8 +51,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   void initState() {
     super.initState();
 
-    initBeacon(setNotification, setRunning, setResult, setGlovalVariable, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
-
+    // initBeacon(setNotification, setRunning, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
+    
     WidgetsBinding.instance.addObserver(this);
 
     getIPAddress().then((map) => deviceip = map["ip"]);
@@ -77,121 +77,103 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(    
-      onWillPop: () {
+    return WillPopScope(
+        onWillPop: () {
           SystemNavigator.pop();
           return Future(() => false);
         },
-    child: MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('TERA GATE 출퇴근'),
-          automaticallyImplyLeading: false,
-          actions: <Widget>[
-            IconButton(
-              onPressed: () {
-                showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
-              },
-              icon: const Icon(
-                Icons.logout_rounded,
-              ),
-            ),
-          ],
-        ),
-        body: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Container(
-                child: const Text(
-                  "근태 확인",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.blue,
+        child: MaterialApp(
+          home: Scaffold(
+            appBar: AppBar(
+              title: const Text('TERA GATE 출퇴근'),
+              automaticallyImplyLeading: false,
+              actions: <Widget>[
+                IconButton(
+                  onPressed: () {
+                    showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+                  },
+                  icon: const Icon(
+                    Icons.logout_rounded,
                   ),
                 ),
-                margin: const EdgeInsets.all(8.0),
+              ],
+            ),
+            body: Center(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Container(
+                    child: const Text(
+                      "근태 확인",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.blue,
+                      ),
+                    ),
+                    margin: const EdgeInsets.all(8.0),
+                  ),
+                  const SizedBox(
+                    height: 20.0,
+                  ),
+                  Expanded(child: comuteItem()), // 변경 ui 출력 테스트
+                  TimerBuilder.periodic(
+                    const Duration(seconds: 1),
+                    builder: (context) {
+                      return Text(
+                        getDateToStringForAllInNow(),
+                        style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w200),
+                      );
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 20.0,
-              ),
-              Expanded(child: comuteItem()), // 변경 ui 출력 테스트
-              TimerBuilder.periodic(
-                const Duration(seconds: 1),
-                builder: (context) {
-                  return Text(
-                    getDateToStringForAllInNow(),
-                    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w200),
-                  );
-                },
-              ),
-            ],
+            ),
+            //플로팅 버튼 추가하기. - 해당 버튼 변경시키기.
+
+            floatingActionButton: SpeedDial(
+              animatedIcon: AnimatedIcons.menu_close,
+              backgroundColor: Colors.redAccent,
+              overlayColor: Colors.grey,
+              overlayOpacity: 0.5,
+              closeManually: true,
+              children: [
+                SpeedDialChild(
+                    child: const Icon(Icons.copy),
+                    label: '출근',
+                    // backgroundColor: Colors.blue,
+                    onTap: () async {
+                      if (isRunning) {
+                        await stopBeacon();
+                      } else {
+                        await restartBeacon();
+                      }
+                      setRunning(!isRunning);
+                      setForGetIn();
+                    }),
+                SpeedDialChild(
+                    child: const Icon(Icons.copy),
+                    label: '퇴근',
+                    onTap: () async {
+                      setForGetOut();
+                    }),
+                SpeedDialChild(
+                    child: const Icon(Icons.copy),
+                    label: '그룹웨어',
+                    onTap: () async {
+                      moveWebview(context, id!, pw!);
+                    }),
+                SpeedDialChild(
+                    child: const Icon(Icons.copy),
+                    label: '환경설정',
+                    onTap: () async {
+                      moveSetting(context);
+                    }),
+              ],
+            ),
           ),
-        ),
-        //플로팅 버튼 추가하기. - 해당 버튼 변경시키기.
-
-        floatingActionButton: SpeedDial(
-          animatedIcon: AnimatedIcons.menu_close,
-          backgroundColor: Colors.redAccent,
-          overlayColor: Colors.grey,
-          overlayOpacity: 0.5,
-          closeManually: true,
-          children: [
-            SpeedDialChild(
-                child: const Icon(Icons.copy),
-                label: '출근',
-                // backgroundColor: Colors.blue,
-                onTap: () async {
-                  if (isRunning) {
-                    await stopBeacon();
-                  } else {
-                    await restartBeacon();
-                  }
-                  setRunning(!isRunning);
-
-                  String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-                  String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
-                  processGetIn(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
-                    if(workInfo.success) {
-                      setNotification("출근 등록이 완료 되었습니다.");
-                    } else {
-                      setNotification("출근 등록이 실패 되었습니다. : " +  workInfo.message);
-                    }
-                  });
-                }),
-            SpeedDialChild(
-                child: const Icon(Icons.copy),
-                label: '퇴근',
-                onTap: () async{
-                  String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-                  String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
-                  processGetOut(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
-                    if(workInfo.success) {
-                      setNotification("출근 등록이 완료 되었습니다.");
-                    } else {
-                      setNotification("출근 등록이 실패 되었습니다. : " +  workInfo.message);
-                    }
-                  });
-                }),
-            SpeedDialChild(
-                child: const Icon(Icons.copy),
-                label: '그룹웨어',
-                onTap: () async{
-                  moveWebview(context, id!, pw!);
-                }),
-            SpeedDialChild(
-                child: const Icon(Icons.copy),
-                label: '환경설정',
-                onTap: () async{
-                  moveSetting(context);
-                }),
-          ],
-        ),
-      ),
-    )
-   );
+        ));
   }
 
   Widget comuteItem() {
@@ -254,18 +236,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     });
   }
 
-  void setResult(String message, bool workSucces) {
-    // if (workSucces) {
-    //   workSucces = true;
-    // }
-  }
-
-  void setGlovalVariable(String _name, String _id, String _pw) {
-    name = _name;
-    id = _id;
-    pw = _pw;
-  }
-
   bool getIsRunning() {
     return isRunning;
   }
@@ -275,7 +245,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   // 로그인 화면으로 이동
-  void moveLogin() {
+  void moveLogin() async{
+    String? isChecked = await secureStorage.read(Env.ID_CHECK);
+    if ( isChecked == null && isChecked == "false") {
+      secureStorage.write(Env.LOGIN_ID, "");
+    }
+    secureStorage.write(Env.LOGIN_PW, "");
     Navigator.push(context, MaterialPageRoute(builder: (_) => const Login()));
   }
 
@@ -292,11 +267,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   // 출근 등록
   void setForGetIn() async {
     String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-    getIn(deviceip!, accessToken!).then((workInfo) {
+    String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
+    processGetIn(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
-        showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
+        setNotification(workInfo.message);
       } else {
-        showConfirmDialog(context, Env.TITLE_DIALOG, "출근처리가 되지 않았습니다. ");
+        setNotification(workInfo.message);
       }
     });
   }
@@ -304,12 +280,14 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   // 퇴근 등록
   void setForGetOut() async {
     String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
-    getOut(deviceip!, accessToken!).then((workInfo) {
+    String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
+    processGetOut(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
-        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
+        setNotification(workInfo.message);
       } else {
-        showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근처리가 되지 않았습니다. ");
+        setNotification(workInfo.message);
       }
     });
   }
+
 }
