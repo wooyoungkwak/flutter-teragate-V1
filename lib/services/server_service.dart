@@ -5,6 +5,7 @@ import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/result_model.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/utils/time_util.dart';
+import 'package:teragate_test/utils/debug_util.dart';
 
 Map<String, String> headers = {};
 
@@ -129,6 +130,8 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
       repeat++;
       if (repeat < 2) {
         return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
+      } else {
+        Log.debug(" ========> repeat value is 2 over..... ");
       }
     }
   }

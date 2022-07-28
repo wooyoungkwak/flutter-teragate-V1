@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:teragate_test/config/env.dart';
+import 'package:teragate_test/utils/debug_util.dart';
 
 Future main() async {
 
@@ -81,7 +82,7 @@ class WebViewState extends State<WebViews> {
 
   @override
   Widget build(BuildContext context) {
-    if(Env.isDebug) debugPrint("웹 실행");
+     Log.debug("웹 실행");
           param = {
         "loginId": widget.id,
         "password": widget.pw,
@@ -162,7 +163,7 @@ class WebViewState extends State<WebViews> {
                     });
                   },
                   onConsoleMessage: (controller, consoleMessage) {
-                    if(Env.isDebug) debugPrint(consoleMessage.toString());
+                     Log.debug(consoleMessage.toString());
                   },
                 ),
                 progress < 1.0

@@ -3,7 +3,7 @@ import 'package:bottom_picker/bottom_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:intl/intl.dart';
-
+import 'package:teragate_test/utils/debug_util.dart';
   
   class SettingWorkTime extends StatefulWidget {
     
@@ -129,7 +129,6 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
       onSubmit: (index) async {
         String formattedDate = DateFormat('kk:mm').format(index).toString();
         //stage에 저장 (키값:요일+text[출근/퇴근], 선택 날짜+시간);
-        debugPrint(formattedDate);
         strage.write(weekEN[weekindex]+timetext[widget.getstate],formattedDate);
     setState(() {
       if(widget.getstate==0){

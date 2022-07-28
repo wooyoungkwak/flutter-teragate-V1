@@ -1,5 +1,5 @@
 class Env {
-  static const String TEST_SERVER = "http://192.168.0.164";
+  static const String TEST_SERVER = "http://192.168.0.247";
   static const String REAL_SERVER = "http://teraenergy.iptime.org";
 
   static const String SERVER_LOGIN_URL = '$TEST_SERVER:3000/login';
