@@ -113,20 +113,20 @@ class LoginState extends State<Login> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        Checkbox(
+                          activeColor: Colors.white,
+                          checkColor: Colors.blue,
+                          value: checkBoxValue,
+                          onChanged: (value) {
+                            setState(() {
+                              checkBoxValue = value!;
+                            });
+                            strage.write("IdStorageCheck", checkBoxValue.toString());
+                          },
+                        ),
                         const Text('아이디 저장    '),
                         Transform.scale(
                           scale: 1.5,
-                          child: Checkbox(
-                            activeColor: Colors.white,
-                            checkColor: Colors.blue,
-                            value: checkBoxValue,
-                            onChanged: (value) {
-                              setState(() {
-                                checkBoxValue = value!;
-                              });
-                              strage.write("IdStorageCheck", checkBoxValue.toString());
-                            },
-                          ),
                         ),
                       ],
                     ),
