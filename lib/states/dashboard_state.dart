@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 
@@ -9,15 +8,16 @@ import 'package:date_format/date_format.dart';
 import 'package:teragate_test/states/setting_state.dart';
 import 'package:timer_builder/timer_builder.dart';
 
+import 'package:teragate_test/config/env.dart';
+import 'package:teragate_test/models/storage_model.dart';
+import 'package:teragate_test/models/result_model.dart';
 import 'package:teragate_test/services/network_service.dart';
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/beacon_service.dart';
-import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/webview_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
-
-import 'package:teragate_test/models/storage_model.dart';
+import 'package:teragate_test/utils/time_util.dart';
 
 //플러터 플로팅버튼용
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -34,7 +34,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   late SecureStorage secureStorage;
 
   int nrMessagesReceived = 0;
-  final results = [];
 
   String? name = "test";
   String? id = "test1"; //id
@@ -45,22 +44,18 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   bool isInForeground = true;
   var workSucces = false;
 
-  late DateTime alertTime;
-  final StreamController<String> beaconStreamController =
-      StreamController<String>.broadcast();
+  final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
 
   @override
   void initState() {
     super.initState();
 
-    initBeacon(setNotification, setRunning, setResult, setGlovalVariable,
-        setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
+    initBeacon(setNotification, setRunning, setResult, setGlovalVariable, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
 
     WidgetsBinding.instance.addObserver(this);
 
     getIPAddress().then((map) => deviceip = map["ip"]);
     const duration = Duration(seconds: 10);
-    alertTime = DateTime.now().add(duration);
 
     initNotification();
     secureStorage = SecureStorage();
@@ -89,8 +84,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           actions: <Widget>[
             IconButton(
               onPressed: () {
-                showOkCancelDialog(
-                    context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
+                showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
               },
               icon: const Icon(
                 Icons.logout_rounded,
@@ -122,9 +116,8 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                 const Duration(seconds: 1),
                 builder: (context) {
                   return Text(
-                    formatDate(DateTime.now(), [hh, ':', nn, ':', ss, ' ', am]),
-                    style: const TextStyle(
-                        fontSize: 30, fontWeight: FontWeight.w200),
+                    getDateToStringForAllInNow(),
+                    style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w200),
                   );
                 },
               ),
@@ -141,34 +134,51 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           closeManually: true,
           children: [
             SpeedDialChild(
-                child: Icon(Icons.copy),
-                label: '출근(임시용)',
-                backgroundColor: Colors.blue,
+                child: const Icon(Icons.copy),
+                label: '출근',
+                // backgroundColor: Colors.blue,
                 onTap: () async {
                   if (isRunning) {
                     await stopBeacon();
                   } else {
-                    await startBeacon();
+                    await restartBeacon();
                   }
                   setRunning(!isRunning);
-                  setForGetIn();
+
+                  String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+                  String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
+                  processGetIn(accessToken!, refreshToken!, deviceip!, secureStorage).then((workInfo) {
+                    if(workInfo.success) {
+                      setNotification("출근 등록이 완료 되었습니다.");
+                    } else {
+                      setNotification("출근 등록이 실패 되었습니다. : " +  workInfo.message);
+                    }
+                  });
                 }),
             SpeedDialChild(
-                child: Icon(Icons.copy),
+                child: const Icon(Icons.copy),
                 label: '퇴근',
-                onTap: () {
-                  setForGetOut();
+                onTap: () async{
+                  String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
+                  String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
+                  processGetIn(accessToken!, refreshToken!, deviceip!, secureStorage).then((workInfo) {
+                    if(workInfo.success) {
+                      setNotification("출근 등록이 완료 되었습니다.");
+                    } else {
+                      setNotification("출근 등록이 실패 되었습니다. : " +  workInfo.message);
+                    }
+                  });
                 }),
             SpeedDialChild(
-                child: Icon(Icons.copy),
+                child: const Icon(Icons.copy),
                 label: '그룹웨어',
-                onTap: () {
+                onTap: () async{
                   moveWebview(context, id!, pw!);
                 }),
             SpeedDialChild(
-                child: Icon(Icons.copy),
+                child: const Icon(Icons.copy),
                 label: '환경설정',
-                onTap: () {
+                onTap: () async{
                   moveSetting(context);
                 }),
           ],
@@ -179,63 +189,56 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   Widget comuteItem() {
     return Scaffold(
-      body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              child: Text(
-                "이름 : $name",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.blue,
-                ),
-              ),
-              margin: const EdgeInsets.all(8.0),
+      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+        Container(
+          child: Text(
+            "이름 : $name",
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.blue,
             ),
-            Container(
-              child: Text(
-                "디바이스 아이피 : $deviceip",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.blue,
-                ),
-              ),
-              margin: const EdgeInsets.all(8.0),
+          ),
+          margin: const EdgeInsets.all(8.0),
+        ),
+        Container(
+          child: Text(
+            "디바이스 아이피 : $deviceip",
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.blue,
             ),
-            Container(
-              child: Text(
-                "접속시간 : $alertTime",
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.blue,
-                ),
-              ),
-              margin: const EdgeInsets.all(8.0),
-            )
-          ]),
+          ),
+          margin: const EdgeInsets.all(8.0),
+        ),
+        Container(
+          child: Text(
+            "접속시간 : ${getDateToStringForAllInNow()}",
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: Colors.blue,
+            ),
+          ),
+          margin: const EdgeInsets.all(8.0),
+        )
+      ]),
     );
   }
 
   // Notifcation 알람 초기화
   Future<void> initNotification() async {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
-    var initializationSettingsAndroid =
-        const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS =
-        const IOSInitializationSettings(onDidReceiveLocalNotification: null);
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = const IOSInitializationSettings(onDidReceiveLocalNotification: null);
+    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: null);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
   }
 
   void setNotification(String message) {
-    showNotification(flutterLocalNotificationsPlugin,
-        Env.TITLE_BEACON_NOTIFICATION, message);
+    showNotification(flutterLocalNotificationsPlugin, Env.TITLE_BEACON_NOTIFICATION, message);
   }
 
   void setRunning(bool state) {
@@ -245,11 +248,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   void setResult(String message, bool workSucces) {
-    results.add(message);
-    if (workSucces) {
-      workSucces = true;
-      alertTime = DateTime.now().add(const Duration(seconds: 10));
-    }
+    // if (workSucces) {
+    //   workSucces = true;
+    // }
   }
 
   void setGlovalVariable(String _name, String _id, String _pw) {
@@ -273,23 +274,20 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   // 웹 뷰 화면으로 이동
   void moveWebview(BuildContext context, String? id, String? pw) {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => WebViews(id!, pw!, null)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(id!, pw!, null)));
   }
 
   //환경 설정 화면으로 이동
   void moveSetting(BuildContext context) {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const Setting(null)));
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const Setting(null)));
   }
 
   // 출근 등록
-  void setForGetIn() async{
+  void setForGetIn() async {
     String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
     getIn(deviceip!, accessToken!).then((workInfo) {
       if (workInfo.success) {
         showConfirmDialog(context, Env.TITLE_DIALOG, "출근하셨습니다 $name님!");
-        setResult("msg: $name님 출근", true);
       } else {
         showConfirmDialog(context, Env.TITLE_DIALOG, "출근처리가 되지 않았습니다. ");
       }
@@ -297,12 +295,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   // 퇴근 등록
-  void setForGetOut() async{
+  void setForGetOut() async {
     String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
     getOut(deviceip!, accessToken!).then((workInfo) {
       if (workInfo.success) {
         showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근하셨습니다 $name님!");
-        setResult("msg: $name님 퇴근", false);
       } else {
         showConfirmDialog(context, Env.TITLE_DIALOG, "퇴근처리가 되지 않았습니다. ");
       }

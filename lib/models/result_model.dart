@@ -61,13 +61,17 @@ class WorkInfo {
 }
 
 class TokenInfo {
+  bool? refreshAble;
   String accessToken;
   String refreshToken;
-  
-  TokenInfo({
+
+  TokenInfo(
+    {
       required this.accessToken, 
-      required this.refreshToken
-  });
+      required this.refreshToken,
+      this.refreshAble
+    }
+  );
 
   String getAccessToken() {
     return accessToken;
@@ -77,6 +81,10 @@ class TokenInfo {
     return refreshToken;
   }
  
+  bool? isRefresh() {
+    return refreshAble;
+  }
+
   void setAccessToken(String accessToken){
     this.accessToken = accessToken;
   }

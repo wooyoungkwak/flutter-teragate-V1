@@ -18,6 +18,9 @@ class Env {
 
   static const String KEY_ACCESS_TOKEN = "accessToken";
   static const String KEY_REFRESH_TOKEN = "refreshToken";
+  static const String KEY_GET_IN_CHECK = "getInCheck";
+  static const String KEY_GET_OUT_CHECK = "getOutCheck";
+
 
   static const String TITLE_DIALOG = "알림";
   static const String TITLE_BEACON_NOTIFICATION = "Beacons Set";
