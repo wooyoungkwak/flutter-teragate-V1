@@ -13,7 +13,7 @@ class SettingAlarm extends StatefulWidget {
 
 class SettingAlarmState extends State<SettingAlarm> {
 
-  late SecureStorage strage;
+  late SecureStorage secureStorage;
   bool switchval = true;
   bool switchval2 = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -24,7 +24,7 @@ class SettingAlarmState extends State<SettingAlarm> {
   void initState() {
     super.initState();
     
-    strage = SecureStorage();
+    secureStorage = SecureStorage();
   }
   @override
   Widget build(BuildContext context) {
@@ -68,7 +68,7 @@ class SettingAlarmState extends State<SettingAlarm> {
                     value: switchval2 ,
                     onChanged: (newValue){
                     setState(() => switchval2 = newValue);
-                    strage.write("Alarm", switchval2.toString());
+                    secureStorage.write("Alarm", switchval2.toString());
                     },
                   );
 
@@ -95,7 +95,7 @@ class SettingAlarmState extends State<SettingAlarm> {
                       value: switchval ,
                       onChanged: (newValue){
                       setState(() => switchval = newValue);
-                      strage.write("VIBRATE", switchval.toString());
+                      secureStorage.write("VIBRATE", switchval.toString());
                       },
                       ),
                       ),
@@ -128,7 +128,7 @@ class SettingAlarmState extends State<SettingAlarm> {
                     onChanged: (newValue){
                     setState(() => switchval2 = newValue);
 
-                    strage.write("Alarm", switchval2.toString());
+                    secureStorage.write("Alarm", switchval2.toString());
                     },
                   ),  
                 ],
@@ -143,8 +143,8 @@ class SettingAlarmState extends State<SettingAlarm> {
   }
   
   Future<String> setuuid() async{
-     String? vibrate = await strage.read("VIBRATE");
-     String? alarm = await strage.read("Alarm");
+     String? vibrate = await secureStorage.read("VIBRATE");
+     String? alarm = await secureStorage.read("Alarm");
      
      if(vibrate==null){
       setState(() {

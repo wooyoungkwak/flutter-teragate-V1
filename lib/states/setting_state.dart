@@ -20,7 +20,7 @@ class Setting extends StatefulWidget {
 
 class SettingState extends State<Setting>  {
 
-  late SecureStorage strage;
+  late SecureStorage secureStorage;
   //스위치 true/false
   bool switchgetin = true;
   bool switchgetout = true;
@@ -31,7 +31,7 @@ class SettingState extends State<Setting>  {
   void initState() {
     super.initState();
     
-    strage = SecureStorage();
+    secureStorage = SecureStorage();
   }
 
   @override
@@ -141,7 +141,7 @@ class SettingState extends State<Setting>  {
                       value: switchgetin,
                       onChanged: (newValue) {
                       setState(() => switchgetin = newValue);
-                      strage.write("Alarmgetin", switchgetin.toString());
+                      secureStorage.write("Alarmgetin", switchgetin.toString());
                       }
                       ),
                       ),
@@ -182,7 +182,7 @@ class SettingState extends State<Setting>  {
                                       value: switchgetout,
                                       onChanged: (newValue) {
                                       setState(() => switchgetout = newValue);
-                                      strage.write("Alarmgetout", switchgetout.toString());
+                                      secureStorage.write("Alarmgetout", switchgetout.toString());
                                       }
                                     ),
                               ],
@@ -246,7 +246,7 @@ class SettingState extends State<Setting>  {
   }
 
   Future<String> setuuid() async{
-    String? chek = await strage.read("uuid");
+    String? chek = await secureStorage.read("uuid");
 
     if (chek == null){
       chek = "UUID가 설정XXXXXXXXXX";
@@ -257,8 +257,8 @@ class SettingState extends State<Setting>  {
     setState(() {
       beaconuuid = chek.toString();
     });
-    String? getin = await strage.read("Alarmgetin");
-    String? getout = await strage.read("Alarmgetout");
+    String? getin = await secureStorage.read("Alarmgetin");
+    String? getout = await secureStorage.read("Alarmgetout");
      
     if(getin==null){
     setState(() {

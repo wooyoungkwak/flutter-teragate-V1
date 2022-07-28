@@ -17,7 +17,7 @@ import 'package:teragate_test/utils/debug_util.dart';
 
 class SettingWorkTimeState extends State<SettingWorkTime> {  
 
-  late SecureStorage strage;
+  late SecureStorage secureStorage;
 
   //
   List<String> timeGetIn = ["08:30","08:30","08:30","08:30","08:30","08:30","08:30"];
@@ -35,7 +35,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
   void initState() {
     super.initState();
     
-    strage = SecureStorage();
+    secureStorage = SecureStorage();
   }
   
   @override
@@ -96,11 +96,11 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
                       onChanged: (newValue) {
                         if(widget.getstate==0){
                         setState(() => switchday[index] = newValue);
-                        strage.write(weekAlarmIn[index], newValue.toString());
+                        secureStorage.write(weekAlarmIn[index], newValue.toString());
                         }
                         if(widget.getstate==1){
                         setState(() => switchday[index] = newValue);
-                        strage.write(weekAlarmOut[index], newValue.toString());
+                        secureStorage.write(weekAlarmOut[index], newValue.toString());
                         }
                       }
                       ),
@@ -129,7 +129,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
       onSubmit: (index) async {
         String formattedDate = DateFormat('kk:mm').format(index).toString();
         //stage에 저장 (키값:요일+text[출근/퇴근], 선택 날짜+시간);
-        strage.write(weekEN[weekindex]+timetext[widget.getstate],formattedDate);
+        secureStorage.write(weekEN[weekindex]+timetext[widget.getstate],formattedDate);
     setState(() {
       if(widget.getstate==0){
         timeGetIn[weekindex] = formattedDate;
@@ -147,7 +147,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     //getstate가 0 이면 출근
     if(widget.getstate==0){
     for(int i=0; i<7; i++){
-     String? cheak = await strage.read(weekEN[i]+timetext[widget.getstate]);
+     String? cheak = await secureStorage.read(weekEN[i]+timetext[widget.getstate]);
      if(cheak!=null){
       timeGetIn[i] = cheak.toString();
      }
@@ -156,7 +156,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     //getstate가 1 이면 퇴근
     if(widget.getstate==1){
     for(int i=0; i<7; i++){
-     String? cheak = await strage.read(weekEN[i]+timetext[widget.getstate]);
+     String? cheak = await secureStorage.read(weekEN[i]+timetext[widget.getstate]);
      if(cheak!=null){
       timeGetOut[i] = cheak.toString();
      }
@@ -164,13 +164,13 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     }
     for(int i=0; i<7; i++){
       if(widget.getstate==0){
-      String? change = await strage.read(weekAlarmIn[i]);
+      String? change = await secureStorage.read(weekAlarmIn[i]);
       if(change == null) switchday[i] = false;
       if(change=="true")switchday[i]= true;
       if(change=="false")switchday[i]= false;
       }
       if(widget.getstate==1){
-      String? change = await strage.read(weekAlarmOut[i]);
+      String? change = await secureStorage.read(weekAlarmOut[i]);
       if(change == null) switchday[i] = false;
       if(change=="true")switchday[i]= true;
       if(change=="false")switchday[i]= false;

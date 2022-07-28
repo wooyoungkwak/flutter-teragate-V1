@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
 
 
@@ -12,14 +13,14 @@ class SettingBeacon extends StatefulWidget {
 
 class SettingBeaconState extends State<SettingBeacon> {
 
-  late SecureStorage strage;
+  late SecureStorage secureStorage;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   
   @override
   void initState() {
     super.initState();
     
-    strage = SecureStorage();
+    secureStorage = SecureStorage();
   }
 
   @override
@@ -63,7 +64,7 @@ class SettingBeaconState extends State<SettingBeacon> {
     );
   }
   void setuuid(String index) async{
-    strage.write("uuid", index);
+    secureStorage.write(Env.KEY_UUID, index);
     Navigator.pop(context);
   }
 }

@@ -51,7 +51,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   void initState() {
     super.initState();
 
-    // initBeacon(setNotification, setRunning, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController);
+    // initBeacon(setNotification, setRunning, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController, secureStorage);
     
     WidgetsBinding.instance.addObserver(this);
 
@@ -147,7 +147,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                       if (isRunning) {
                         await stopBeacon();
                       } else {
-                        await restartBeacon();
+                        // await restartBeacon(initBeacon(setNotification, setRunning, setResult, setGlovalVariable, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController, secureStorage));
                       }
                       setRunning(!isRunning);
                       setForGetIn();
@@ -251,6 +251,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       secureStorage.write(Env.LOGIN_ID, "");
     }
     secureStorage.write(Env.LOGIN_PW, "");
+    secureStorage.write(Env.KEY_LOGIN_STATE, "false");
     Navigator.push(context, MaterialPageRoute(builder: (_) => const Login()));
   }
 

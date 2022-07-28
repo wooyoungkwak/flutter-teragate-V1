@@ -5,8 +5,12 @@ class BeaconData  {
    String minor;
    String distance;
    String rssi;
+   String? macAddress;
+   String? proximity;
+   String? scanTime;
+   String? txPower;
 
-  BeaconData (this.name, this.uuid, this.major, this.minor, this.distance, this.rssi);
+  BeaconData (this.name, this.uuid, this.major, this.minor, this.distance, this.rssi, this.macAddress, this.proximity, this.scanTime, this.txPower);
 
   BeaconData.fromJson(Map<String, dynamic> json)
       : name = json['name'],
@@ -14,7 +18,11 @@ class BeaconData  {
         major = json['major'],
         minor = json['minor'],
         distance = json['distance'],
-        rssi = json['rssi'];
+        rssi = json['rssi'],
+        macAddress = null,
+        proximity = null,
+        scanTime = null,
+        txPower = null;
 
   Map<String, dynamic> toJson() => {
         'name': name,

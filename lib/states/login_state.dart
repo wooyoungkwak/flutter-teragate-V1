@@ -157,7 +157,7 @@ class LoginState extends State<Login> {
                               secureStorage.write('krName', '${loginInfo.data?['krName']}');
                               secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
                               secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
-                              
+                              secureStorage.write(Env.KEY_LOGIN_STATE, "true");
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
                             } else {
                               showSnackBar(context, loginInfo.message!);

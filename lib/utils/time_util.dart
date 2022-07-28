@@ -32,3 +32,7 @@ String getDateToStringForYYYYMMDDInNow() {
 String getDateToStringForAllInNow() {
   return getDateToStringForAll(getNow());
 }
+
+String getMinorToDate() {
+  return getDateToString(getNow(), "MM-dd");
+}

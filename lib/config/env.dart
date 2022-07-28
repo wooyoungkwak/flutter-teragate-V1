@@ -22,6 +22,8 @@ class Env {
   static const String KEY_REFRESH_TOKEN = "refreshToken";
   static const String KEY_GET_IN_CHECK = "getInCheck";
   static const String KEY_GET_OUT_CHECK = "getOutCheck";
+  static const String KEY_UUID = "uuid";
+  static const String KEY_LOGIN_STATE = "loginState";
 
   static const String MSG_GET_IN_EXIST = "exist";
   static const String MSG_GET_IN_SUCCESS = "출근 등록 되었습니다.";

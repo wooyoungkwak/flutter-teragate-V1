@@ -32,7 +32,6 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
-
   late SecureStorage secureStorage;
 
   @override
@@ -53,7 +52,7 @@ class _SplashPageState extends State<SplashPage> {
     );
   }
 
-  void initSet() async{
+  void initSet() async {
     secureStorage = SecureStorage();
     await _checkUser(context).then((data) => move(data["loginId"], data["loginPw"]));
   }
@@ -62,27 +61,28 @@ class _SplashPageState extends State<SplashPage> {
     String? loginId = await secureStorage.read(Env.LOGIN_ID);
     String? loginPw = await secureStorage.read(Env.LOGIN_PW);
 
-    return {
-      "loginId": loginId,
-      "loginPw": loginPw
-    };
+    return {"loginId": loginId, "loginPw": loginPw};
   }
 
-  void move(String? id, String? password) {
-    if (id != null && password != null ) {
-      login(id, password).then((loginInfo) {
-        if (loginInfo.success!) {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
-          secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
-        } else {
-          showSnackBar(context, loginInfo.message!);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
-        }
-      });
+  void move(String? id, String? password) async {
+    String? isLogin = await secureStorage.read(Env.KEY_LOGIN_STATE);
+    if (isLogin == "true") {
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
     } else {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+      if (id != null && password != null) {
+        login(id, password).then((loginInfo) {
+          if (loginInfo.success!) {
+            secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
+            secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
+          } else {
+            showSnackBar(context, loginInfo.message!);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+          }
+        });
+      } else {
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+      }
     }
   }
-  
 }
