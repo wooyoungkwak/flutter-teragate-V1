@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
+import 'package:teragate_test/utils/debug_util.dart';
 import 'package:teragate_test/states/dashboard_state.dart';
 
 import 'package:teragate_test/config/env.dart';
@@ -27,7 +28,7 @@ class LoginState extends State<Login> {
   void initState() {
     super.initState();
     final permissionResult = callPermissions();
-    permissionResult.then((data) => debugPrint(data));
+    permissionResult.then((data) => Log.debug(data));
 
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");
