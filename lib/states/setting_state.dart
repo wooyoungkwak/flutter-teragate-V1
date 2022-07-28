@@ -22,8 +22,8 @@ class SettingState extends State<Setting>  {
 
   late SecureStorage strage;
   //스위치 true/false
-  bool switchListTileValue1 = true;
-  bool switchListTileValue2 = true;
+  bool switchgetin = true;
+  bool switchgetout = true;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   String beaconuuid= "";
   
@@ -138,10 +138,10 @@ class SettingState extends State<Setting>  {
                     ),
                     Align(                                          
                     child: Switch(
-                      value: switchListTileValue1,
+                      value: switchgetin,
                       onChanged: (newValue) {
-                      setState(() => switchListTileValue1 = newValue);
-                      strage.write("AlarmGetIn", switchListTileValue1.toString());
+                      setState(() => switchgetin = newValue);
+                      strage.write("Alarmgetin", switchgetin.toString());
                       }
                       ),
                       ),
@@ -179,10 +179,10 @@ class SettingState extends State<Setting>  {
                                     ]), 
                                     ),
                                     Switch(
-                                      value: switchListTileValue2,
+                                      value: switchgetout,
                                       onChanged: (newValue) {
-                                      setState(() => switchListTileValue2 = newValue);
-                                      strage.write("AlarmGetOut", switchListTileValue2.toString());
+                                      setState(() => switchgetout = newValue);
+                                      strage.write("Alarmgetout", switchgetout.toString());
                                       }
                                     ),
                               ],
@@ -257,6 +257,25 @@ class SettingState extends State<Setting>  {
     setState(() {
       beaconuuid = chek.toString();
     });
+    String? getin = await strage.read("Alarmgetin");
+    String? getout = await strage.read("Alarmgetout");
+     
+    if(getin==null){
+    setState(() {
+      switchgetin = false; 
+    });
+    }
+    if(getout== null){
+    setState(() {
+      switchgetout = false; 
+    });
+    }
+    if(getin=="true")switchgetin= true;
+    if(getin=="false")switchgetin= false;
+    if(getout=="true")switchgetout= true;
+    if(getout=="false")switchgetout= false; 
+     
+
     return chek;
   }
 }
