@@ -1,17 +1,16 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 
 //현재시간
-import 'package:date_format/date_format.dart';
 import 'package:teragate_test/states/setting_state.dart';
 import 'package:timer_builder/timer_builder.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/models/result_model.dart';
 import 'package:teragate_test/services/network_service.dart';
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/beacon_service.dart';
@@ -52,7 +51,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.initState();
 
     secureStorage = SecureStorage();
-    initBeacon(setNotification, setRunning, setForGetIn, getIsRunning, getWorkSucces, beaconStreamController, secureStorage);
+    initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
     
     WidgetsBinding.instance.addObserver(this);
 
@@ -144,14 +143,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     label: '출근',
                     // backgroundColor: Colors.blue,
                     onTap: () async {
-                      if (isRunning) {
-                        await stopBeacon();
-                      } else {
-                        await restartBeacon();
-                      }
-                      setRunning(!isRunning);
-                      
-                      // setForGetIn();
+                      setForGetIn();
                     }),
                 SpeedDialChild(
                     child: const Icon(Icons.copy),
@@ -170,6 +162,19 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     label: '환경설정',
                     onTap: () async {
                       moveSetting(context);
+                    }),
+                SpeedDialChild(
+                    child: const Icon(Icons.copy),
+                    label: '시작',
+                    onTap: () async {
+                      initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
+                      startBeacon();
+                    }),
+                SpeedDialChild(
+                    child: const Icon(Icons.copy),
+                    label: '정지',
+                    onTap: () async {
+                      stopBeacon();
                     }),
               ],
             ),

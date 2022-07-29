@@ -1,5 +1,5 @@
 class Env {
-  static const String TEST_SERVER = "http://192.168.0.247";
+  static const String TEST_SERVER = "http://192.168.0.164";
   static const String REAL_SERVER = "http://teraenergy.iptime.org";
 
   static const String SERVER_LOGIN_URL = '$TEST_SERVER:3000/login';
@@ -68,6 +68,7 @@ class Env {
   static const String MSG_GET_OUT_SUCCESS = "퇴근 등록 되었습니다.";
   static const String MSG_GET_IN_FAIL = "출근 등록을 실패 하였습니다.";
   static const String MSG_GET_OUT_FAIL = "퇴근 등록을 실패 하였습니다.";
+  static const String MSG_MINOR_FAIL = "비콘이 존재 하지 않습니다. 수동으로 등록 해주세요.";
 
   static const String TITLE_DIALOG = "알림";
   static const String TITLE_BEACON_NOTIFICATION = "Beacons Set";
