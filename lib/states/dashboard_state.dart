@@ -32,6 +32,7 @@ class Dashboard extends StatefulWidget {
 class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late SecureStorage secureStorage;
+  late StreamSubscription subscription;
 
   int nrMessagesReceived = 0;
 
@@ -51,7 +52,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.initState();
 
     secureStorage = SecureStorage();
-    initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
+    initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage).then((_subscription) => subscription = _subscription);
     
     WidgetsBinding.instance.addObserver(this);
 
@@ -167,14 +168,16 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     child: const Icon(Icons.copy),
                     label: '시작',
                     onTap: () async {
-                      initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
-                      startBeacon();
+                      // initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
+                      await startBeacon();
+                      subscription.resume();
                     }),
                 SpeedDialChild(
                     child: const Icon(Icons.copy),
                     label: '정지',
                     onTap: () async {
-                      stopBeacon();
+                      subscription.pause();
+                      await stopBeacon();
                     }),
               ],
             ),
