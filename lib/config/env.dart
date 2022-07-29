@@ -31,7 +31,7 @@ class Env {
   static const String KEY_SETTING_THU_GI = "ThursdayGi";
   static const String KEY_SETTING_FRI_GI = "FridayGi";
   static const String KEY_SETTING_SAT_GI = "SaturdayGi";
-  static const String KEY_SETTING_SUN_GI = "mondayGi";
+  static const String KEY_SETTING_SUN_GI = "SundayGi";
 
   static const String KEY_SETTING_MON_GO = "MondayGO";
   static const String KEY_SETTING_TUE_GO = "TuesdayGO";
@@ -39,7 +39,7 @@ class Env {
   static const String KEY_SETTING_THU_GO = "ThursdayGO";
   static const String KEY_SETTING_FRI_GO = "FridayGO";
   static const String KEY_SETTING_SAT_GO = "SaturdayGO";
-  static const String KEY_SETTING_SUN_GO = "mondayGO";
+  static const String KEY_SETTING_SUN_GO = "SundayGO";
 
   static const String KEY_SETTING_MON_GI_TIME = "MondayTimeGetIn";
   static const String KEY_SETTING_TUE_GI_TIME = "TuesdayTimeGetIn";
@@ -47,7 +47,7 @@ class Env {
   static const String KEY_SETTING_THU_GI_TIME = "ThursdayTimeGetIn";
   static const String KEY_SETTING_FRI_GI_TIME = "FridayTimeGetIn";
   static const String KEY_SETTING_SAT_GI_TIME = "SaturdayTimeGetIn";
-  static const String KEY_SETTING_SUN_GI_TIME = "mondayTimeGetIn";
+  static const String KEY_SETTING_SUN_GI_TIME = "SundayTimeGetIn";
 
   static const String KEY_SETTING_MON_GO_TIME = "MondayTimeGetOut";
   static const String KEY_SETTING_TUE_GO_TIME = "TuesdayTimeGetOut";
@@ -55,7 +55,7 @@ class Env {
   static const String KEY_SETTING_THU_GO_TIME = "ThursdayTimeGetOut";
   static const String KEY_SETTING_FRI_GO_TIME = "FridayTimeGetOut";
   static const String KEY_SETTING_SAT_GO_TIME = "SaturdayTimeGetOut";
-  static const String KEY_SETTING_SUN_GO_TIME = "mondayTimeGetOut";
+  static const String KEY_SETTING_SUN_GO_TIME = "SundayTimeGetOut";
 
   static const String KEY_SETTING_VIBRATE = "VIBRATE";
   static const String KEY_SETTING_ALARM = "ALARM";

@@ -34,5 +34,9 @@ String getDateToStringForAllInNow() {
 }
 
 String getMinorToDate() {
-  return getDateToString(getNow(), "MM-dd");
+  return getDateToString(getNow(), "MMdd");
+}
+
+String getWeek() {
+  return DateFormat('E', 'en_US').format(getNow());
 }
