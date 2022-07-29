@@ -7,6 +7,8 @@ class Env {
   static const String SERVER_GET_OUT_URL = '$TEST_SERVER:3000/teragate/leaveWork';
   static const String SERVER_REFRESH_TOKEN_URL = '$TEST_SERVER:3000/teragate/refreshToken';
 
+  static const String INITIAL_UUID = '74278bdb-b644-4520-8f0c-720eeaffffff';
+
   static const String SERVER_GROUPWARE_TEST = "$TEST_SERVER:8080";
   static const String SERVER_GROUPWARE_REAL = "http://teragroupware.duckdns.org";
   static const String SERVER_GROUPWARE_URL = '$SERVER_GROUPWARE_TEST/signInapp';

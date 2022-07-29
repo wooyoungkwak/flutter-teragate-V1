@@ -64,9 +64,11 @@ dependencies:
   date_format: ^2.0.6
   bottom_picker: ^1.9.1
 
-
   #플로팅 버튼 위젯용.
   flutter_speed_dial: ^3.0.5
+
+  #Back버튼 app최소화로 변경
+  move_to_background: ^1.0.2
 
 dev_dependencies:
   flutter_test:
