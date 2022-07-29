@@ -11,15 +11,8 @@ import 'package:teragate_test/utils/time_util.dart';
 import '../models/beacon_model.dart';
 
 // 비콘 초기화
-<<<<<<< HEAD
 Future<StreamSubscription> initBeacon(Function setNotification, Function setForGetIn, StreamController beaconStreamController, SecureStorage secureStorage) async {
-=======
-Future<void> initBeacon(
-    Function setNotification,
-    Function setForGetIn,
-    StreamController<String> beaconStreamController,
-    SecureStorage secureStorage) async {
->>>>>>> 199371ee77b9550ba364451168b77f6a86a9975e
+
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(
         title: "Need Location Permission",
@@ -50,8 +43,7 @@ Future<void> initBeacon(
   StreamSubscription subscription = beaconStreamController.stream.listen(
       (data) async {
         if (data.isNotEmpty) {
-          Log.debug(
-              " =============== beacon Stream Controller listen ==============");
+          Log.debug(" =============== beacon Stream Controller listen ==============");
           String? uuid = await secureStorage.read(Env.KEY_UUID);
 
           // TODO : 임시
@@ -66,14 +58,6 @@ Future<void> initBeacon(
             return;
           }
 
-<<<<<<< HEAD
-            if ( beaconKey != getMinorToDate() ) {
-              setNotification(Env.MSG_MINOR_FAIL); //다이얼로그창
-            } else {
-              setForGetIn();
-            }
-
-=======
           String beaconKey = iBeacon.minor; // 비콘의 key 값
 
           Log.debug(" =====> ${getMinorToDate()} : $beaconKey");
@@ -83,7 +67,6 @@ Future<void> initBeacon(
           } else {
             setForGetIn();
           }
->>>>>>> 199371ee77b9550ba364451168b77f6a86a9975e
           BeaconsPlugin.stopMonitoring(); //모니터링 종료
         }
       },
