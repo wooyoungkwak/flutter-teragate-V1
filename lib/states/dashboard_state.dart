@@ -34,7 +34,6 @@ class Dashboard extends StatefulWidget {
 class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late SecureStorage secureStorage;
-  late StreamSubscription subscription;
 
   int nrMessagesReceived = 0;
 
@@ -43,10 +42,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   String? pw = "test2"; //pw
   String? deviceip = "00";
 
-  var isRunning = false;
-  bool isInForeground = true;
-  var workSucces = false;
-
   final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
 
   @override
@@ -54,7 +49,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.initState();
 
     secureStorage = SecureStorage();
-    initBeacon(setNotification, setForGetIn, pauseStream, resumeStream, beaconStreamController, secureStorage).then((_subscription) => subscription = _subscription);
+    initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
     
     WidgetsBinding.instance.addObserver(this);
 
@@ -62,12 +57,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     const duration = Duration(seconds: 10);
 
     initNotification();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    isInForeground = state == AppLifecycleState.resumed;
   }
 
   @override
@@ -170,15 +159,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     child: const Icon(Icons.copy),
                     label: '시작',
                     onTap: () async {
+                      initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
                       await startBeacon();
-                      subscription.resume();
-                    }),
-                SpeedDialChild(
-                    child: const Icon(Icons.copy),
-                    label: '정지',
-                    onTap: () async {
-                      await stopBeacon();
-                    }),
+                    })
               ],
             ),
           ),
@@ -239,20 +222,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     showNotification(flutterLocalNotificationsPlugin, Env.TITLE_BEACON_NOTIFICATION, message);
   }
 
-  void setRunning(bool state) {
-    setState(() {
-      isRunning = state;
-    });
-  }
-
-  bool getIsRunning() {
-    return isRunning;
-  }
-
-  bool getWorkSucces() {
-    return workSucces;
-  }
-
   // 로그인 화면으로 이동
   void moveLogin() async{
     String? isChecked = await secureStorage.read(Env.KEY_ID_CHECK);
@@ -298,13 +267,5 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         setNotification(workInfo.message);
       }
     });
-  }
-
-  Future<void> pauseStream() async{
-    subscription.pause();
-  }
-
-  Future<void> resumeStream() async{
-    subscription.resume();
   }
 }

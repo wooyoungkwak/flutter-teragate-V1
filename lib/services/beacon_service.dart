@@ -11,7 +11,7 @@ import 'package:teragate_test/utils/time_util.dart';
 import '../models/beacon_model.dart';
 
 // 비콘 초기화
-Future<StreamSubscription> initBeacon(Function setNotification, Function setForGetIn, Function pauseStream, Function resumeStream, StreamController beaconStreamController, SecureStorage secureStorage) async {
+Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamController beaconStreamController, SecureStorage secureStorage) async {
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
 
@@ -19,60 +19,100 @@ Future<StreamSubscription> initBeacon(Function setNotification, Function setForG
       if (Env.isDebug) Log.debug(" ********* Call Method: ${call.method}");
 
       if (call.method == 'scannerReady') {
-        await setBeacon();
+        await _setBeacon();
         await startBeacon();
       } else if (call.method == 'isPermissionDialogShown') {
-        setNotification("Beacon 을 스켄할 수 없습니다. ??? ");
+        setNotification("Beacon 을 검색 할 수 없습니다. 권한을 확인 하세요.");
       }
     });
     BeaconsPlugin.listenToBeacons(beaconStreamController);
   } else if (Platform.isIOS) {
     BeaconsPlugin.setDebugLevel(2);
     BeaconsPlugin.listenToBeacons(beaconStreamController);
-    await setBeacon();
+    await _setBeacon();
     await startBeacon();
   }
 
   //Send 'true' to run in background
   await BeaconsPlugin.runInBackground(true);
 
-  //Valid values: 0 = no messages, 1 = errors, 2 = all messages
-  StreamSubscription subscription = beaconStreamController.stream.listen(
-      (data) async {
-        if (data.isNotEmpty) {
-          Log.debug(" =============== beacon Stream Controller listen ==============");
+  beaconStreamController.stream.first.then((data) async {
+      if (data.isNotEmpty) {
+        Log.debug(" =============== beacon Stream Controller listen ==============");
+        String? uuid = await secureStorage.read(Env.KEY_UUID);
+        String? state = await secureStorage.read(Env.KEY_BEACON_COMPLETE_STATE);
 
-          String? uuid = await secureStorage.read(Env.KEY_UUID);
-
-          // TODO : 임시
-          uuid = "74278bdb-b644-4520-8f0c-720eeaffffff";
-
-          Map<String, dynamic> userMap = jsonDecode(data);
-          var iBeacon = BeaconData.fromJson(userMap);
-          if (iBeacon.uuid != uuid) {
-            return;
-          }
-
-          String beaconKey = iBeacon.minor; // 비콘의 key 값
-
-          if (beaconKey != getMinorToDate()) {
-            setNotification(Env.MSG_MINOR_FAIL); //다이얼로그창
-          } else {
-            setForGetIn();
-          }
-
-          
+        if ( state != null && state == "true")  {
+          return;
         }
-      },
-      onDone: () {},
-      onError: (error) {
-        if (Env.isDebug) Log.debug("Error: $error");
-      });
 
-  return subscription;
+        // TODO : 임시
+        uuid = "74278bdb-b644-4520-8f0c-720eeaffffff";
+
+        Map<String, dynamic> userMap = jsonDecode(data);
+        var iBeacon = BeaconData.fromJson(userMap);
+        if (iBeacon.uuid != uuid) {
+          return;
+        }
+
+        String beaconKey = iBeacon.minor; // 비콘의 key 값
+        // if (beaconKey != getMinorToDate()) {
+        if (beaconKey != "729") {
+          setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+        } else {
+          setForGetIn();
+          // secureStorage.write(Env.KEY_BEACON_COMPLETE_STATE, "true");
+        }
+        
+        BeaconsPlugin.stopMonitoring();
+      }
+    });
+  
+
+  //Valid values: 0 = no messages, 1 = errors, 2 = all messages
+  // beaconStreamController.stream.listen(
+  //   (data) async {
+  //     if (data.isNotEmpty) {
+  //       Log.debug(" =============== beacon Stream Controller listen ==============");
+
+  //       String? uuid = await secureStorage.read(Env.KEY_UUID);
+
+  //       String? state = await secureStorage.read(Env.KEY_BEACON_COMPLETE_STATE);
+
+  //       if ( state != null && state == "true")  {
+  //         Log.debug(" state ========================= $state");
+  //         return;
+  //       }
+
+  //       // TODO : 임시
+  //       uuid = "74278bdb-b644-4520-8f0c-720eeaffffff";
+
+  //       Map<String, dynamic> userMap = jsonDecode(data);
+  //       var iBeacon = BeaconData.fromJson(userMap);
+  //       if (iBeacon.uuid != uuid) {
+  //         return;
+  //       }
+
+  //       String beaconKey = iBeacon.minor; // 비콘의 key 값
+
+  //       if (beaconKey != getMinorToDate()) {
+  //         setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+  //       } else {
+  //         // setForGetIn();
+  //         secureStorage.write(Env.KEY_BEACON_COMPLETE_STATE, "true");
+  //       }
+        
+  //       BeaconsPlugin.stopMonitoring();
+  //     }
+  //   },
+  //   onDone: () {},
+  //   onError: (error) {
+  //     if (Env.isDebug) Log.debug("Error: $error");
+  //   });
+
 }
 
-Future<void> setBeacon() async {
+Future<void> _setBeacon() async {
   await BeaconsPlugin.addRegion("iBeacon", "74278bdb-b644-4520-8f0c-720eeaffffff");
   if (Platform.isAndroid) {
     BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24");

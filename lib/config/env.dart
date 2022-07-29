@@ -65,6 +65,8 @@ class Env {
   static const String KEY_SETTING_GI_ON_OFF = "GIONOFF";
   static const String KEY_SETTING_GO_ON_OFF = "GOONOFF";
 
+  static const String KEY_BEACON_COMPLETE_STATE = "false";
+
   static const String MSG_GET_IN_EXIST = "exist";
   static const String MSG_GET_IN_SUCCESS = "출근 등록 되었습니다.";
   static const String MSG_GET_OUT_SUCCESS = "퇴근 등록 되었습니다.";
