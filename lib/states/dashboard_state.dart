@@ -51,7 +51,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.initState();
 
     secureStorage = SecureStorage();
-    initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage).then((_subscription) => subscription = _subscription);
+    initBeacon(setNotification, setForGetIn, pauseStream, resumeStream, beaconStreamController, secureStorage).then((_subscription) => subscription = _subscription);
     
     WidgetsBinding.instance.addObserver(this);
 
@@ -167,7 +167,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     child: const Icon(Icons.copy),
                     label: '시작',
                     onTap: () async {
-                      // initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
                       await startBeacon();
                       subscription.resume();
                     }),
@@ -175,7 +174,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     child: const Icon(Icons.copy),
                     label: '정지',
                     onTap: () async {
-                      subscription.pause();
                       await stopBeacon();
                     }),
               ],
@@ -299,4 +297,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     });
   }
 
+  Future<void> pauseStream() async{
+    subscription.pause();
+  }
+
+  Future<void> resumeStream() async{
+    subscription.resume();
+  }
 }
