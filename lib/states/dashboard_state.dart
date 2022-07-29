@@ -21,6 +21,9 @@ import 'package:teragate_test/utils/time_util.dart';
 //플러터 플로팅버튼용
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
+//Back버튼 기능 변경(종료 > background)
+import 'package:move_to_background/move_to_background.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
 
@@ -78,7 +81,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     return WillPopScope(
         onWillPop: () {
-          SystemNavigator.pop();
+          MoveToBackground.moveTaskToBack();
           return Future(() => false);
         },
         child: MaterialApp(
