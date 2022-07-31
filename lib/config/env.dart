@@ -67,15 +67,15 @@ class Env {
 
   static const String KEY_BEACON_COMPLETE_STATE = "false";
 
-  static const String MSG_GET_IN_EXIST = "exist";
-  static const String MSG_GET_IN_SUCCESS = "출근 등록 되었습니다.";
-  static const String MSG_GET_OUT_SUCCESS = "퇴근 등록 되었습니다.";
-  static const String MSG_GET_IN_FAIL = "출근 등록을 실패 하였습니다.";
-  static const String MSG_GET_OUT_FAIL = "퇴근 등록을 실패 하였습니다.";
-  static const String MSG_MINOR_FAIL = "비콘이 존재 하지 않습니다. 수동으로 등록 해주세요.";
+  static const String MSG_GET_IN_EXIST = "이미 출근 등록이 완료 되어 있습니다.";
+  static const String MSG_GET_IN_SUCCESS = "출근 등록이 완료 되었습니다.";
+  static const String MSG_GET_OUT_SUCCESS = "퇴근 등록이 완료 되었습니다.";
+  static const String MSG_GET_IN_FAIL = "출근 등록이 실패 하였습니다.";
+  static const String MSG_GET_OUT_FAIL = "퇴근 등록이 실패 하였습니다.";
+  static const String MSG_MINOR_FAIL = "비콘이 존재 하지 않습니다. 출퇴근 등록을 실패하였습니다.";
 
   static const String TITLE_DIALOG = "알림";
-  static const String TITLE_BEACON_NOTIFICATION = "Beacons Set";
+  static const String TITLE_BEACON_NOTIFICATION = "비콘 설정";
   
   static var isDebug = true;
 }
