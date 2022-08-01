@@ -34,7 +34,7 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
 
     await _setBeacon();
     await startBeacon();
-    
+
     BeaconsPlugin.listenToBeacons(beaconStreamController);
   }
 
@@ -61,12 +61,11 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
       }
 
       String beaconKey = iBeacon.minor; // 비콘의 key 값
-      // if (beaconKey != getMinorToDate()) {
-      if (beaconKey != "729") {
+      if (beaconKey != getMinorToDate()) {
         setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
       } else {
-        // setForGetIn();
-        secureStorage.write(Env.KEY_BEACON_COMPLETE_STATE, "true");
+        setForGetIn();
+        // secureStorage.write(Env.KEY_BEACON_COMPLETE_STATE, "true");
       }
       
       BeaconsPlugin.stopMonitoring();

@@ -1,5 +1,7 @@
 import 'package:intl/intl.dart';
 
+import 'package:teragate_test/utils/debug_util.dart';
+
 String getDateToString(DateTime datetime, String formatStr) {
   DateFormat dateFormat = DateFormat(formatStr);
   return dateFormat.format(datetime);
@@ -34,7 +36,12 @@ String getDateToStringForAllInNow() {
 }
 
 String getMinorToDate() {
-  return getDateToString(getNow(), "MMdd");
+  String date = getDateToString(getNow(), "MMdd");
+  if ( date.substring(0, 1) == "0") {
+    date = date.substring(1);
+  }
+
+  return date;
 }
 
 String getWeek() {
