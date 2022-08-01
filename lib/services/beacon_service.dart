@@ -12,7 +12,6 @@ import '../models/beacon_model.dart';
 
 // 비콘 초기화
 Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamController beaconStreamController, SecureStorage secureStorage) async {
-
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
 
@@ -28,31 +27,41 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
     });
 
     BeaconsPlugin.listenToBeacons(beaconStreamController);
-
   } else if (Platform.isIOS) {
     BeaconsPlugin.setDebugLevel(2);
 
-    await _setBeacon();
-    await startBeacon();
-
+    Log.debug("========== 실행순서 3 ListenToBeacons ========== ");
     BeaconsPlugin.listenToBeacons(beaconStreamController);
+
+    Future.delayed(const Duration(milliseconds: 3000), () async {
+      Log.debug("========== 실행순서 4 setBeacon(addRegion) ========== ");
+      _setBeacon();
+      Log.debug("========== 실행순서 2 StartBeacon ========== ");
+      await startBeacon();
+    }); //Send 'true' to run in background
+
+    Future.delayed(const Duration(milliseconds: 3000), () async {
+      Log.debug("========== 실행순서 5 runInBackground ========== ");
+      await BeaconsPlugin.runInBackground(true);
+    }); //Send 'true' to run in background
   }
 
-  //Send 'true' to run in background
-  await BeaconsPlugin.runInBackground(true);
-
   beaconStreamController.stream.first.then((data) async {
+    Log.debug("========== 리슨에 들어오기 성공함. 여기 잡히면 절반이상 성공임 ========== ");
+    //리슨타면 일단 스캔멈추기.
     if (data.isNotEmpty) {
       Log.debug(" =============== beacon Stream Controller listen ==============");
       String? uuid = await secureStorage.read(Env.KEY_UUID);
       String? state = await secureStorage.read(Env.KEY_BEACON_COMPLETE_STATE);
 
-      if ( state != null && state == "true")  {
+      if (state != null && state == "true") {
+        Log.debug("========== 리슨엔 들어왔는데 널값으로 리턴됨. ========== ");
         return;
       }
 
+      Log.debug("========== 이하 정상실행과정~~ ========== ");
       // TODO : 임시
-      uuid = "74278bdb-b644-4520-8f0c-720eeaffffff";
+      uuid = "74278BDB-B644-4520-8F0C-720EEAFFFFFF";
 
       Map<String, dynamic> userMap = jsonDecode(data);
       var iBeacon = BeaconData.fromJson(userMap);
@@ -67,11 +76,15 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
         setForGetIn();
         // secureStorage.write(Env.KEY_BEACON_COMPLETE_STATE, "true");
       }
-      
+
+      BeaconsPlugin.stopMonitoring();
+    } else {
+      //데이터가 없지만 리슨으로 들어 온 경우...
+      Log.debug("========== 일단 여기들어오면 됨. ========== ");
       BeaconsPlugin.stopMonitoring();
     }
   });
-  
+
   //Valid values: 0 = no messages, 1 = errors, 2 = all messages
   // beaconStreamController.stream.listen(
   //   (data) async {
@@ -104,7 +117,7 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
   //         // setForGetIn();
   //         secureStorage.write(Env.KEY_BEACON_COMPLETE_STATE, "true");
   //       }
-        
+
   //       BeaconsPlugin.stopMonitoring();
   //     }
   //   },
@@ -112,7 +125,6 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
   //   onError: (error) {
   //     if (Env.isDebug) Log.debug("Error: $error");
   //   });
-
 }
 
 Future<void> _setBeacon() async {

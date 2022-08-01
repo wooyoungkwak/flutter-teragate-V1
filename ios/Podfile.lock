@@ -24,6 +24,8 @@ PODS:
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
+  - move_to_background (0.0.1):
+    - Flutter
   - network_info_plus (0.0.1):
     - Flutter
   - OrderedSet (5.0.0)
@@ -47,6 +49,7 @@ DEPENDENCIES:
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - move_to_background (from `.symlinks/plugins/move_to_background/ios`)
   - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
@@ -76,6 +79,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  move_to_background:
+    :path: ".symlinks/plugins/move_to_background/ios"
   network_info_plus:
     :path: ".symlinks/plugins/network_info_plus/ios"
   permission_handler_apple:
@@ -96,6 +101,7 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 0c0b1ae97e741e1521e4c1629a459d04b9aec743
   flutter_secure_storage: 7953c38a04c3fdbb00571bcd87d8e3b5ceb9daec
   fluttertoast: 16fbe6039d06a763f3533670197d01fc73459037
+  move_to_background: 39a5b79b26d577b0372cbe8a8c55e7aa9fcd3a2d
   network_info_plus: b78876159360f5580608c2cea620d6ceffabd0ad
   OrderedSet: aaeb196f7fef5a9edf55d89760da9176ad40b93c
   permission_handler_apple: 44366e37eaf29454a1e7b1b7d736c2cceaeb17ce
@@ -105,6 +111,6 @@ SPEC CHECKSUMS:
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
   webview_flutter_wkwebview: b7e70ef1ddded7e69c796c7390ee74180182971f
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: b084f5f513fbaf22e63c3b89611f60c629671fda
 
 COCOAPODS: 1.10.2
