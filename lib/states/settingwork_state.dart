@@ -16,14 +16,13 @@ class SettingWorkTime extends StatefulWidget {
 class SettingWorkTimeState extends State<SettingWorkTime> {
   late SecureStorage secureStorage;
   
-  List<String> initTimeGetIn = ["08:30", "08:30", "08:30", "08:30", "08:30", "08:30", "08:30"];
-  List<String> initTimeGetOut = ["18:30", "18:30", "18:30", "18:30", "18:30", "18:30", "18:30"];
-  List<String> weekKR = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
+  List<String> initTimeGetIn = ["08:30","08:30", "08:30", "08:30", "08:30", "08:30", "08:30", "08:30"];
+  List<String> initTimeGetOut = ["18:00","18:00", "18:00", "18:00", "18:00", "18:00", "18:00", "18:00"];
+  List<String> weekKR = ["월~금요일","월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
   List<String> weekAlarmInTime = [Env.KEY_SETTING_MON_GI_TIME, Env.KEY_SETTING_TUE_GI_TIME, Env.KEY_SETTING_WED_GI_TIME, Env.KEY_SETTING_THU_GI_TIME, Env.KEY_SETTING_FRI_GI_TIME, Env.KEY_SETTING_SAT_GI_TIME, Env.KEY_SETTING_SUN_GI];
   List<String> weekAlarmOutTime = [Env.KEY_SETTING_MON_GO_TIME, Env.KEY_SETTING_TUE_GO_TIME, Env.KEY_SETTING_WED_GO_TIME, Env.KEY_SETTING_THU_GO_TIME, Env.KEY_SETTING_FRI_GO_TIME, Env.KEY_SETTING_SAT_GO_TIME, Env.KEY_SETTING_SUN_GO];
   List<String> weekAlarmIn = [Env.KEY_SETTING_MON_GI, Env.KEY_SETTING_TUE_GI, Env.KEY_SETTING_WED_GI, Env.KEY_SETTING_THU_GI, Env.KEY_SETTING_FRI_GI, Env.KEY_SETTING_SAT_GI, Env.KEY_SETTING_SUN_GI];
   List<String> weekAlarmOut = [Env.KEY_SETTING_MON_GO, Env.KEY_SETTING_TUE_GO, Env.KEY_SETTING_WED_GO, Env.KEY_SETTING_THU_GO, Env.KEY_SETTING_FRI_GO, Env.KEY_SETTING_SAT_GO, Env.KEY_SETTING_SUN_GO];
-
   List<bool> switchDay = [true, true, true, true, true, false, false]; //스위치 true/false
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -143,13 +142,13 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     for (int i = 0; i < 7; i++) {
       if (widget.getstate == 0) {
         String? change = await secureStorage.read(weekAlarmIn[i]);
-        if (change == null) switchDay[i] = false;
+        if (change == null) secureStorage.write(weekAlarmIn[i], switchDay[i].toString()) ;
         if (change == "true") switchDay[i] = true;
         if (change == "false") switchDay[i] = false;
       }
       if (widget.getstate == 1) {
         String? change = await secureStorage.read(weekAlarmOut[i]);
-        if (change == null) switchDay[i] = false;
+        if (change == null) secureStorage.write(weekAlarmOut[i], switchDay[i].toString()) ;
         if (change == "true") switchDay[i] = true;
         if (change == "false") switchDay[i] = false;
       }

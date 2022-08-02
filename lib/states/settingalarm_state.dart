@@ -126,7 +126,6 @@ class SettingAlarmState extends State<SettingAlarm> {
                     value: switchval2 ,
                     onChanged: (newValue){
                     setState(() => switchval2 = newValue);
-
                     secureStorage.write(Env.KEY_SETTING_ALARM, switchval2.toString());
                     },
                   ),  
@@ -148,11 +147,13 @@ class SettingAlarmState extends State<SettingAlarm> {
      if(vibrate==null){
       setState(() {
         switchval = false; 
+        secureStorage.write(Env.KEY_SETTING_ALARM, switchval.toString());
       });
      }
      if(alarm== null){
       setState(() {
-       switchval2 = false; 
+       switchval2 = false;
+       secureStorage.write(Env.KEY_SETTING_ALARM, switchval2.toString());
       });
      }
      if(vibrate=="true")switchval= true;

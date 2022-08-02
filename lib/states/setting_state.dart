@@ -18,8 +18,8 @@ class SettingState extends State<Setting>  {
 
   late SecureStorage secureStorage;
   //스위치 true/false
-  bool switchgetin = true;
-  bool switchgetout = true;
+  bool switchgetin = false;
+  bool switchgetout = false;
   final scaffoldKey = GlobalKey<ScaffoldState>();
   String beaconuuid= "";
   
@@ -242,10 +242,11 @@ class SettingState extends State<Setting>  {
   }
 
   Future<String> setuuid() async{
-    String? chek = await secureStorage.read("uuid");
+    String? chek = await secureStorage.read(Env.KEY_UUID);
 
     if (chek == null){
-      chek = "UUID가 설정XXXXXXXXXX";
+      chek = Env.UUID_DEFAULT;
+      secureStorage.write(Env.KEY_UUID, chek);
       beaconuuid = chek;
     }else{
       beaconuuid = chek;
