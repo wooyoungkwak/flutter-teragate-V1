@@ -11,7 +11,7 @@ import 'package:teragate_test/utils/time_util.dart';
 import '../models/beacon_model.dart';
 
 // 비콘 초기화
-Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamController beaconStreamController, SecureStorage secureStorage) async {
+Future<void> initBeacon(Function setNotification, Function setForGetInOut, StreamController beaconStreamController, SecureStorage secureStorage) async {
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
 
@@ -46,13 +46,6 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
     //리슨타면 일단 스캔멈추기.
     if (data.isNotEmpty) {
       String? uuid = await secureStorage.read(Env.KEY_UUID);
-      String? state = await secureStorage.read(Env.KEY_BEACON_COMPLETE_STATE);
-      
-
-      if (state != null && state == "true") {
-        return;
-      }
-
       uuid = uuid!.toUpperCase();
       
       Map<String, dynamic> userMap = jsonDecode(data);
@@ -65,8 +58,7 @@ Future<void> initBeacon(Function setNotification, Function setForGetIn, StreamCo
       if (beaconKey != getMinorToDate()) {
         setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
       } else {
-        setForGetIn();
-        // secureStorage.write(Env.KEY_BEACON_COMPLETE_STATE, "true");
+        setForGetInOut();
       }
 
       BeaconsPlugin.stopMonitoring();

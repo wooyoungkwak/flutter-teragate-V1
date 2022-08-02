@@ -47,3 +47,7 @@ String getMinorToDate() {
 String getWeek() {
   return DateFormat('E', 'en_US').format(getNow());
 }
+
+DateTime getToDateTime(String date) {
+  return DateTime.parse(date);
+}
