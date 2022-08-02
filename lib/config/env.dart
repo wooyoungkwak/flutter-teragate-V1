@@ -82,6 +82,10 @@ class Env {
   static const String TITLE_BEACON_NOTIFICATION = "비콘 설정";
   
   static const String UUID_DEFAULT = "74278BDB-B644-4520-8F0C-720EEAFFFFFF";
-  
-  static var isDebug = true;
+
+
+  static const String NOTIFICATION_CHANNEL_ID = "channelID";
+  static const String NOTIFICATION_CHANNEL_NAME = "channelName";
+
+  static bool isDebug = true;
 }

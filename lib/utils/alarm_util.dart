@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:teragate_test/config/env.dart';
 
 void showToast(String text) {
   Fluttertoast.showToast(
@@ -84,8 +85,8 @@ Future showNotification(FlutterLocalNotificationsPlugin flutterLocalNotification
 
   int id = 0;
   var androidNotificationDetails = const AndroidNotificationDetails(
-      "your channel id", 
-      "your channel name",
+      Env.NOTIFICATION_CHANNEL_ID, 
+      Env.NOTIFICATION_CHANNEL_NAME,
       ongoing: true,
       importance: Importance.high,
       priority: Priority.high
