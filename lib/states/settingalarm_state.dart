@@ -156,10 +156,17 @@ class SettingAlarmState extends State<SettingAlarm> {
        secureStorage.write(Env.KEY_SETTING_ALARM, switchval2.toString());
       });
      }
-     if(vibrate=="true")switchval= true;
-     if(vibrate=="false")switchval= false;
-     if(alarm=="true")switchval2= true;
-     if(alarm=="false")switchval2= false; 
+     if(vibrate=="true"){
+      switchval= true;
+     }else if(vibrate=="false"){
+
+      switchval= false;
+     }
+     if(alarm=="true"){
+      switchval2= true;
+     }else if(alarm=="false"){
+      switchval2= false;
+     }
      
      // 리턴 값이 있어야 감지가 됩니다!
      return "re";

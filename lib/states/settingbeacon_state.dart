@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:get/get.dart';
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/utils/debug_util.dart';
 
 
@@ -39,16 +36,16 @@ class SettingBeaconState extends State<SettingBeacon> {
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-  leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: Colors.black),
-    onPressed: () {
-      Log.debug(uuidContoroller.text);
-      InputDecoration.collapsed(hintText: uuidContoroller.text);
-      secureStorage.write(Env.KEY_UUID, uuidContoroller.text);
-      Navigator.of(context).pop();
-    },
-  ), 
-        title: const Text(
+      leading: IconButton(
+      icon: const Icon(Icons.arrow_back, color: Colors.black),
+      onPressed: () {
+        Log.debug(uuidContoroller.text);
+        InputDecoration.collapsed(hintText: uuidContoroller.text);
+        secureStorage.write(Env.KEY_UUID, uuidContoroller.text);
+        Navigator.of(context).pop();
+      },
+      ), 
+       title: const Text(
           'Beacon Scan', 
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)
         ),
