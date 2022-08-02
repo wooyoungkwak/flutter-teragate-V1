@@ -40,6 +40,10 @@ Future<WorkInfo> getIn(String ip, String accessToken) async {
   var body = json.encode(data);
   var response = await http.post(Uri.parse(Env.SERVER_GET_IN_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
 
+Log.debug(accessToken);
+Log.debug(Env.SERVER_GET_IN_URL);
+Log.debug(response.body);
+
   if (response.statusCode == 200) {
     return WorkInfo.fromJson(json.decode(response.body));
   } else {
@@ -52,7 +56,7 @@ Future<WorkInfo> getOut(String ip, String accessToken) async {
   var data = {"attIpIn": ip};
   var body = json.encode(data);
   final response = await http.post(Uri.parse(Env.SERVER_GET_OUT_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
-  
+
   if (response.statusCode == 200) {
     return WorkInfo.fromJson(json.decode(response.body));
   } else {
@@ -88,7 +92,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
     // 출근 처리 가 이미 된 경우
     workInfo = WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST);
   } else {
-    workInfo = await getIn(accessToken, ip);
+    workInfo = await getIn(ip, accessToken);
     if (workInfo.success) {
       // 정상 등록 된 경우
       tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
@@ -125,7 +129,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
 
 // 퇴근 요청 처리
 Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
-  WorkInfo workInfo = await getOut(accessToken, ip);
+  WorkInfo workInfo = await getOut(ip, accessToken);
   TokenInfo tokenInfo;
   
   if (workInfo.success) {
