@@ -53,7 +53,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
     secureStorage = SecureStorage();
     initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
-    
+
     WidgetsBinding.instance.addObserver(this);
 
     getIPAddress().then((map) => deviceip = map["ip"]);
@@ -62,12 +62,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     initNotification();
   }
 
-    @override
+  @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     isInForeground = state == AppLifecycleState.resumed;
     Log.debug(" state = $state");
-    switch(state){
+    switch (state) {
       case AppLifecycleState.resumed:
         break;
       case AppLifecycleState.inactive:
@@ -75,7 +75,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       case AppLifecycleState.detached:
         break;
       case AppLifecycleState.paused:
-        Log.debug("===========alarm ============");
         alarm();
         break;
     }
@@ -179,10 +178,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
                     }),
                 SpeedDialChild(
                     child: const Icon(Icons.copy),
-                    label: '시작',
+                    label: '초기화',
                     onTap: () async {
-                      initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
-                      await startBeacon();
+                      secureStorage.delete(Env.KEY_GET_IN_CHECK);
                     })
               ],
             ),
@@ -245,9 +243,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   // 로그인 화면으로 이동
-  void moveLogin() async{
+  void moveLogin() async {
     String? isChecked = await secureStorage.read(Env.KEY_ID_CHECK);
-    if ( isChecked == null && isChecked == "false") {
+    if (isChecked == null && isChecked == "false") {
       secureStorage.write(Env.LOGIN_ID, "");
     }
     secureStorage.write(Env.LOGIN_PW, "");
@@ -290,50 +288,47 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       }
     });
   }
-  
+
   //요일별 알람 체크(출근)
-  Future<Map<String, dynamic>> getInTime(String key) async{
+  Future<Map<String, dynamic>> getInTime(String key) async {
     String? result;
     bool alarmSwitch = false;
-    if(await secureStorage.read(key) == "true"){
+    if (await secureStorage.read(key) == "true") {
       Log.debug("IN######### ");
-      result = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);        
+      result = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
       alarmSwitch = true;
       //현재 null 값 들어가고 있는데 확인필요
     }
-        return {
-      "alarmtime" :result,
-      "alarmSwitch": alarmSwitch 
-    };
+    return {"alarmtime": result, "alarmSwitch": alarmSwitch};
   }
+
   //요일별 알람 체크(퇴근)
-  Future<Map<String, dynamic>> getOutTime(String key) async{
+  Future<Map<String, dynamic>> getOutTime(String key) async {
     String? result;
     bool alarmSwitch = false;
-    if(await secureStorage.read(key) == "true"){
+    if (await secureStorage.read(key) == "true") {
       Log.debug("OUT######### ");
-      result = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);        
+      result = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
       alarmSwitch = true;
       //현재 null 값 들어가고 있는데 확인필요
-   }
-   return {
-      "alarmtime" :result,
-      "alarmSwitch": alarmSwitch 
-    };
+    }
+    return {"alarmtime": result, "alarmSwitch": alarmSwitch};
   }
 
-
-  //남은 시간 계산(초) 
-  Future<void> alarm() async {    
-    Timer? t = Timer.periodic(const Duration(seconds: 1), (timer) async{  
+  //남은 시간 계산(초)
+  Future<void> alarm() async {
+    Timer? t = Timer.periodic(const Duration(seconds: 10), (timer) async {
       Log.debug("alarm");
-      if(await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF)=="true")workIn();
-      if(await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF)=="true")workOut();
+      if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
+        workIn();
+      } else if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
+        workOut();
+      }
     });
-    
+
     //if(t.isActive) t.cancel();
 
-    // Future.delayed(Duration(seconds: diff.inSeconds.toInt()), () async {  
+    // Future.delayed(Duration(seconds: diff.inSeconds.toInt()), () async {
     //   showNotification(flutterLocalNotificationsPlugin, "자동 출근 테스트?", texttime);
     //   initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
     //   await startBeacon();
@@ -347,19 +342,18 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     // });
   }
 
-  Future<void> workIn() async{
+  Future<void> workIn() async {
     Map<String, dynamic>? gimap;
     String keyWeek = getWeek();
-    String texttime ;
+    String texttime;
     String? alarmtime;
     DateTime datetime;
     bool alarmSwitch = true;
-          //출근 ON/OFF확인
-      if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true")  { 
-        switch (keyWeek) {
+    //출근 ON/OFF확인
+    if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
+      switch (keyWeek) {
         case 'Mon':
           gimap = await getInTime(Env.KEY_SETTING_MON_GI);
-          Log.debug("======workIn1=======");
           break;
         case 'Tue':
           gimap = await getInTime(Env.KEY_SETTING_THU_GI);
@@ -367,83 +361,83 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         case 'Wed':
           gimap = await getInTime(Env.KEY_SETTING_WED_GI);
           break;
-        case 'Thu': 
+        case 'Thu':
           gimap = await getInTime(Env.KEY_SETTING_THU_GI);
           break;
-        case 'Fri': 
+        case 'Fri':
           gimap = await getInTime(Env.KEY_SETTING_FRI_GI);
           break;
-        case 'Sat': 
+        case 'Sat':
           gimap = await getInTime(Env.KEY_SETTING_SAT_GI);
           break;
         case 'Sun':
           gimap = await getInTime(Env.KEY_SETTING_SUN_GI);
           break;
-        }
-        alarmtime = gimap!["alarmtime"];
-        alarmSwitch = gimap["alarmSwitch"];
-
-        if(alarmtime != null){
-          texttime = getDateToStringForYYMMDD(DateTime.now())+" "+ alarmtime;
-          datetime = DateTime.parse(texttime);
-          Log.debug("======workIn2=======");
-        }else{
-          texttime = getDateToStringForYYMMDD(DateTime.now())+" "+ "08:30:00";
-          datetime = DateTime.parse(texttime);
-        }
-
-        Log.debug(texttime);
-        if(DateTime.now() == datetime){
-          Log.debug(texttime);
-          Log.debug("======workIn3=======");
-        } 
       }
+      alarmtime = gimap!["alarmtime"];
+      alarmSwitch = gimap["alarmSwitch"];
+
+      if (alarmtime != null) {
+        texttime = getDateToStringForYYMMDD(DateTime.now()) + " " + alarmtime;
+        datetime = DateTime.parse(texttime);
+      } else {
+        texttime = getDateToStringForYYMMDD(DateTime.now()) + " " + "08:30:00";
+        datetime = DateTime.parse(texttime);
+      }
+
+      Log.debug(texttime);
+      if (DateTime.now() == datetime) {
+        Log.debug(texttime);
+      }
+    }
   }
-  Future<void> workOut() async{
+
+  Future<void> workOut() async {
     if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
       Map<String, dynamic>? gimap;
       String keyWeek = getWeek();
-      String texttime ;
+      String texttime;
       String? alarmtime;
       DateTime datetime;
       bool alarmSwitch = true;
 
       switch (keyWeek) {
-      case 'Mon':
-        gimap = await getOutTime(Env.KEY_SETTING_MON_GO);
-        break;
-      case 'Tue':
-        gimap = await getOutTime(Env.KEY_SETTING_THU_GO);
-        break;
-      case 'Wed':
-        gimap = await getOutTime(Env.KEY_SETTING_WED_GO);
-        break;
-      case 'Thu': 
-        gimap = await getOutTime(Env.KEY_SETTING_THU_GO);
-        break;
-      case 'Fri': 
-        gimap = await getOutTime(Env.KEY_SETTING_FRI_GO);
-        break;
-      case 'Sat': 
-        gimap = await getOutTime(Env.KEY_SETTING_SAT_GO);
-        break;
-      case 'Sun':
-        gimap = await getOutTime(Env.KEY_SETTING_SUN_GO);
-        break;
+        case 'Mon':
+          gimap = await getOutTime(Env.KEY_SETTING_MON_GO);
+          break;
+        case 'Tue':
+          gimap = await getOutTime(Env.KEY_SETTING_THU_GO);
+          break;
+        case 'Wed':
+          gimap = await getOutTime(Env.KEY_SETTING_WED_GO);
+          break;
+        case 'Thu':
+          gimap = await getOutTime(Env.KEY_SETTING_THU_GO);
+          break;
+        case 'Fri':
+          gimap = await getOutTime(Env.KEY_SETTING_FRI_GO);
+          break;
+        case 'Sat':
+          gimap = await getOutTime(Env.KEY_SETTING_SAT_GO);
+          break;
+        case 'Sun':
+          gimap = await getOutTime(Env.KEY_SETTING_SUN_GO);
+          break;
       }
       alarmtime = gimap!["alarmtime"];
       alarmSwitch = gimap["alarmSwitch"];
-      
-      if(alarmtime != null){
-        texttime = getDateToStringForYYMMDD(DateTime.now())+" "+ alarmtime;
+
+      if (alarmtime != null) {
+        texttime = getDateToStringForYYMMDD(DateTime.now()) + " " + alarmtime;
         datetime = DateTime.parse(texttime);
-      }else{
-        texttime = getDateToStringForYYMMDD(DateTime.now())+" "+ "18:00:00";
+      } else {
+        texttime = getDateToStringForYYMMDD(DateTime.now()) + " " + "18:00:00";
         datetime = DateTime.parse(texttime);
       }
-        if(DateTime.now() == datetime){
-          Log.debug("======workIn=======");
-        } 
+
+      if (DateTime.now() == datetime) {
+        Log.debug("======workIn=======");
+      }
     }
   }
 }

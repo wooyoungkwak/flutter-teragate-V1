@@ -2,14 +2,14 @@ class Env {
   static const String TEST_SERVER = "http://192.168.0.164";
   static const String REAL_SERVER = "http://teraenergy.iptime.org";
 
-  static const String SERVER_LOGIN_URL = '$TEST_SERVER:3000/login';
-  static const String SERVER_GET_IN_URL = '$TEST_SERVER:3000/teragate/goToWork';
-  static const String SERVER_GET_OUT_URL = '$TEST_SERVER:3000/teragate/leaveWork';
-  static const String SERVER_REFRESH_TOKEN_URL = '$TEST_SERVER:3000/teragate/refreshToken';
+  static const String SERVER_LOGIN_URL = '$REAL_SERVER:3000/login';
+  static const String SERVER_GET_IN_URL = '$REAL_SERVER:3000/teragate/goToWork';
+  static const String SERVER_GET_OUT_URL = '$REAL_SERVER:3000/teragate/leaveWork';
+  static const String SERVER_REFRESH_TOKEN_URL = '$REAL_SERVER:3000/teragate/refreshToken';
 
   static const String INITIAL_UUID = '74278bdb-b644-4520-8f0c-720eeaffffff';
 
-  static const String SERVER_GROUPWARE_TEST = "$TEST_SERVER:8080";
+  static const String SERVER_GROUPWARE_TEST = "$REAL_SERVER:8080";
   static const String SERVER_GROUPWARE_REAL = "http://teragroupware.duckdns.org";
   static const String SERVER_GROUPWARE_URL = '$SERVER_GROUPWARE_TEST/signInapp';
 
