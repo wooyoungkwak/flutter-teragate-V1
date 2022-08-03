@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 class Env {
   static const String TEST_SERVER = "http://192.168.0.164";
   static const String REAL_SERVER = "http://teraenergy.iptime.org";
@@ -16,6 +18,9 @@ class Env {
   static const String USER_NICK_NAME = 'USER_NICK_NAME';
   static const String LOGIN_ID = 'LOGIN_ID';
   static const String LOGIN_PW = 'LOGIN_PW';
+
+  static const String WORK_GET_IN = "getin";
+  static const String WORK_GET_OUT = "getout";
 
   static const String KEY_ID_CHECK = 'KEY_ID_CHECK';
   static const String KEY_SUCCESS = "sucess";

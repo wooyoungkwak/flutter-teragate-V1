@@ -42,8 +42,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   String? pw = "test2"; //pw
   String? deviceip = "00";
 
-  bool isInForeground = true;
-
   final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
 
   @override
@@ -59,14 +57,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     const duration = Duration(seconds: 10);
 
     initNotification();
+
+    _backgroundTimer();
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    isInForeground = state == AppLifecycleState.resumed;
-    Log.debug(" state = $state");
-    switch (state) {
+  // ignore: avoid_renaming_method_parameters
+  void didChangeAppLifecycleState(AppLifecycleState appLifecycleState) {
+    super.didChangeAppLifecycleState(appLifecycleState);
+    switch (appLifecycleState) {
       case AppLifecycleState.resumed:
         break;
       case AppLifecycleState.inactive:
@@ -74,8 +73,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       case AppLifecycleState.detached:
         break;
       case AppLifecycleState.paused:
-        alarm();
-        break;
+      break;
     }
   }
 
@@ -293,8 +291,42 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String? result;
     bool alarmSwitch = false;
     if (await secureStorage.read(key) == "true") {
-      Log.debug(" ==========> getInTime true ... ");
+      switch (getWeek()) {
+        case 'Mon':
+          result = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
+          break;
+        case 'Tue':
+          result = await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME);
+          break;
+        case 'Wed':
+          result = await secureStorage.read(Env.KEY_SETTING_WED_GI_TIME);
+          break;
+        case 'Thu':
+          result = await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME);
+          break;
+        case 'Fri':
+          result = await secureStorage.read(Env.KEY_SETTING_FRI_GI_TIME);
+          break;
+        case 'Sat':
+          result = await secureStorage.read(Env.KEY_SETTING_SAT_GI_TIME);
+          break;
+        case 'Sun':
+          result = await secureStorage.read(Env.KEY_SETTING_SUN_GI_TIME);
+          break;
+      }
+      alarmSwitch = true;
+    }
 
+    return {"alarmtime": result, "alarmSwitch": alarmSwitch};
+  }
+
+  //요일별 알람 체크(퇴근)
+  Future<Map<String, dynamic>> getOutTime(String key) async {
+    String? result;
+    bool alarmSwitch = false;
+    String? value = await secureStorage.read(key);
+
+    if (value == "true") {
       switch (getWeek()) {
         case 'Mon':
           result = await secureStorage.read(Env.KEY_SETTING_MON_GO_TIME);
@@ -319,30 +351,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           break;
       }
 
-      Log.debug(" ==========> getInTime ... $result");
-
-      alarmSwitch = true;
-
-    }
-
-    return {"alarmtime": result, "alarmSwitch": alarmSwitch};
-  }
-
-  //요일별 알람 체크(퇴근)
-  Future<Map<String, dynamic>> getOutTime(String key) async {
-    String? result;
-    bool alarmSwitch = false;
-    if (await secureStorage.read(key) == "true") {
-      result = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
       alarmSwitch = true;
     }
     return {"alarmtime": result, "alarmSwitch": alarmSwitch};
   }
 
   //남은 시간 계산(초)
-  Future<void> alarm() async {
+  Future<void> _backgroundTimer() async {
     Timer? t = Timer.periodic(const Duration(seconds: 10), (timer) async {
-      Log.debug("alarm");
+      Log.debug("_backgroundTimer");
       if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
         _workIn();
       } else if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
@@ -421,9 +438,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String texttime;
     String? alarmtime;
     if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
-      Log.debug(" Env.KEY_SETTING_GO_ON_OF  is true");
+
       if (await secureStorage.read(Env.KEY_SETTING_WEEK_GO) == "false") {
-        Log.debug(" Env.KEY_SETTING_WEEK_GO  is false");
+
         switch (getWeek()) {
           case 'Mon':
             gimap = await getOutTime(Env.KEY_SETTING_MON_GO);
@@ -458,12 +475,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           } else {
             texttime = getDateToStringForYYYYMMDDInNow() + " " + "18:00:00";
           }
-
-          _excuteWork(setForGetOut, texttime);
+          await _excuteWork(setForGetOut, texttime);
         }
 
       } else {
-         Log.debug(" Env.KEY_SETTING_WEEK_GO  is true");
         String? temp = await secureStorage.read(Env.KEY_SETTING_WEEK_GO_TIME);
         texttime = getDateToStringForYYYYMMDDInNow() + " " + temp!;
         _excuteWork(setForGetOut, texttime);
@@ -477,5 +492,44 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
       startBeacon();
     }
+    Log.debug(" diffTime ====> $diffTime.inMinutes.toInt() ");
   }
+
+  // Future<void> test() async{
+  //   Log.debug(" week ============== ");
+  //   Log.debug( " gi mon = ${await secureStorage.read(Env.KEY_SETTING_MON_GI)}" );
+  //   Log.debug( " gi thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GI)}" );
+  //   Log.debug( " gi wed = ${await secureStorage.read(Env.KEY_SETTING_WED_GI)}" );
+  //   Log.debug( " gi Thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GI)}" );
+  //   Log.debug( " gi fri = ${await secureStorage.read(Env.KEY_SETTING_FRI_GI)}" );
+  //   Log.debug( " gi sat = ${await secureStorage.read(Env.KEY_SETTING_SAT_GI)}" );
+  //   Log.debug( " gi sun = ${await secureStorage.read(Env.KEY_SETTING_SUN_GI)}" );
+  //   Log.debug(" time ============== ");
+  //   Log.debug( " gi mon time = ${await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME)}" );
+  //   Log.debug( " gi thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME)}" );
+  //   Log.debug( " gi wed time = ${await secureStorage.read(Env.KEY_SETTING_WED_GI_TIME)}" );
+  //   Log.debug( " gi Thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME)}" );
+  //   Log.debug( " gi fri time = ${await secureStorage.read(Env.KEY_SETTING_FRI_GI_TIME)}" );
+  //   Log.debug( " gi sat time = ${await secureStorage.read(Env.KEY_SETTING_SAT_GI_TIME)}" );
+  //   Log.debug( " gi sun time = ${await secureStorage.read(Env.KEY_SETTING_SUN_GI_TIME)}" );
+
+  //   Log.debug(" =================== ");
+  //   Log.debug(" week ============== ");
+  //   Log.debug( " go mon = ${await secureStorage.read(Env.KEY_SETTING_MON_GO)}" );
+  //   Log.debug( " go thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GO)}" );
+  //   Log.debug( " go wed = ${await secureStorage.read(Env.KEY_SETTING_WED_GO)}" );
+  //   Log.debug( " go Thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GO)}" );
+  //   Log.debug( " go fri = ${await secureStorage.read(Env.KEY_SETTING_FRI_GO)}" );
+  //   Log.debug( " go sat = ${await secureStorage.read(Env.KEY_SETTING_SAT_GO)}" );
+  //   Log.debug( " go sun = ${await secureStorage.read(Env.KEY_SETTING_SUN_GO)}" );
+  //   Log.debug(" time ============== ");
+  //   Log.debug( " gi mon time = ${await secureStorage.read(Env.KEY_SETTING_MON_GO_TIME)}" );
+  //   Log.debug( " gi thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME)}" );
+  //   Log.debug( " gi wed time = ${await secureStorage.read(Env.KEY_SETTING_WED_GO_TIME)}" );
+  //   Log.debug( " gi Thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME)}" );
+  //   Log.debug( " gi fri time = ${await secureStorage.read(Env.KEY_SETTING_FRI_GO_TIME)}" );
+  //   Log.debug( " gi sat time = ${await secureStorage.read(Env.KEY_SETTING_SAT_GO_TIME)}" );
+  //   Log.debug( " gi sun time = ${await secureStorage.read(Env.KEY_SETTING_SUN_GO_TIME)}" );
+
+  // }
 }

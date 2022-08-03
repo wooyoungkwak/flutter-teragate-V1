@@ -35,6 +35,10 @@ String getDateToStringForAllInNow() {
   return getDateToStringForAll(getNow());
 }
 
+String getPickerTime(DateTime datetime) {
+  return getDateToString(datetime, "hh:mm");
+}
+
 String getMinorToDate() {
   String date = getDateToString(getNow(), "MMdd");
   if ( date.substring(0, 1) == "0") {
