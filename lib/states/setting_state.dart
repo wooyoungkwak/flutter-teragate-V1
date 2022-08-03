@@ -271,7 +271,7 @@ class SettingState extends State<Setting> {
   }
 
   Future<String> _initValue() async {
-    String? uuid = await secureStorage.read(Env.KEY_UUID);
+    String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
     String? getin = await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF);
     String? getout = await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF);
 
@@ -285,6 +285,7 @@ class SettingState extends State<Setting> {
   }
 
   Future<void> _saveValue() async {
+    secureStorage.write(Env.KEY_SETTING_UUID, beaconuuid);
     secureStorage.write(Env.KEY_SETTING_GI_ON_OFF, switchGetIn.toString());
     secureStorage.write(Env.KEY_SETTING_GO_ON_OFF, switchGetOut.toString());
   }

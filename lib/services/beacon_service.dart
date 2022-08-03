@@ -45,16 +45,19 @@ Future<void> initBeacon(Function setNotification, Function setForGetInOut, Strea
   beaconStreamController.stream.first.then((data) async {
     //리슨타면 일단 스캔멈추기.
     if (data.isNotEmpty) {
-      String? uuid = await secureStorage.read(Env.KEY_UUID);
+      String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
       uuid = uuid!.toUpperCase();
       
       Map<String, dynamic> userMap = jsonDecode(data);
       var iBeacon = BeaconData.fromJson(userMap);
-      if (iBeacon.uuid != uuid) {
+
+      if (iBeacon.uuid.toUpperCase() != uuid) {
+        setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
         return;
       }
 
       String beaconKey = iBeacon.minor; // 비콘의 key 값
+
       if (beaconKey != getMinorToDate()) {
         setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
       } else {
@@ -63,8 +66,6 @@ Future<void> initBeacon(Function setNotification, Function setForGetInOut, Strea
 
       BeaconsPlugin.stopMonitoring();
     } else {
-      //데이터가 없지만 리슨으로 들어 온 경우...
-      Log.debug("========== 일단 여기들어오면 됨. ========== ");
       BeaconsPlugin.stopMonitoring();
     }
   });
@@ -72,7 +73,7 @@ Future<void> initBeacon(Function setNotification, Function setForGetInOut, Strea
 }
 
 Future<void> _setBeacon() async {
-  await BeaconsPlugin.addRegion("iBeacon", "74278bdb-b644-4520-8f0c-720eeaffffff");
+  await BeaconsPlugin.addRegion("iBeacon", Env.UUID_DEFAULT);
   if (Platform.isAndroid) {
     BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=0215,i:4-19,i:20-21,i:22-23,p:24-24");
     BeaconsPlugin.addBeaconLayoutForAndroid("m:2-3=beac,i:4-19,i:20-21,i:22-23,p:24-24,d:25-25");
