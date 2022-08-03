@@ -73,7 +73,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       case AppLifecycleState.detached:
         break;
       case AppLifecycleState.paused:
-      break;
+        break;
     }
   }
 
@@ -229,14 +229,16 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Future<void> initNotification() async {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS = const IOSInitializationSettings(onDidReceiveLocalNotification: null);
-    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettingsIOS =
+        const IOSInitializationSettings(onDidReceiveLocalNotification: null);
+    var initializationSettings = InitializationSettings(
+        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
   }
 
   void setNotification(String message) {
-    showNotification(flutterLocalNotificationsPlugin, Env.TITLE_BEACON_NOTIFICATION, message);
+    selectNotiType(flutterLocalNotificationsPlugin, Env.TITLE_BEACON_NOTIFICATION, message);
   }
 
   // 로그인 화면으로 이동
@@ -438,9 +440,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String texttime;
     String? alarmtime;
     if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
-
       if (await secureStorage.read(Env.KEY_SETTING_WEEK_GO) == "false") {
-
         switch (getWeek()) {
           case 'Mon':
             gimap = await getOutTime(Env.KEY_SETTING_MON_GO);
@@ -477,7 +477,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           }
           await _excuteWork(setForGetOut, texttime);
         }
-
       } else {
         String? temp = await secureStorage.read(Env.KEY_SETTING_WEEK_GO_TIME);
         texttime = getDateToStringForYYYYMMDDInNow() + " " + temp!;

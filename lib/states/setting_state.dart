@@ -24,6 +24,8 @@ class SettingState extends State<Setting> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   String beaconuuid = "";
 
+  bool switchval = true;
+
   @override
   void initState() {
     super.initState();
@@ -65,10 +67,7 @@ class SettingState extends State<Setting> {
   }
 
   Visibility _createVisibility(Widget widget) {
-    return  Visibility(
-                visible: Platform.isIOS,
-                child: widget
-    );
+    return Visibility(visible: Platform.isIOS, child: widget);
   }
 
   Scaffold _initScaffold() {
@@ -96,7 +95,10 @@ class SettingState extends State<Setting> {
             _createGestureDetector(onTapuuid, _initContainerByUuid()),
             _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
             _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
-            _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
+
+            _createGestureDetector(onTapAlarm, _initSetupSwitch()),
+            // _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
+
             _createVisibility(_createGestureDetector(onTapInit, _initContainerByInitIos()))
           ],
         ),
@@ -118,7 +120,7 @@ class SettingState extends State<Setting> {
       ],
     ));
   }
-  
+
   Container _initContainerByGetIn() {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,9 +133,13 @@ class SettingState extends State<Setting> {
                 recognizer: TapGestureRecognizer()
                   //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
                   ..onTapDown = (details) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_IN, null)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingWorkTime(Env.WORK_GET_IN, null)));
                   },
-                style: const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
+                style:
+                    const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
           ]),
         ),
         Switch(
@@ -157,9 +163,13 @@ class SettingState extends State<Setting> {
                 recognizer: TapGestureRecognizer()
                   //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
                   ..onTapDown = (details) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_OUT, null)));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SettingWorkTime(Env.WORK_GET_OUT, null)));
                   },
-                style: const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
+                style:
+                    const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
           ]),
         ),
         Switch(
@@ -177,7 +187,9 @@ class SettingState extends State<Setting> {
       children: [
         RichText(
           text: const TextSpan(children: [
-            TextSpan(text: '알람 설정', style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
+            TextSpan(
+                text: '알람 설정',
+                style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
           ]),
         ),
       ],
@@ -185,17 +197,40 @@ class SettingState extends State<Setting> {
   }
 
   Container _initContainerByInitIos() {
-    return _createContainer(
-      Row(
-          children: [
-            RichText(
-              text: const TextSpan(children: [
-                TextSpan(text: '초기화', style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
-              ]),
+    return _createContainer(Row(
+      children: [
+        RichText(
+          text: const TextSpan(children: [
+            TextSpan(
+                text: '초기화',
+                style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
+          ]),
+        ),
+      ],
+    ));
+  }
+
+  Container _initSetupSwitch() {
+    return _createContainer(Row(
+      children: [
+        RichText(
+          text: const TextSpan(children: [
+            TextSpan(
+              text: '알람설정',
+              style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400),
             ),
-          ],
-        )
-    );
+          ]),
+        ),
+        Switch(
+          value: switchval,
+          onChanged: (newValue) {
+            setState(() => switchval = newValue);
+            secureStorage.write(Env.KEY_SETTING_VIBRATE, switchval.toString());
+            secureStorage.write(Env.KEY_SETTING_ALARM, switchval.toString());
+          },
+        ),
+      ],
+    ));
   }
 
   void onTapuuid() {
@@ -203,15 +238,21 @@ class SettingState extends State<Setting> {
   }
 
   void onTapWorkIn() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_IN, null)));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_IN, null)));
   }
 
   void onTapWorkOut() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_OUT, null)));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_OUT, null)));
   }
 
   void onTapAlarm() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingAlarm(null)));
+    //iOS일 경우, 넘기지 말고 안드일때만 넘겨야한다.
+
+    if (Platform.isAndroid) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingAlarm(null)));
+    }
   }
 
   void onTapInit() {
@@ -275,12 +316,45 @@ class SettingState extends State<Setting> {
     String? getin = await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF);
     String? getout = await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF);
 
+    //------------------------------------------------------------------------//
+
+    //알람세팅용... 수정예정.
+    String? vibrate = await secureStorage.read(Env.KEY_SETTING_VIBRATE);
+    String? alarm = await secureStorage.read(Env.KEY_SETTING_ALARM);
+
+    //널값일떄 자동으로 값 넣어주는거 처리 해야할듯.. 이렇게 수동으로하면 꼬일가능성 매우높음.
+    // String? alarmState = await secureStorage.read(Env.KEY_SETTING_ALARM);
+
+    if (vibrate == null) {
+      setState(() {
+        switchval = false;
+        secureStorage.write(Env.KEY_SETTING_ALARM, switchval.toString());
+      });
+    }
+    if (alarm == null) {
+      setState(() {
+        switchval = false;
+        secureStorage.write(Env.KEY_SETTING_ALARM, switchval.toString());
+      });
+    }
+    if (vibrate == "true") {
+      switchval = true;
+    } else if (vibrate == "false") {
+      switchval = false;
+    }
+    if (alarm == "true") {
+      switchval = true;
+    } else if (alarm == "false") {
+      switchval = false;
+    }
+
     setState(() {
       // ignore: prefer_if_null_operators
       beaconuuid = (uuid == null ? Env.UUID_DEFAULT : uuid);
     });
     switchGetIn = (getin == "true" ? true : false);
     switchGetOut = (getout == "true" ? true : false);
+
     return "";
   }
 
