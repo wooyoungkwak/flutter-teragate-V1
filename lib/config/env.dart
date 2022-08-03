@@ -29,7 +29,7 @@ class Env {
   static const String KEY_REFRESH_TOKEN = "refreshToken";
   static const String KEY_GET_IN_CHECK = "getInCheck";
   static const String KEY_GET_OUT_CHECK = "getOutCheck";
-  static const String KEY_UUID = "uuid";
+  static const String KEY_SETTING_UUID = "uuid";
   static const String KEY_LOGIN_STATE = "loginState";
 
   static const String KEY_SETTING_WEEK_GI = "WeekGi";
@@ -74,7 +74,7 @@ class Env {
   static const String KEY_SETTING_GI_ON_OFF = "GIONOFF";
   static const String KEY_SETTING_GO_ON_OFF = "GOONOFF";
 
-  static const String MSG_GET_IN_EXIST = "이미 출근 등록이 완료 되어 있습니다.";
+  static const String MSG_GET_IN_EXIST = "이미 출근 등록이 완료 되었습니다.";
   static const String MSG_GET_IN_SUCCESS = "출근 등록이 완료 되었습니다.";
   static const String MSG_GET_OUT_SUCCESS = "퇴근 등록이 완료 되었습니다.";
   static const String MSG_GET_IN_FAIL = "출근 등록이 실패 하였습니다.";
