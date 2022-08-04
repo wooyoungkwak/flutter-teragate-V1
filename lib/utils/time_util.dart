@@ -20,7 +20,7 @@ String getDateToStringForYYMMDD(DateTime datetime) {
 }
 
 String getDateToStringForAll(DateTime datetime) {
-  return getDateToString(datetime,"yyyy-MM-dd hh:mm:ss");
+  return getDateToString(datetime,"yyyy-MM-dd kk:mm:ss");
 }
 
 String getDateToStringForMMDDInNow() {
@@ -36,7 +36,7 @@ String getDateToStringForAllInNow() {
 }
 
 String getPickerTime(DateTime datetime) {
-  return getDateToString(datetime, "hh:mm");
+  return getDateToString(datetime, "kk:mm");
 }
 
 String getMinorToDate() {

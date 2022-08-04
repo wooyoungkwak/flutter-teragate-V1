@@ -1,16 +1,13 @@
 import 'dart:convert';
 
+import '../config/env.dart';
+
 LoginInfo resultInfoFromJson(String str) => LoginInfo.fromJson(json.decode(str));
 
 String resultInfoToJson(LoginInfo loginInfo) => json.encode(loginInfo.toJson());
 
 class LoginInfo {
-  LoginInfo(
-      this.success, 
-      this.data, 
-      this.message,
-      this.tokenInfo
-  );
+  LoginInfo(this.success, this.data, this.message, this.tokenInfo);
 
   bool? success;
   String? message;
@@ -19,45 +16,29 @@ class LoginInfo {
 
   static LoginInfo fromJson(Map<String, dynamic> json) {
     TokenInfo tokenInfo = TokenInfo(accessToken: json["accessToken"], refreshToken: json["refreshToken"], isUpdated: true);
-    return LoginInfo( json["success"], json["data"], "", tokenInfo ); 
+    return LoginInfo(json["success"], json["data"], "", tokenInfo);
   }
 
-  static LoginInfo fromJsonByFail(Map<String, dynamic> json) => LoginInfo(json["success"], {}, "", null); 
+  static LoginInfo fromJsonByFail(Map<String, dynamic> json) => LoginInfo(json["success"], {}, "", null);
 
-  Map<String, dynamic> toJson() => 
-    {
-        "success": success,
-        "data": data
-    };
+  Map<String, dynamic> toJson() => {"success": success, "data": data};
 }
 
 class WorkInfo {
   bool success;
   String message;
 
-  WorkInfo({
-      required this.success, 
-      required this.message
-  });
+  WorkInfo({required this.success, required this.message});
 
   static WorkInfo fromJson(Map<String, dynamic> json) {
     if (json["success"]) {
-      return WorkInfo(
-          success: json["success"], 
-          message: ""
-      ); 
+      return WorkInfo(success: json["success"], message: "");
     } else {
-      return WorkInfo(
-        success: json["success"], 
-        message: json["message"]
-    ); 
+      return WorkInfo(success: json["success"], message: json["message"] == "exist" ? Env.MSG_GET_IN_EXIST : json["message"]);
     }
   }
 
-  Map<String, dynamic> toJson() => 
-  {
-      "success": success
-  };
+  Map<String, dynamic> toJson() => {"success": success};
 }
 
 class TokenInfo {
@@ -66,14 +47,7 @@ class TokenInfo {
   String refreshToken;
   String? message;
 
-  TokenInfo(
-    {
-      required this.accessToken, 
-      required this.refreshToken,
-      this.message,
-      required this.isUpdated
-    }
-  );
+  TokenInfo({required this.accessToken, required this.refreshToken, this.message, required this.isUpdated});
 
   String getAccessToken() {
     return accessToken;
@@ -87,13 +61,11 @@ class TokenInfo {
     return message;
   }
 
-  void setAccessToken(String accessToken){
+  void setAccessToken(String accessToken) {
     this.accessToken = accessToken;
   }
 
-  void setRefreshToken(String refreshToken){
+  void setRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
   }
-
 }
-

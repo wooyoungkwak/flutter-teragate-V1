@@ -95,10 +95,7 @@ class SettingState extends State<Setting> {
             _createGestureDetector(onTapuuid, _initContainerByUuid()),
             _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
             _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
-
-            _createGestureDetector(onTapAlarm, _initSetupSwitch()),
-            // _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
-
+            _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
             _createVisibility(_createGestureDetector(onTapInit, _initContainerByInitIos()))
           ],
         ),
@@ -182,20 +179,6 @@ class SettingState extends State<Setting> {
     ));
   }
 
-  Container _initContainerByAlarm() {
-    return _createContainer(Row(
-      children: [
-        RichText(
-          text: const TextSpan(children: [
-            TextSpan(
-                text: '알람 설정',
-                style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
-          ]),
-        ),
-      ],
-    ));
-  }
-
   Container _initContainerByInitIos() {
     return _createContainer(Row(
       children: [
@@ -210,13 +193,14 @@ class SettingState extends State<Setting> {
     ));
   }
 
-  Container _initSetupSwitch() {
+  Container _initContainerByAlarm() {
     return _createContainer(Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         RichText(
           text: const TextSpan(children: [
             TextSpan(
-              text: '알람설정',
+              text: '알람 설정',
               style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400),
             ),
           ]),
@@ -249,10 +233,9 @@ class SettingState extends State<Setting> {
 
   void onTapAlarm() {
     //iOS일 경우, 넘기지 말고 안드일때만 넘겨야한다.
-
-    if (Platform.isAndroid) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingAlarm(null)));
-    }
+    // if (Platform.isAndroid) {
+    //   Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingAlarm(null)));
+    // }
   }
 
   void onTapInit() {

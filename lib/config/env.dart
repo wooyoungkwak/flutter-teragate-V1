@@ -31,7 +31,6 @@ class Env {
   static const String KEY_GET_OUT_CHECK = "getOutCheck";
   static const String KEY_SETTING_UUID = "uuid";
   static const String KEY_LOGIN_STATE = "loginState";
-
   static const String KEY_SETTING_WEEK_GI = "WeekGi";
   static const String KEY_SETTING_MON_GI = "MondayGi";
   static const String KEY_SETTING_TUE_GI = "TuesdayGi";
@@ -40,7 +39,6 @@ class Env {
   static const String KEY_SETTING_FRI_GI = "FridayGi";
   static const String KEY_SETTING_SAT_GI = "SaturdayGi";
   static const String KEY_SETTING_SUN_GI = "SundayGi";
-
   static const String KEY_SETTING_WEEK_GO = "WeekGO";
   static const String KEY_SETTING_MON_GO = "MondayGO";
   static const String KEY_SETTING_TUE_GO = "TuesdayGO";
@@ -49,7 +47,6 @@ class Env {
   static const String KEY_SETTING_FRI_GO = "FridayGO";
   static const String KEY_SETTING_SAT_GO = "SaturdayGO";
   static const String KEY_SETTING_SUN_GO = "SundayGO";
-
   static const String KEY_SETTING_WEEK_GI_TIME = "WeekTimeGetIn";
   static const String KEY_SETTING_MON_GI_TIME = "MondayTimeGetIn";
   static const String KEY_SETTING_TUE_GI_TIME = "TuesdayTimeGetIn";
@@ -58,7 +55,6 @@ class Env {
   static const String KEY_SETTING_FRI_GI_TIME = "FridayTimeGetIn";
   static const String KEY_SETTING_SAT_GI_TIME = "SaturdayTimeGetIn";
   static const String KEY_SETTING_SUN_GI_TIME = "SundayTimeGetIn";
-
   static const String KEY_SETTING_WEEK_GO_TIME = "WeekTimeGetOut";
   static const String KEY_SETTING_MON_GO_TIME = "MondayTimeGetOut";
   static const String KEY_SETTING_TUE_GO_TIME = "TuesdayTimeGetOut";
@@ -67,13 +63,12 @@ class Env {
   static const String KEY_SETTING_FRI_GO_TIME = "FridayTimeGetOut";
   static const String KEY_SETTING_SAT_GO_TIME = "SaturdayTimeGetOut";
   static const String KEY_SETTING_SUN_GO_TIME = "SundayTimeGetOut";
-
   static const String KEY_SETTING_VIBRATE = "VIBRATE";
   static const String KEY_SETTING_ALARM = "ALARM";
-
   static const String KEY_SETTING_GI_ON_OFF = "GIONOFF";
   static const String KEY_SETTING_GO_ON_OFF = "GOONOFF";
 
+  static const String MSG_NOT_TOKEN = "로그 아웃 후에 다시 로그인 해주세요.";
   static const String MSG_GET_IN_EXIST = "이미 출근 등록이 완료 되었습니다.";
   static const String MSG_GET_IN_SUCCESS = "출근 등록이 완료 되었습니다.";
   static const String MSG_GET_OUT_SUCCESS = "퇴근 등록이 완료 되었습니다.";
@@ -85,7 +80,6 @@ class Env {
   static const String TITLE_BEACON_NOTIFICATION = "비콘 설정";
   
   static const String UUID_DEFAULT = "74278BDB-B644-4520-8F0C-720EEAFFFFFF";
-
 
   static const String NOTIFICATION_CHANNEL_ID = "channelID";
   static const String NOTIFICATION_CHANNEL_NAME = "channelName";

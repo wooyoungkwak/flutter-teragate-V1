@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 
@@ -37,10 +38,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   int nrMessagesReceived = 0;
 
-  String? name = "test";
-  String? id = "test1"; //id
-  String? pw = "test2"; //pw
-  String? deviceip = "00";
+  String? name = "";
+  String? id = ""; //id
+  String? pw = ""; //pw
+  String? deviceip = "";
+  Timer? backgroundTimer;
 
   final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
 
@@ -49,16 +51,15 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.initState();
 
     secureStorage = SecureStorage();
-    initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
+    // initBeacon(_setNotification, _runToGetIn, beaconStreamController, secureStorage);
 
     WidgetsBinding.instance.addObserver(this);
 
     getIPAddress().then((map) => deviceip = map["ip"]);
-    const duration = Duration(seconds: 10);
 
-    initNotification();
+    _initNotification();
 
-    _backgroundTimer();
+    _backgroundTimer().then((_backgroundTimer) => backgroundTimer = _backgroundTimer);
   }
 
   @override
@@ -91,158 +92,151 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           MoveToBackground.moveTaskToBack();
           return Future(() => false);
         },
-        child: MaterialApp(
-          home: Scaffold(
-            appBar: AppBar(
-              title: const Text('TERA GATE 출퇴근'),
-              automaticallyImplyLeading: false,
-              actions: <Widget>[
-                IconButton(
-                  onPressed: () {
-                    showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', moveLogin);
-                  },
-                  icon: const Icon(
-                    Icons.logout_rounded,
-                  ),
-                ),
-              ],
-            ),
-            body: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    child: const Text(
-                      "근태 확인",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    margin: const EdgeInsets.all(8.0),
-                  ),
-                  const SizedBox(
-                    height: 20.0,
-                  ),
-                  Expanded(child: comuteItem()), // 변경 ui 출력 테스트
-                  TimerBuilder.periodic(
-                    const Duration(seconds: 1),
-                    builder: (context) {
-                      return Text(
-                        getDateToStringForAllInNow(),
-                        style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w200),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-            //플로팅 버튼 추가하기. - 해당 버튼 변경시키기.
-
-            floatingActionButton: SpeedDial(
-              animatedIcon: AnimatedIcons.menu_close,
-              backgroundColor: Colors.redAccent,
-              overlayColor: Colors.grey,
-              overlayOpacity: 0.5,
-              closeManually: true,
-              children: [
-                SpeedDialChild(
-                    child: const Icon(Icons.copy),
-                    label: '출근',
-                    // backgroundColor: Colors.blue,
-                    onTap: () async {
-                      setForGetIn();
-                    }),
-                SpeedDialChild(
-                    child: const Icon(Icons.copy),
-                    label: '퇴근',
-                    onTap: () async {
-                      setForGetOut();
-                    }),
-                SpeedDialChild(
-                    child: const Icon(Icons.copy),
-                    label: '그룹웨어',
-                    onTap: () async {
-                      moveWebview(context, id!, pw!);
-                    }),
-                SpeedDialChild(
-                    child: const Icon(Icons.copy),
-                    label: '환경설정',
-                    onTap: () async {
-                      moveSetting(context);
-                    }),
-                SpeedDialChild(
-                    child: const Icon(Icons.copy),
-                    label: '초기화',
-                    onTap: () async {
-                      secureStorage.delete(Env.KEY_GET_IN_CHECK);
-                    })
-              ],
-            ),
-          ),
-        ));
+        child: _initScaffoldByMain());
   }
 
-  Widget comuteItem() {
+  WillPopScope _createWillPopScope(Widget widget) {
+    return WillPopScope(
+        onWillPop: () {
+          Navigator.pop(context);
+          return Future(() => false);
+        },
+        child: widget);
+  }
+
+  MaterialApp _createMaterialApp(Widget widget) {
+    return MaterialApp(home: widget);
+  }
+
+  Container _createContainer(Widget widget) {
+    return Container(
+        margin: const EdgeInsets.all(8.0),
+        // padding: const EdgeInsets.all(10),
+        // decoration: const BoxDecoration(
+        //   color: Color(0xFFEEEEEE),
+        // ),
+        child: widget);
+  }
+
+  Text _createText(String subject, String value) {
+    return Text(
+      "$subject : $value",
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+        color: Colors.blue,
+      ),
+    );
+  }
+
+  Scaffold _initScaffoldByMain() {
     return Scaffold(
-      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
-        Container(
-          child: Text(
-            "이름 : $name",
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.blue,
+      appBar: AppBar(
+        title: const Text('TERA GATE 출퇴근'),
+        automaticallyImplyLeading: false,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              showOkCancelDialog(context, "로그아웃", '로그인 페이지로 이동하시겠습니까?', _moveLogin);
+            },
+            icon: const Icon(
+              Icons.logout_rounded,
             ),
           ),
-          margin: const EdgeInsets.all(8.0),
+        ],
+      ),
+      body: Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              child: const Text(
+                "근태 확인",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.blue,
+                ),
+              ),
+              margin: const EdgeInsets.all(8.0),
+            ),
+            const SizedBox(
+              height: 20.0,
+            ),
+            Expanded(child: _initScaffoldByComuteItem()), // 변경 ui 출력 테스트
+            TimerBuilder.periodic(
+              const Duration(seconds: 1),
+              builder: (context) {
+                return Text(
+                  getDateToStringForAllInNow(),
+                  style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w200),
+                );
+              },
+            ),
+          ],
         ),
-        Container(
-          child: Text(
-            "디바이스 아이피 : $deviceip",
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.blue,
-            ),
-          ),
-          margin: const EdgeInsets.all(8.0),
-        ),
-        Container(
-          child: Text(
-            "접속시간 : ${getDateToStringForAllInNow()}",
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: Colors.blue,
-            ),
-          ),
-          margin: const EdgeInsets.all(8.0),
-        )
-      ]),
+      ),
+      //플로팅 버튼 추가하기. - 해당 버튼 변경시키기.
+
+      floatingActionButton: SpeedDial(
+        animatedIcon: AnimatedIcons.menu_close,
+        backgroundColor: Colors.redAccent,
+        overlayColor: Colors.grey,
+        overlayOpacity: 0.5,
+        closeManually: true,
+        children: [
+          SpeedDialChild(
+              child: const Icon(Icons.copy),
+              label: '출근',
+              // backgroundColor: Colors.blue,
+              onTap: () async {
+                _runToGetIn();
+              }),
+          SpeedDialChild(
+              child: const Icon(Icons.copy),
+              label: '퇴근',
+              onTap: () async {
+                _runToGetOut();
+              }),
+          SpeedDialChild(
+              child: const Icon(Icons.copy),
+              label: '그룹웨어',
+              onTap: () async {
+                _moveWebview(context, id!, pw!);
+              }),
+          SpeedDialChild(
+              child: const Icon(Icons.copy),
+              label: '환경설정',
+              onTap: () async {
+                _moveSetting(context);
+              })
+        ],
+      ),
+    );
+  }
+
+  Scaffold _initScaffoldByComuteItem() {
+    return Scaffold(
+      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[_createContainer(_createText("이름", name!)), _createContainer(_createText("디바이스 아이피", deviceip!)), _createContainer(_createText("접속시간", getDateToStringForAllInNow()))]),
     );
   }
 
   // Notifcation 알람 초기화
-  Future<void> initNotification() async {
+  Future<void> _initNotification() async {
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var initializationSettingsAndroid = const AndroidInitializationSettings('@mipmap/ic_launcher');
-    var initializationSettingsIOS =
-        const IOSInitializationSettings(onDidReceiveLocalNotification: null);
-    var initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
+    var initializationSettingsIOS = const IOSInitializationSettings(onDidReceiveLocalNotification: null);
+    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
   }
 
-  void setNotification(String message) {
-    selectNotiType(flutterLocalNotificationsPlugin, Env.TITLE_BEACON_NOTIFICATION, message);
+  void _setNotification(String message) {
+    selectNotiType(flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
   }
 
-  // 로그인 화면으로 이동
-  void moveLogin() async {
+  void _moveLogin() async {
     String? isChecked = await secureStorage.read(Env.KEY_ID_CHECK);
     if (isChecked == null && isChecked == "false") {
       secureStorage.write(Env.LOGIN_ID, "");
@@ -252,44 +246,61 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Navigator.push(context, MaterialPageRoute(builder: (_) => const Login()));
   }
 
-  // 웹 뷰 화면으로 이동
-  void moveWebview(BuildContext context, String? id, String? pw) {
+  void _moveWebview(BuildContext context, String? id, String? pw) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(id!, pw!, null)));
   }
 
-  //환경 설정 화면으로 이동
-  void moveSetting(BuildContext context) {
+  void _moveSetting(BuildContext context) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const Setting(null)));
   }
 
-  // 출근 등록
-  void setForGetIn() async {
+  void _runToGetIn() async {
     String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
     String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
-    processGetIn(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
+
+    if (accessToken == null) {
+      _setNotification(Env.MSG_NOT_TOKEN);
+      return;
+    }
+
+    if (refreshToken == null) {
+      _setNotification(Env.MSG_NOT_TOKEN);
+      return;
+    }
+
+    processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
-        setNotification(workInfo.message);
+        _setNotification(workInfo.message);
       } else {
-        setNotification(workInfo.message);
+        _setNotification(workInfo.message);
       }
     });
   }
 
-  // 퇴근 등록
-  void setForGetOut() async {
+  void _runToGetOut() async {
     String? accessToken = await secureStorage.read(Env.KEY_ACCESS_TOKEN);
     String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
-    processGetOut(accessToken!, refreshToken!, deviceip!, secureStorage, 0).then((workInfo) {
+
+    if (accessToken == null) {
+      _setNotification(Env.MSG_NOT_TOKEN);
+      return;
+    }
+
+    if (refreshToken == null) {
+      _setNotification(Env.MSG_NOT_TOKEN);
+      return;
+    }
+
+    processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       if (workInfo.success) {
-        setNotification(workInfo.message);
+        _setNotification(workInfo.message);
       } else {
-        setNotification(workInfo.message);
+        _setNotification(workInfo.message);
       }
     });
   }
 
-  //요일별 알람 체크(출근)
-  Future<Map<String, dynamic>> getInTime(String key) async {
+  Future<Map<String, dynamic>> _getTimeByGetIn(String key) async {
     String? result;
     bool alarmSwitch = false;
     if (await secureStorage.read(key) == "true") {
@@ -322,8 +333,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     return {"alarmtime": result, "alarmSwitch": alarmSwitch};
   }
 
-  //요일별 알람 체크(퇴근)
-  Future<Map<String, dynamic>> getOutTime(String key) async {
+  Future<Map<String, dynamic>> _getTimeByGetOut(String key) async {
     String? result;
     bool alarmSwitch = false;
     String? value = await secureStorage.read(key);
@@ -358,177 +368,114 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     return {"alarmtime": result, "alarmSwitch": alarmSwitch};
   }
 
-  //남은 시간 계산(초)
-  Future<void> _backgroundTimer() async {
-    Timer? t = Timer.periodic(const Duration(seconds: 10), (timer) async {
-      Log.debug("_backgroundTimer");
+  Future<void> _setWorkGetIn(String data) async {
+    Map<String, dynamic>? gimap;
+    String texttime;
+    String? alarmtime;
+
+    switch (getWeek()) {
+      case 'Mon':
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_MON_GI);
+        break;
+      case 'Tue':
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI);
+        break;
+      case 'Wed':
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_WED_GI);
+        break;
+      case 'Thu':
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI);
+        break;
+      case 'Fri':
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_FRI_GI);
+        break;
+      case 'Sat':
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SAT_GI);
+        break;
+      case 'Sun':
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SUN_GI);
+        break;
+    }
+    alarmtime = gimap!["alarmtime"];
+    bool alarmSwitch = gimap["alarmSwitch"];
+
+    // ignore: unrelated_type_equality_checks
+    if (alarmSwitch == true) {
+      if (alarmtime != null) {
+        texttime = getDateToStringForYYYYMMDDInNow() + " " + alarmtime;
+      } else {
+        texttime = getDateToStringForYYYYMMDDInNow() + " " + "08:30:00";
+      }
+      _runToBeacon(_runToGetIn, texttime);
+    }
+
+  }
+
+  Future<void> _setWorkGetOut(String data) async {
+    Map<String, dynamic>? gimap;
+    String texttime;
+    String? alarmtime;
+
+    switch (getWeek()) {
+      case 'Mon':
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_MON_GO);
+        break;
+      case 'Tue':
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO);
+        break;
+      case 'Wed':
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_WED_GO);
+        break;
+      case 'Thu':
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO);
+        break;
+      case 'Fri':
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_FRI_GO);
+        break;
+      case 'Sat':
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SAT_GO);
+        break;
+      case 'Sun':
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SUN_GO);
+        break;
+    }
+
+    alarmtime = gimap!["alarmtime"];
+    bool alarmSwitch = gimap["alarmSwitch"];
+
+    // ignore: unrelated_type_equality_checks
+    if (alarmSwitch == true) {
+      if (alarmtime != null) {
+        texttime = getDateToStringForYYYYMMDDInNow() + " " + alarmtime;
+      } else {
+        texttime = getDateToStringForYYYYMMDDInNow() + " " + "18:00:00";
+      }
+
+      await _runToBeacon(_runToGetOut, texttime);
+    }
+  }
+
+  Future<void> _runToBeacon(Function setForGetInOut, String texttime) async {
+    Duration diffTime = getToDateTime(texttime).difference(getNow());
+    if (diffTime.inMinutes.toInt() == 0) {
+      initBeacon(_setNotification, setForGetInOut, beaconStreamController, secureStorage);
+      startBeacon();
+    }
+  }
+
+  Future<Timer> _backgroundTimer() async {
+    Timer? timer = Timer.periodic(const Duration(seconds: 40), (timer) async {
       if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
-        _workIn();
-      } else if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
-        _workOut();
+        compute(_setWorkGetIn, "") ;
+      }
+
+      if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
+        compute(_setWorkGetOut, "") ;
       }
     });
 
     //if(t.isActive) t.cancel();
-
-    // Future.delayed(Duration(seconds: diff.inSeconds.toInt()), () async {
-    //   showNotification(flutterLocalNotificationsPlugin, "자동 출근 테스트?", texttime);
-    //   initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
-    //   await startBeacon();
-    //   	});
-
-    // Timer.run(() async{
-    //   showNotification(flutterLocalNotificationsPlugin, "자동 출근 테스트?", diff.inSeconds.toString());
-    //   oneCheck = false; //완료되면 다시 타이머 작동
-    //   //initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
-    //   //await startBeacon();
-    // });
+    return timer;
   }
-
-  Future<void> _workIn() async {
-    Map<String, dynamic>? gimap;
-    String texttime;
-    String? alarmtime;
-
-    if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
-      if (await secureStorage.read(Env.KEY_SETTING_WEEK_GI) == "false") {
-        switch (getWeek()) {
-          case 'Mon':
-            gimap = await getInTime(Env.KEY_SETTING_MON_GI);
-            break;
-          case 'Tue':
-            gimap = await getInTime(Env.KEY_SETTING_THU_GI);
-            break;
-          case 'Wed':
-            gimap = await getInTime(Env.KEY_SETTING_WED_GI);
-            break;
-          case 'Thu':
-            gimap = await getInTime(Env.KEY_SETTING_THU_GI);
-            break;
-          case 'Fri':
-            gimap = await getInTime(Env.KEY_SETTING_FRI_GI);
-            break;
-          case 'Sat':
-            gimap = await getInTime(Env.KEY_SETTING_SAT_GI);
-            break;
-          case 'Sun':
-            gimap = await getInTime(Env.KEY_SETTING_SUN_GI);
-            break;
-        }
-        alarmtime = gimap!["alarmtime"];
-        bool alarmSwitch = gimap["alarmSwitch"];
-
-        // ignore: unrelated_type_equality_checks
-        if (alarmSwitch == "true") {
-          if (alarmtime != null) {
-            texttime = getDateToStringForYYYYMMDDInNow() + " " + alarmtime;
-          } else {
-            texttime = getDateToStringForYYYYMMDDInNow() + " " + "08:30:00";
-          }
-          _excuteWork(setForGetIn, texttime);
-        }
-      } else {
-        String? temp = await secureStorage.read(Env.KEY_SETTING_WEEK_GI_TIME);
-        texttime = getDateToStringForYYYYMMDDInNow() + " " + temp!;
-        _excuteWork(setForGetIn, texttime);
-      }
-    }
-  }
-
-  Future<void> _workOut() async {
-    Map<String, dynamic>? gimap;
-    String texttime;
-    String? alarmtime;
-    if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
-      if (await secureStorage.read(Env.KEY_SETTING_WEEK_GO) == "false") {
-        switch (getWeek()) {
-          case 'Mon':
-            gimap = await getOutTime(Env.KEY_SETTING_MON_GO);
-            break;
-          case 'Tue':
-            gimap = await getOutTime(Env.KEY_SETTING_THU_GO);
-            break;
-          case 'Wed':
-            gimap = await getOutTime(Env.KEY_SETTING_WED_GO);
-            break;
-          case 'Thu':
-            gimap = await getOutTime(Env.KEY_SETTING_THU_GO);
-            break;
-          case 'Fri':
-            gimap = await getOutTime(Env.KEY_SETTING_FRI_GO);
-            break;
-          case 'Sat':
-            gimap = await getOutTime(Env.KEY_SETTING_SAT_GO);
-            break;
-          case 'Sun':
-            gimap = await getOutTime(Env.KEY_SETTING_SUN_GO);
-            break;
-        }
-
-        alarmtime = gimap!["alarmtime"];
-        bool alarmSwitch = gimap["alarmSwitch"];
-
-        // ignore: unrelated_type_equality_checks
-        if (alarmSwitch == "true") {
-          if (alarmtime != null) {
-            texttime = getDateToStringForYYYYMMDDInNow() + " " + alarmtime;
-          } else {
-            texttime = getDateToStringForYYYYMMDDInNow() + " " + "18:00:00";
-          }
-          await _excuteWork(setForGetOut, texttime);
-        }
-      } else {
-        String? temp = await secureStorage.read(Env.KEY_SETTING_WEEK_GO_TIME);
-        texttime = getDateToStringForYYYYMMDDInNow() + " " + temp!;
-        _excuteWork(setForGetOut, texttime);
-      }
-    }
-  }
-
-  Future<void> _excuteWork(Function setForGetInOut, String texttime) async {
-    Duration diffTime = getToDateTime(texttime).difference(getNow());
-    if (diffTime.inMinutes.toInt() == 0) {
-      initBeacon(setNotification, setForGetIn, beaconStreamController, secureStorage);
-      startBeacon();
-    }
-    Log.debug(" diffTime ====> $diffTime.inMinutes.toInt() ");
-  }
-
-  // Future<void> test() async{
-  //   Log.debug(" week ============== ");
-  //   Log.debug( " gi mon = ${await secureStorage.read(Env.KEY_SETTING_MON_GI)}" );
-  //   Log.debug( " gi thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GI)}" );
-  //   Log.debug( " gi wed = ${await secureStorage.read(Env.KEY_SETTING_WED_GI)}" );
-  //   Log.debug( " gi Thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GI)}" );
-  //   Log.debug( " gi fri = ${await secureStorage.read(Env.KEY_SETTING_FRI_GI)}" );
-  //   Log.debug( " gi sat = ${await secureStorage.read(Env.KEY_SETTING_SAT_GI)}" );
-  //   Log.debug( " gi sun = ${await secureStorage.read(Env.KEY_SETTING_SUN_GI)}" );
-  //   Log.debug(" time ============== ");
-  //   Log.debug( " gi mon time = ${await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME)}" );
-  //   Log.debug( " gi thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME)}" );
-  //   Log.debug( " gi wed time = ${await secureStorage.read(Env.KEY_SETTING_WED_GI_TIME)}" );
-  //   Log.debug( " gi Thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME)}" );
-  //   Log.debug( " gi fri time = ${await secureStorage.read(Env.KEY_SETTING_FRI_GI_TIME)}" );
-  //   Log.debug( " gi sat time = ${await secureStorage.read(Env.KEY_SETTING_SAT_GI_TIME)}" );
-  //   Log.debug( " gi sun time = ${await secureStorage.read(Env.KEY_SETTING_SUN_GI_TIME)}" );
-
-  //   Log.debug(" =================== ");
-  //   Log.debug(" week ============== ");
-  //   Log.debug( " go mon = ${await secureStorage.read(Env.KEY_SETTING_MON_GO)}" );
-  //   Log.debug( " go thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GO)}" );
-  //   Log.debug( " go wed = ${await secureStorage.read(Env.KEY_SETTING_WED_GO)}" );
-  //   Log.debug( " go Thu = ${await secureStorage.read(Env.KEY_SETTING_THU_GO)}" );
-  //   Log.debug( " go fri = ${await secureStorage.read(Env.KEY_SETTING_FRI_GO)}" );
-  //   Log.debug( " go sat = ${await secureStorage.read(Env.KEY_SETTING_SAT_GO)}" );
-  //   Log.debug( " go sun = ${await secureStorage.read(Env.KEY_SETTING_SUN_GO)}" );
-  //   Log.debug(" time ============== ");
-  //   Log.debug( " gi mon time = ${await secureStorage.read(Env.KEY_SETTING_MON_GO_TIME)}" );
-  //   Log.debug( " gi thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME)}" );
-  //   Log.debug( " gi wed time = ${await secureStorage.read(Env.KEY_SETTING_WED_GO_TIME)}" );
-  //   Log.debug( " gi Thu time = ${await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME)}" );
-  //   Log.debug( " gi fri time = ${await secureStorage.read(Env.KEY_SETTING_FRI_GO_TIME)}" );
-  //   Log.debug( " gi sat time = ${await secureStorage.read(Env.KEY_SETTING_SAT_GO_TIME)}" );
-  //   Log.debug( " gi sun time = ${await secureStorage.read(Env.KEY_SETTING_SUN_GO_TIME)}" );
-
-  // }
+  
 }

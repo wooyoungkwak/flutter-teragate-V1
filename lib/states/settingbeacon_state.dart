@@ -42,8 +42,7 @@ class SettingBeaconState extends State<SettingBeacon> {
               Navigator.of(context).pop();
             },
           ),
-          title: const Text('Beacon Scan',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
+          title: const Text('Beacon Scan', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
           actions: const [],
           centerTitle: true,
           elevation: 4,
@@ -77,10 +76,7 @@ class SettingBeaconState extends State<SettingBeacon> {
                               controller: uuidContoroller,
                               validator: (value) => (value!.isEmpty) ? " UUID를 입력해주세요" : null,
                               style: style,
-                              decoration: const InputDecoration(
-                                  prefixIcon: Icon(Icons.bluetooth),
-                                  labelText: "UUID",
-                                  border: OutlineInputBorder()), //클릭시 legend 효과
+                              decoration: const InputDecoration(prefixIcon: Icon(Icons.bluetooth), labelText: "UUID", border: OutlineInputBorder()), //클릭시 legend 효과
                             ),
                           );
                         }
@@ -94,7 +90,6 @@ class SettingBeaconState extends State<SettingBeacon> {
                       child: MaterialButton(
                         onPressed: () {
                           setState(() {
-                            Log.debug(Env.INITIAL_UUID);
                             uuidContoroller = TextEditingController(text: Env.INITIAL_UUID);
                             secureStorage.write(Env.KEY_SETTING_UUID, Env.INITIAL_UUID);
                           });
