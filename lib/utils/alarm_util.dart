@@ -1,11 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/utils/debug_util.dart';
 
 void showToast(String text) {
   Fluttertoast.showToast(

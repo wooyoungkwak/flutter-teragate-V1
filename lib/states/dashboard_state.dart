@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 //현재시간
 import 'package:teragate_test/states/setting_state.dart';
-import 'package:teragate_test/utils/debug_util.dart';
 import 'package:timer_builder/timer_builder.dart';
 
 import 'package:teragate_test/config/env.dart';
@@ -18,6 +17,7 @@ import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/webview_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 import 'package:teragate_test/utils/time_util.dart';
+import 'package:teragate_test/utils/debug_util.dart';
 
 //플러터 플로팅버튼용
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
