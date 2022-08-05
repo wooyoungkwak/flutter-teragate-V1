@@ -1,7 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:teragate_test/config/env.dart';
@@ -9,9 +7,6 @@ import 'package:teragate_test/models/result_model.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/utils/time_util.dart';
 import 'package:teragate_test/utils/debug_util.dart';
-import 'package:teragate_test/services/beacon_service.dart';
-import 'package:teragate_test/services/network_service.dart';
-import 'package:teragate_test/utils/alarm_util.dart';
 
 Map<String, String> headers = {};
 

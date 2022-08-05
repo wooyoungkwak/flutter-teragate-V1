@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
@@ -457,7 +456,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   Future<void> _runToBeacon(Function setForGetInOut, String texttime) async {
     Duration diffTime = getToDateTime(texttime).difference(getNow());
+    Log.debug( " ===========> diffTime.inMinutes.toInt() = ${diffTime.inMinutes.toInt()} :: texttime == $texttime");
     if (diffTime.inMinutes.toInt() == 0) {
+      _showProgressDialog();
       initBeacon(_setNotification, setForGetInOut, beaconStreamController, secureStorage);
       startBeacon();
     }
@@ -466,12 +467,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Future<Timer> _runBackgroundTimer() async {
     Timer? timer = Timer.periodic(const Duration(seconds: 40), (timer) async {
       if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
-        _showProgressDialog();
         _setWorkGetIn();
       }
 
       if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
-        _showProgressDialog();
         _setWorkGetOut();
       }
     });
