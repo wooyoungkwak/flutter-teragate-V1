@@ -1,15 +1,23 @@
+import 'dart:io';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:app_settings/app_settings.dart';
 
 Future<String> callPermissions() async {
-  Map<Permission, PermissionStatus> statuses = await [
-    // Permission.bluetoothScan,
-    // Permission.bluetoothConnect,
-    // Permission.bluetooth,
-    Permission.location,
-    Permission.locationAlways,
-    Permission.locationWhenInUse
-  ].request();
+
+  List<Permission> permissions = [
+    Permission.location
+  ];
+
+  if (Platform.isAndroid) {
+    permissions.add(Permission.bluetoothScan);
+    permissions.add(Permission.bluetoothConnect);
+    permissions.add(Permission.bluetooth);
+    // permissions.add(Permission.locationAlways);
+    // permissions.add(Permission.locationWhenInUse);
+  }
+
+  Map<Permission, PermissionStatus> statuses = await permissions.request();
 
   if (statuses.values.every((element) => element.isGranted)) {
     return 'permission success';

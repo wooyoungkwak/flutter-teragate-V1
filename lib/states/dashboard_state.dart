@@ -456,7 +456,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   Future<void> _runToBeacon(Function setForGetInOut, String texttime) async {
     Duration diffTime = getToDateTime(texttime).difference(getNow());
-    Log.debug( " ===========> diffTime.inMinutes.toInt() = ${diffTime.inMinutes.toInt()} :: texttime == $texttime");
     if (diffTime.inMinutes.toInt() == 0) {
       _showProgressDialog();
       initBeacon(_setNotification, setForGetInOut, beaconStreamController, secureStorage);
@@ -465,7 +464,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   Future<Timer> _runBackgroundTimer() async {
-    Timer? timer = Timer.periodic(const Duration(seconds: 40), (timer) async {
+    Timer? timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
       if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
         _setWorkGetIn();
       }
@@ -499,6 +498,3 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
 }
-
-
-

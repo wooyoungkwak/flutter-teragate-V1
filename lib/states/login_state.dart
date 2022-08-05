@@ -30,8 +30,7 @@ class LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    final permissionResult = callPermissions();
-    permissionResult.then((data) => Log.debug(data));
+    callPermissions().then((data) => Log.debug(data));
 
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");
