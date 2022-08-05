@@ -72,6 +72,69 @@ Future<void> initBeacon(Function setNotification, Function setForGetInOut, Strea
 
 }
 
+Future<void> initBeaconTest(Function setNotification, Function setForGetInOut, StreamController beaconStreamController) async {
+  SecureStorage secureStorage = SecureStorage();
+  
+  if (Platform.isAndroid) {
+    await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
+
+    BeaconsPlugin.channel.setMethodCallHandler((call) async {
+      if (Env.isDebug) Log.debug(" ********* Call Method: ${call.method}");
+
+      if (call.method == 'scannerReady') {
+        await _setBeacon();
+        await startBeacon();
+      } else if (call.method == 'isPermissionDialogShown') {
+        setNotification("Beacon 을 검색 할 수 없습니다. 권한을 확인 하세요.");
+      }
+    });
+
+    BeaconsPlugin.listenToBeacons(beaconStreamController);
+  } else if (Platform.isIOS) {
+    BeaconsPlugin.setDebugLevel(2);
+
+    BeaconsPlugin.listenToBeacons(beaconStreamController);
+
+    Future.delayed(const Duration(milliseconds: 3000), () async {
+      _setBeacon();
+      await startBeacon();
+    }); //Send 'true' to run in background
+
+    Future.delayed(const Duration(milliseconds: 3000), () async {
+      await BeaconsPlugin.runInBackground(true);
+    }); //Send 'true' to run in background
+  }
+
+  beaconStreamController.stream.first.then((data) async {
+    //리슨타면 일단 스캔멈추기.
+    if (data.isNotEmpty) {
+      String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
+      uuid = uuid!.toUpperCase();
+      
+      Map<String, dynamic> userMap = jsonDecode(data);
+      var iBeacon = BeaconData.fromJson(userMap);
+
+      if (iBeacon.uuid.toUpperCase() != uuid) {
+        setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+        return;
+      }
+
+      String beaconKey = iBeacon.minor; // 비콘의 key 값
+
+      if (beaconKey != getMinorToDate()) {
+        setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+      } else {
+        setForGetInOut();
+      }
+
+      BeaconsPlugin.stopMonitoring();
+    } else {
+      BeaconsPlugin.stopMonitoring();
+    }
+  });
+
+}
+
 Future<void> _setBeacon() async {
   await BeaconsPlugin.addRegion("iBeacon", Env.UUID_DEFAULT);
   if (Platform.isAndroid) {

@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:teragate_test/config/env.dart';
@@ -6,6 +9,9 @@ import 'package:teragate_test/models/result_model.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/utils/time_util.dart';
 import 'package:teragate_test/utils/debug_util.dart';
+import 'package:teragate_test/services/beacon_service.dart';
+import 'package:teragate_test/services/network_service.dart';
+import 'package:teragate_test/utils/alarm_util.dart';
 
 Map<String, String> headers = {};
 
@@ -79,8 +85,8 @@ Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
 }
 
 // 출근 요청 처리
-Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
-  String? isGetInCheck = await secureStorage.read(Env.KEY_GET_IN_CHECK);
+Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip, SecureStorage _secureStorage, int repeat) async {
+  String? isGetInCheck = await _secureStorage.read(Env.KEY_GET_IN_CHECK);
   TokenInfo tokenInfo;
   WorkInfo workInfo;
 
@@ -92,7 +98,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
     if (workInfo.success) {
       // 정상 등록 된 경우
       tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
-      secureStorage.write(Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
+      _secureStorage.write(Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
       workInfo.message = Env.MSG_GET_OUT_SUCCESS;
     } else {
       if (workInfo.message == "expired") {
@@ -101,12 +107,12 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
           tokenInfo = await getTokenByRefreshToken(refreshToken);
 
           // Token 저장
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
+          _secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
+          _secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
 
           repeat++;
           if (repeat < 2) {
-            return await processGetIn(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
+            return await processGetIn(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, _secureStorage, repeat);
           } else {
             return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL);
           }
@@ -122,13 +128,13 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
 }
 
 // 퇴근 요청 처리
-Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String ip, SecureStorage secureStorage, int repeat) async {
+Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String ip, SecureStorage _secureStorage, int repeat) async {
   WorkInfo workInfo = await _getOut(ip, accessToken);
   TokenInfo tokenInfo;
 
   if (workInfo.success) {
     tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
-    secureStorage.write(Env.KEY_GET_OUT_CHECK, getDateToStringForAllInNow());
+    _secureStorage.write(Env.KEY_GET_OUT_CHECK, getDateToStringForAllInNow());
     workInfo.message = Env.MSG_GET_OUT_SUCCESS;
   } else {
     if (workInfo.message == "expired") {
@@ -138,12 +144,12 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
 
         if (tokenInfo.isUpdated == true) {
           // Token 저장
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
-          secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
+          _secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
+          _secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
 
           repeat++;
           if (repeat < 2) {
-            return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, secureStorage, repeat);
+            return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, _secureStorage, repeat);
           } else {
             return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
           }
@@ -157,3 +163,4 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
 
   return workInfo;
 }
+

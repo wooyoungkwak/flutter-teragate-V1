@@ -74,7 +74,8 @@ class Env {
   static const String MSG_GET_OUT_SUCCESS = "퇴근 등록이 완료 되었습니다.";
   static const String MSG_GET_IN_FAIL = "출근 등록이 실패 하였습니다.";
   static const String MSG_GET_OUT_FAIL = "퇴근 등록이 실패 하였습니다.";
-  static const String MSG_MINOR_FAIL = "비콘이 존재 하지 않습니다. 출퇴근 등록을 실패하였습니다.";
+  static const String MSG_MINOR_FAIL = "비콘이 존재 하지 않습니다. 출근 / 퇴근 등록을 실패하였습니다.";
+  static const String MSG_LODING = "등록중입니다 ....";
 
   static const String TITLE_DIALOG = "알림";
   static const String TITLE_BEACON_NOTIFICATION = "비콘 설정";

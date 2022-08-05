@@ -70,6 +70,8 @@ dependencies:
   #Back버튼 app최소화로 변경
   move_to_background: ^1.0.2
 
+  simple_fontellico_progress_dialog: ^0.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

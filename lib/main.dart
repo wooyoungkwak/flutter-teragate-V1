@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
@@ -7,9 +6,9 @@ import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/dashboard_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
-import 'package:teragate_test/utils/debug_util.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 

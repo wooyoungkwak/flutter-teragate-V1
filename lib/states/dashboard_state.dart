@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
+import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
 
 //현재시간
 import 'package:teragate_test/states/setting_state.dart';
@@ -36,13 +37,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   late SecureStorage secureStorage;
 
-  int nrMessagesReceived = 0;
-
   String? name = "";
   String? id = ""; //id
   String? pw = ""; //pw
   String? deviceip = "";
   Timer? backgroundTimer;
+  SimpleFontelicoProgressDialog? progressDialog;
 
   final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
 
@@ -51,15 +51,17 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     super.initState();
 
     secureStorage = SecureStorage();
-    // initBeacon(_setNotification, _runToGetIn, beaconStreamController, secureStorage);
 
     WidgetsBinding.instance.addObserver(this);
 
     getIPAddress().then((map) => deviceip = map["ip"]);
 
-    _initNotification();
+    _runBackgroundTimer().then((_backgroundTimer) => backgroundTimer = _backgroundTimer);
 
-    _backgroundTimer().then((_backgroundTimer) => backgroundTimer = _backgroundTimer);
+    _initProgressDialog().then((_progressDialog) => progressDialog = _progressDialog);
+
+    _initNotification();
+    
   }
 
   @override
@@ -87,18 +89,13 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () {
-          MoveToBackground.moveTaskToBack();
-          return Future(() => false);
-        },
-        child: _initScaffoldByMain());
+    return _createWillPopScope( _initScaffoldByMain());
   }
 
   WillPopScope _createWillPopScope(Widget widget) {
     return WillPopScope(
         onWillPop: () {
-          Navigator.pop(context);
+          MoveToBackground.moveTaskToBack();
           return Future(() => false);
         },
         child: widget);
@@ -191,12 +188,14 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
               label: '출근',
               // backgroundColor: Colors.blue,
               onTap: () async {
+                _showProgressDialog();
                 _runToGetIn();
               }),
           SpeedDialChild(
               child: const Icon(Icons.copy),
               label: '퇴근',
               onTap: () async {
+                _showProgressDialog();
                 _runToGetOut();
               }),
           SpeedDialChild(
@@ -274,6 +273,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       } else {
         _setNotification(workInfo.message);
       }
+      _hideProgressDialog();
     });
   }
 
@@ -297,6 +297,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       } else {
         _setNotification(workInfo.message);
       }
+      _hideProgressDialog();
     });
   }
 
@@ -368,7 +369,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     return {"alarmtime": result, "alarmSwitch": alarmSwitch};
   }
 
-  Future<void> _setWorkGetIn(String data) async {
+  Future<void> _setWorkGetIn() async {
     Map<String, dynamic>? gimap;
     String texttime;
     String? alarmtime;
@@ -408,10 +409,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       }
       _runToBeacon(_runToGetIn, texttime);
     }
-
   }
 
-  Future<void> _setWorkGetOut(String data) async {
+  Future<void> _setWorkGetOut() async {
     Map<String, dynamic>? gimap;
     String texttime;
     String? alarmtime;
@@ -463,19 +463,43 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     }
   }
 
-  Future<Timer> _backgroundTimer() async {
+  Future<Timer> _runBackgroundTimer() async {
     Timer? timer = Timer.periodic(const Duration(seconds: 40), (timer) async {
       if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
-        compute(_setWorkGetIn, "") ;
+        _showProgressDialog();
+        _setWorkGetIn();
       }
 
       if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
-        compute(_setWorkGetOut, "") ;
+        _showProgressDialog();
+        _setWorkGetOut();
       }
     });
 
-    //if(t.isActive) t.cancel();
     return timer;
   }
-  
+
+  Future<void> _stopBackgroundTimer() async {
+    backgroundTimer!.cancel();
+  }
+
+  Future<SimpleFontelicoProgressDialog> _initProgressDialog()  async {
+    SimpleFontelicoProgressDialog progressDialog = SimpleFontelicoProgressDialog(context: context, barrierDimisable: true);
+    return progressDialog;
+  }
+
+  void _showProgressDialog() async {
+    progressDialog!.show(
+      message: Env.MSG_LODING,
+      width: 200
+    );
+  }
+
+  void _hideProgressDialog() async {
+    progressDialog!.hide();
+  }
+
 }
+
+
+
