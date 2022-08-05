@@ -8,17 +8,14 @@ import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/utils/debug_util.dart';
 
 Future main() async {
-
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
- 
 }
 
 class WebViews extends StatefulWidget {
-
   final String id;
   final String pw;
   const WebViews(this.id, this.pw, Key? key) : super(key: key);
@@ -72,7 +69,6 @@ class WebViewState extends State<WebViews> {
         }
       },
     );
-    
   }
 
   @override
@@ -82,11 +78,11 @@ class WebViewState extends State<WebViews> {
 
   @override
   Widget build(BuildContext context) {
-     Log.debug("웹 실행");
-          param = {
-        "loginId": widget.id,
-        "password": widget.pw,
-      };
+    Log.debug("웹 실행");
+    param = {
+      "loginId": widget.id,
+      "password": widget.pw,
+    };
 
     return Scaffold(
         appBar: AppBar(title: const Text("Groupware Hi5")),
@@ -97,7 +93,9 @@ class WebViewState extends State<WebViews> {
               children: [
                 InAppWebView(
                   key: webViewKey,
-                  initialUrlRequest: URLRequest(url: Uri.parse(addres).replace(queryParameters: param)), //실행 시 첫 접속 url
+                  initialUrlRequest: URLRequest(
+                      url: Uri.parse(addres)
+                          .replace(queryParameters: param)), //실행 시 첫 접속 url
                   initialOptions: options,
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) {
@@ -112,12 +110,14 @@ class WebViewState extends State<WebViews> {
                       urlController.text = currentUrl;
                     });
                   },
-                  androidOnPermissionRequest: (controller, origin, resources) async {
+                  androidOnPermissionRequest:
+                      (controller, origin, resources) async {
                     return PermissionRequestResponse(
                         resources: resources,
                         action: PermissionRequestResponseAction.GRANT);
-                  }, 
-                  shouldOverrideUrlLoading: (controller, navigationAction) async {
+                  },
+                  shouldOverrideUrlLoading:
+                      (controller, navigationAction) async {
                     Uri url = navigationAction.request.url!;
                     if (![
                       "http",
@@ -163,7 +163,7 @@ class WebViewState extends State<WebViews> {
                     });
                   },
                   onConsoleMessage: (controller, consoleMessage) {
-                     Log.debug(consoleMessage.toString());
+                    Log.debug(consoleMessage.toString());
                   },
                 ),
                 progress < 1.0
@@ -171,29 +171,6 @@ class WebViewState extends State<WebViews> {
                     : Container(),
               ],
             ),
-          ),
-          ButtonBar(
-            alignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ElevatedButton(
-                child: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  webViewController?.goBack();
-                },
-              ),
-              ElevatedButton(
-                child: const Icon(Icons.arrow_forward),
-                onPressed: () {
-                  webViewController?.goForward();
-                },
-              ),
-              ElevatedButton(
-                child: const Icon(Icons.refresh),
-                onPressed: () {
-                  webViewController?.reload();
-                },
-              ),
-            ],
           ),
         ])));
   }
