@@ -30,10 +30,7 @@ class LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
-    callPermissions().then((data) {
-      Log.log(data);
-      showConfirmDialog(context, Env.TITLE_PERMISSION, Env.MSG_PERMISSON_LOCATION);
-    });
+    callPermissions();
 
     _loginIdContoroller = TextEditingController(text: "");
     _passwordContorller = TextEditingController(text: "");

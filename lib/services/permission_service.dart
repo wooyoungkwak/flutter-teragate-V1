@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:app_settings/app_settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 Future<String> callPermissions() async {
@@ -22,6 +23,6 @@ Future<String> callPermissions() async {
     return 'permission success';
   } 
 
-  // AppSettings.openAppSettings();
+  AppSettings.openAppSettings();
   return 'permission failed';
 } 

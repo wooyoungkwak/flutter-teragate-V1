@@ -126,13 +126,13 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
   WorkInfo workInfo = await _getOut(ip, accessToken);
   TokenInfo tokenInfo;
 
-  if (workInfo.success) {
-    tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
-    _secureStorage.write(Env.KEY_GET_OUT_CHECK, getDateToStringForAllInNow());
-    workInfo.message = Env.MSG_GET_OUT_SUCCESS;
-  } else {
-    if (workInfo.message == "expired") {
-      try {
+  try {
+    if (workInfo.success) {
+      tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
+      _secureStorage.write(Env.KEY_GET_OUT_CHECK, getDateToStringForAllInNow());
+      workInfo.message = Env.MSG_GET_OUT_SUCCESS;
+    } else {
+      if (workInfo.message == "expired") {
         // 만료 인 경우 재 요청 경우
         tokenInfo = await getTokenByRefreshToken(refreshToken);
 
@@ -148,12 +148,11 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
             return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
           }
         }
-      } catch (err) {
-        Log.log(" 퇴근 요청 처리 오류 : ${err.toString()}");
-        return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
       }
     }
+    return workInfo;
+  } catch (err) {
+    Log.log(" 퇴근 요청 처리 오류 : ${err.toString()}");
+    return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
   }
-
-  return workInfo;
 }
