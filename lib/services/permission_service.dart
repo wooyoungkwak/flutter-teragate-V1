@@ -12,8 +12,8 @@ Future<String> callPermissions() async {
     permissions.add(Permission.bluetoothScan);
     permissions.add(Permission.bluetoothConnect);
     permissions.add(Permission.bluetooth);
-    // permissions.add(Permission.locationAlways);
-    // permissions.add(Permission.locationWhenInUse);
+    permissions.add(Permission.locationAlways);
+    permissions.add(Permission.locationWhenInUse);
   }
 
   Map<Permission, PermissionStatus> statuses = await permissions.request();
