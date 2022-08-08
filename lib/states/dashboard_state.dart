@@ -241,6 +241,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     }
     secureStorage.write(Env.LOGIN_PW, "");
     secureStorage.write(Env.KEY_LOGIN_STATE, "false");
+    secureStorage.write(Env.KEY_ACCESS_TOKEN, "");
+    secureStorage.write(Env.KEY_REFRESH_TOKEN, "");
+
+    _stopBackgroundTimer();
     Navigator.push(context, MaterialPageRoute(builder: (_) => const Login()));
   }
 
