@@ -47,3 +47,5 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 pubspec.lock
+ios/Runner.xcodeproj/project.pbxproj
+ios/Podfile.lock
