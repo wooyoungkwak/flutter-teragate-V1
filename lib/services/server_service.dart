@@ -6,7 +6,7 @@ import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/result_model.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/utils/time_util.dart';
-import 'package:teragate_test/utils/debug_util.dart';
+import 'package:teragate_test/utils/Log_util.dart';
 
 Map<String, String> headers = {};
 
@@ -85,19 +85,19 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
   TokenInfo tokenInfo;
   WorkInfo workInfo;
 
-  if (isGetInCheck != null && isGetInCheck == getDateToStringForYYYYMMDDInNow()) {
-    // 출근 처리 가 이미 된 경우
-    workInfo = WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST);
-  } else {
-    workInfo = await _getIn(ip, accessToken);
-    if (workInfo.success) {
-      // 정상 등록 된 경우
-      tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
-      _secureStorage.write(Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
-      workInfo.message = Env.MSG_GET_OUT_SUCCESS;
+  try {
+    if (isGetInCheck != null && isGetInCheck == getDateToStringForYYYYMMDDInNow()) {
+      // 출근 처리 가 이미 된 경우
+      workInfo = WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST);
     } else {
-      if (workInfo.message == "expired") {
-        try {
+      workInfo = await _getIn(ip, accessToken);
+      if (workInfo.success) {
+        // 정상 등록 된 경우
+        tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
+        _secureStorage.write(Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
+        workInfo.message = Env.MSG_GET_OUT_SUCCESS;
+      } else {
+        if (workInfo.message == "expired") {
           // 만료 인 경우 재 요청 경우
           tokenInfo = await getTokenByRefreshToken(refreshToken);
 
@@ -111,15 +111,14 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
           } else {
             return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL);
           }
-        } catch (err) {
-          Log.log(" processGetIn Exception : ${err.toString()}");
-          return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL);
         }
       }
     }
+    return workInfo;
+  } catch (err) {
+    Log.log(" processGetIn Exception : ${err.toString()}");
+    return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL);
   }
-
-  return workInfo;
 }
 
 // 퇴근 요청 처리
@@ -158,4 +157,3 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
 
   return workInfo;
 }
-

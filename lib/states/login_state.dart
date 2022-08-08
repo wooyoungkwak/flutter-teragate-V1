@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
-import 'package:teragate_test/utils/debug_util.dart';
+import 'package:teragate_test/utils/Log_util.dart';
 import 'package:teragate_test/states/dashboard_state.dart';
 
 import 'package:teragate_test/config/env.dart';
@@ -31,7 +31,7 @@ class LoginState extends State<Login> {
   void initState() {
     super.initState();
     callPermissions().then((data) {
-      Log.debug(data);
+      Log.log(data);
       showConfirmDialog(context, Env.TITLE_PERMISSION, Env.MSG_PERMISSON_LOCATION);
     });
 

@@ -5,23 +5,25 @@ import 'package:beacons_plugin/beacons_plugin.dart';
 
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/utils/debug_util.dart';
+import 'package:teragate_test/utils/Log_util.dart';
 import 'package:teragate_test/utils/time_util.dart';
 
 import '../models/beacon_model.dart';
 
 // 비콘 초기화
-Future<void> initBeacon(Function setNotification, Function setForGetInOut, StreamController beaconStreamController, SecureStorage secureStorage) async {
+Future<void> initBeacon(Function setNotification, Function _hideProgressDialog, Function setForGetInOut, StreamController beaconStreamController, SecureStorage secureStorage) async {
+  
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
 
     BeaconsPlugin.channel.setMethodCallHandler((call) async {
-      if (Env.isDebug) Log.debug(" ********* Call Method: ${call.method}");
+      Log.log(" ********* Call Method: ${call.method}");
 
       if (call.method == 'scannerReady') {
         await _setBeacon();
         await startBeacon();
       } else if (call.method == 'isPermissionDialogShown') {
+        _hideProgressDialog();
         setNotification("Beacon 을 검색 할 수 없습니다. 권한을 확인 하세요.");
       }
     });
@@ -29,9 +31,7 @@ Future<void> initBeacon(Function setNotification, Function setForGetInOut, Strea
     BeaconsPlugin.listenToBeacons(beaconStreamController);
   } else if (Platform.isIOS) {
     BeaconsPlugin.setDebugLevel(2);
-
     BeaconsPlugin.listenToBeacons(beaconStreamController);
-
     Future.delayed(const Duration(milliseconds: 3000), () async {
       _setBeacon();
       await startBeacon();
@@ -69,7 +69,6 @@ Future<void> initBeacon(Function setNotification, Function setForGetInOut, Strea
       BeaconsPlugin.stopMonitoring();
     }
   });
-
 }
 
 Future<void> initBeaconTest(Function setNotification, Function setForGetInOut, StreamController beaconStreamController) async {

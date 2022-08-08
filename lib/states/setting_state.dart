@@ -1,18 +1,23 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/states/settingalarm_state.dart';
 import 'package:teragate_test/states/settingbeacon_state.dart';
 import 'package:teragate_test/states/settingwork_state.dart';
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/states/login_state.dart';
-import 'package:teragate_test/utils/debug_util.dart';
+import 'package:teragate_test/utils/Log_util.dart';
 import 'dart:io' show Platform;
 
 class Setting extends StatefulWidget {
-  const Setting(Key? key) : super(key: key);
+  final String uuid;
+  final bool? switchGetIn;
+  final bool? switchGetOut;
+  final bool? switchAlarm;
+
+  const Setting(this.uuid, this.switchGetIn, this.switchGetOut, this.switchAlarm, Key? key) : super(key: key);
 
   @override
+  // ignore: no_logic_in_create_state
   SettingState createState() => SettingState();
 }
 
@@ -22,14 +27,17 @@ class SettingState extends State<Setting> {
   bool switchGetIn = false;
   bool switchGetOut = false;
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  String beaconuuid = "";
 
-  bool switchval = true;
+  late TextEditingController uuidContoroller;
+  TextStyle style = const TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+
+  bool switchAlarm = false;
 
   @override
   void initState() {
     super.initState();
     secureStorage = SecureStorage();
+    uuidContoroller = TextEditingController(text: widget.uuid);
     _initValue();
   }
 
@@ -55,7 +63,8 @@ class SettingState extends State<Setting> {
         decoration: const BoxDecoration(
           color: Color(0xFFEEEEEE),
         ),
-        child: widget);
+        child: widget
+      );
   }
 
   GestureDetector _createGestureDetector(Function callback, Widget widget) {
@@ -68,6 +77,14 @@ class SettingState extends State<Setting> {
 
   Visibility _createVisibility(Widget widget) {
     return Visibility(visible: Platform.isIOS, child: widget);
+  }
+
+  FutureBuilder _createFutureBuilder(Future callback, Widget widget) {
+    return FutureBuilder(
+        future: callback,
+        builder: (context, snapshot) {
+          return widget;
+        });
   }
 
   Scaffold _initScaffold() {
@@ -92,7 +109,7 @@ class SettingState extends State<Setting> {
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            _createGestureDetector(onTapuuid, _initContainerByUuid()),
+            _initContainerByUuid(),
             _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
             _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
             _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
@@ -103,49 +120,70 @@ class SettingState extends State<Setting> {
     );
   }
 
+  // UUID text 작성
+  Padding _initPaddingBytextUUID() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextFormField(controller: uuidContoroller, validator: (value) => (value!.isEmpty) ? " UUID를 입력해주세요" : null, style: style, decoration: const InputDecoration(prefixIcon: Icon(Icons.bluetooth), labelText: "UUID", border: OutlineInputBorder())),
+    );
+  }
+
+  // 초기값 세팅
+  Padding _initPaddingBySetUUID() {
+    return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Material(
+            elevation: 5.0,
+            borderRadius: BorderRadius.circular(30.0),
+            color: Colors.red,
+            child: MaterialButton(
+                onPressed: () {
+                  setState(() {
+                    uuidContoroller = TextEditingController(text: Env.INITIAL_UUID);
+                  });
+                },
+                child: Text("초기값 세팅", style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold)))));
+  }
+
+  // UUID 가져오기
+  Padding _initPaddingByGetUUID() {
+    return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Material(
+            elevation: 5.0,
+            borderRadius: BorderRadius.circular(30.0),
+            color: Colors.red,
+            child: MaterialButton(
+                onPressed: () {
+                  setState(() {
+                    uuidContoroller = TextEditingController(text: "123123123123123123123");
+                  });
+                },
+                child: Text(
+                  "UUID 가져오기",
+                  style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                ))));
+  }
+
   Container _initContainerByUuid() {
-    return _createContainer(Stack(
-      children: [
-        Align(
-            alignment: const AlignmentDirectional(0.07, 0.21),
-            child: RichText(
-              text: TextSpan(children: [
-                const TextSpan(text: 'UUID:   ', style: TextStyle(color: Colors.black)),
-                TextSpan(text: beaconuuid, style: const TextStyle(color: Colors.red)),
-              ]),
-            ))
-      ],
+    return _createContainer(Column(
+      children: [_initPaddingBytextUUID(), _initPaddingBySetUUID(), Visibility(visible: false, child: _initPaddingByGetUUID())],
     ));
   }
 
   Container _initContainerByGetIn() {
-    return _createContainer(Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        RichText(
-          text: TextSpan(children: [
-            TextSpan(
-                text: '출근 일정',
-                //텍스트를 클릭시 이벤트를 발생시키기 위함
-                recognizer: TapGestureRecognizer()
-                  //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
-                  ..onTapDown = (details) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SettingWorkTime(Env.WORK_GET_IN, null)));
-                  },
-                style:
-                    const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
-          ]),
-        ),
-        Switch(
-            value: switchGetIn,
-            onChanged: (newValue) {
-              setState(() => switchGetIn = newValue);
-            }),
-      ],
-    ));
+    return _createContainer(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      RichText(
+        text: TextSpan(children: [
+          TextSpan(text: '출근 일정', recognizer: TapGestureRecognizer()..onTapDown = (details) async {}, style: const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
+        ]),
+      ),
+      Switch(
+          value: switchGetIn,
+          onChanged: (newValue) {
+            setState(() => switchGetIn = newValue);
+          })
+    ]));
   }
 
   Container _initContainerByGetOut() {
@@ -154,19 +192,7 @@ class SettingState extends State<Setting> {
       children: [
         RichText(
           text: TextSpan(children: [
-            TextSpan(
-                text: '퇴근 일정',
-                //텍스트를 클릭시 이벤트를 발생시키기 위함
-                recognizer: TapGestureRecognizer()
-                  //클래스 생성과 동시에 '선언부..함수명'을 입력하면 클래스 변수 없이 함수를 바로 호출 가능함
-                  ..onTapDown = (details) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SettingWorkTime(Env.WORK_GET_OUT, null)));
-                  },
-                style:
-                    const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
+            TextSpan(text: '퇴근 일정', recognizer: TapGestureRecognizer()..onTapDown = (details) async {}, style: const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
           ]),
         ),
         Switch(
@@ -184,9 +210,7 @@ class SettingState extends State<Setting> {
       children: [
         RichText(
           text: const TextSpan(children: [
-            TextSpan(
-                text: '초기화',
-                style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
+            TextSpan(text: '초기화', style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
           ]),
         ),
       ],
@@ -206,29 +230,61 @@ class SettingState extends State<Setting> {
           ]),
         ),
         Switch(
-          value: switchval,
+          value: switchAlarm,
           onChanged: (newValue) {
-            setState(() => switchval = newValue);
-            secureStorage.write(Env.KEY_SETTING_VIBRATE, switchval.toString());
-            secureStorage.write(Env.KEY_SETTING_ALARM, switchval.toString());
+            setState(() => switchAlarm = newValue);
+            secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
+            secureStorage.write(Env.KEY_SETTING_ALARM, switchAlarm.toString());
           },
         ),
       ],
     ));
   }
 
-  void onTapuuid() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingBeacon("", null)));
+  void onTapWorkIn() async {
+    String? timeMon = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
+    String? timeTue = await secureStorage.read(Env.KEY_SETTING_TUE_GI_TIME);
+    String? timeWed = await secureStorage.read(Env.KEY_SETTING_WED_GI_TIME);
+    String? timeThu = await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME);
+    String? timeFri = await secureStorage.read(Env.KEY_SETTING_FRI_GI_TIME);
+    String? timeSat = await secureStorage.read(Env.KEY_SETTING_SAT_GI_TIME);
+    String? timeSun = await secureStorage.read(Env.KEY_SETTING_SUN_GI_TIME);
+
+    String? switchMon = await secureStorage.read(Env.KEY_SETTING_MON_GI_SWITCH);
+    String? switchTue = await secureStorage.read(Env.KEY_SETTING_TUE_GI_SWITCH);
+    String? switchWed = await secureStorage.read(Env.KEY_SETTING_WED_GI_SWITCH);
+    String? switchThu = await secureStorage.read(Env.KEY_SETTING_THU_GI_SWITCH);
+    String? switchFri = await secureStorage.read(Env.KEY_SETTING_FRI_GI_SWITCH);
+    String? switchSat = await secureStorage.read(Env.KEY_SETTING_SAT_GI_SWITCH);
+    String? switchSun = await secureStorage.read(Env.KEY_SETTING_SUN_GI_SWITCH);
+
+    List<String?> initTimeList = [timeMon, timeTue, timeWed, timeThu, timeFri, timeSat, timeSun];
+    List<String?> initSwitchList = [switchMon, switchTue, switchWed, switchThu, switchFri, switchSat, switchSun];
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingWorkTime(Env.WORK_GET_IN, initSwitchList, initTimeList, null)));
   }
 
-  void onTapWorkIn() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_IN, null)));
-  }
+  void onTapWorkOut() async {
+    String? timeMon = await secureStorage.read(Env.KEY_SETTING_MON_GO_TIME);
+    String? timeTue = await secureStorage.read(Env.KEY_SETTING_TUE_GO_TIME);
+    String? timeWed = await secureStorage.read(Env.KEY_SETTING_WED_GO_TIME);
+    String? timeThu = await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME);
+    String? timeFri = await secureStorage.read(Env.KEY_SETTING_FRI_GO_TIME);
+    String? timeSat = await secureStorage.read(Env.KEY_SETTING_SAT_GO_TIME);
+    String? timeSun = await secureStorage.read(Env.KEY_SETTING_SUN_GO_TIME);
 
-  void onTapWorkOut() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const SettingWorkTime(Env.WORK_GET_OUT, null)));
+    String? switchMon = await secureStorage.read(Env.KEY_SETTING_MON_GO_SWITCH);
+    String? switchTue = await secureStorage.read(Env.KEY_SETTING_TUE_GO_SWITCH);
+    String? switchWed = await secureStorage.read(Env.KEY_SETTING_WED_GO_SWITCH);
+    String? switchThu = await secureStorage.read(Env.KEY_SETTING_THU_GO_SWITCH);
+    String? switchFri = await secureStorage.read(Env.KEY_SETTING_FRI_GO_SWITCH);
+    String? switchSat = await secureStorage.read(Env.KEY_SETTING_SAT_GO_SWITCH);
+    String? switchSun = await secureStorage.read(Env.KEY_SETTING_SUN_GO_SWITCH);
+
+    List<String?> initTimeList = [timeMon, timeTue, timeWed, timeThu, timeFri, timeSat, timeSun];
+    List<String?> initSwitchList = [switchMon, switchTue, switchWed, switchThu, switchFri, switchSat, switchSun];
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingWorkTime(Env.WORK_GET_OUT, initSwitchList, initTimeList, null)));
   }
 
   void onTapAlarm() {
@@ -250,31 +306,31 @@ class SettingState extends State<Setting> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
             //Dialog Main Title
             title: Column(
-              children: <Widget>[
-                new Text("데이터 초기화"),
+              children: const <Widget>[
+                Text("데이터 초기화"),
               ],
             ),
             //
             content: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
+              children: const <Widget>[
                 Text(
                   "데이터를 초기화하시겠습니까? \n초기화 후에는 로그인 페이지로 자동 이동합니다.",
                 ),
               ],
             ),
             actions: <Widget>[
-              new TextButton(
-                child: new Text("확인"),
+              TextButton(
+                child: const Text("확인"),
                 onPressed: () {
                   Navigator.pop(context);
                   //데이터 초기화 실행.
                   initSecureData();
                 },
               ),
-              new TextButton(
-                child: new Text("취소"),
+              TextButton(
+                child: const Text("취소"),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -290,60 +346,22 @@ class SettingState extends State<Setting> {
     //3. 백버튼 사용은 막혀있으므로 처리할 필요가 없음
 
     secureStorage.deleteAll();
-
     await Navigator.push(context, MaterialPageRoute(builder: (context) => const Login()));
   }
 
-  Future<String> _initValue() async {
-    String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
-    String? getin = await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF);
-    String? getout = await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF);
-
-    //------------------------------------------------------------------------//
-
-    //알람세팅용... 수정예정.
-    String? vibrate = await secureStorage.read(Env.KEY_SETTING_VIBRATE);
-    String? alarm = await secureStorage.read(Env.KEY_SETTING_ALARM);
-
-    //널값일떄 자동으로 값 넣어주는거 처리 해야할듯.. 이렇게 수동으로하면 꼬일가능성 매우높음.
-    // String? alarmState = await secureStorage.read(Env.KEY_SETTING_ALARM);
-
-    if (vibrate == null) {
-      setState(() {
-        switchval = false;
-        secureStorage.write(Env.KEY_SETTING_ALARM, switchval.toString());
-      });
-    }
-    if (alarm == null) {
-      setState(() {
-        switchval = false;
-        secureStorage.write(Env.KEY_SETTING_ALARM, switchval.toString());
-      });
-    }
-    if (vibrate == "true") {
-      switchval = true;
-    } else if (vibrate == "false") {
-      switchval = false;
-    }
-    if (alarm == "true") {
-      switchval = true;
-    } else if (alarm == "false") {
-      switchval = false;
-    }
-
-    setState(() {
-      // ignore: prefer_if_null_operators
-      beaconuuid = (uuid == null ? Env.UUID_DEFAULT : uuid);
-    });
-    switchGetIn = (getin == "true" ? true : false);
-    switchGetOut = (getout == "true" ? true : false);
-
-    return "";
-  }
-
   Future<void> _saveValue() async {
-    secureStorage.write(Env.KEY_SETTING_UUID, beaconuuid);
+    secureStorage.write(Env.KEY_SETTING_UUID, uuidContoroller.text);
     secureStorage.write(Env.KEY_SETTING_GI_ON_OFF, switchGetIn.toString());
     secureStorage.write(Env.KEY_SETTING_GO_ON_OFF, switchGetOut.toString());
+    secureStorage.write(Env.KEY_SETTING_ALARM, switchAlarm.toString());
+    secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
+    secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
+
+  }
+
+  void _initValue() {
+    switchGetIn = widget.switchGetIn!;
+    switchGetOut = widget.switchGetOut!;
+    switchAlarm = widget.switchAlarm!;
   }
 }

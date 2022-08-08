@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:teragate_test/config/env.dart';
 import 'package:teragate_test/models/storage_model.dart';
-import 'package:teragate_test/utils/debug_util.dart';
 
 class SettingBeacon extends StatefulWidget {
-  final String uuiddata;
-  const SettingBeacon(this.uuiddata, Key? key) : super(key: key);
+  final String uuid;
+  const SettingBeacon(this.uuid, Key? key) : super(key: key);
 
   @override
   SettingBeaconState createState() => SettingBeaconState();
@@ -28,7 +27,7 @@ class SettingBeaconState extends State<SettingBeacon> {
 
   @override
   Widget build(BuildContext context) {
-    uuidContoroller = TextEditingController(text: "");
+    uuidContoroller = TextEditingController(text: widget.uuid);
 
     return Scaffold(
         key: scaffoldKey,
@@ -36,9 +35,7 @@ class SettingBeaconState extends State<SettingBeacon> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Log.debug(uuidContoroller.text);
-              InputDecoration.collapsed(hintText: uuidContoroller.text);
-              secureStorage.write(Env.KEY_SETTING_UUID, uuidContoroller.text);
+              _saveValue();
               Navigator.of(context).pop();
             },
           ),
@@ -48,98 +45,74 @@ class SettingBeaconState extends State<SettingBeacon> {
           elevation: 4,
         ),
         backgroundColor: const Color(0xFFF5F5F5),
-        body: WillPopScope(
-          onWillPop: () {
-            Log.debug(uuidContoroller.text);
-            InputDecoration.collapsed(hintText: uuidContoroller.text);
-            secureStorage.write(Env.KEY_SETTING_UUID, uuidContoroller.text);
-            Navigator.of(context).pop();
-            return Future(() => false);
-          },
-          child: Form(
+        body: _createWillPopScope(Form(
             key: _formKey,
             child: Center(
-              child: ListView(
-                shrinkWrap: true,
-                children: <Widget>[
-                  FutureBuilder(
-                      future: setuuid(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData == false) {
-                          return const CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        } else {
-                          return Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: TextFormField(
-                              controller: uuidContoroller,
-                              validator: (value) => (value!.isEmpty) ? " UUID를 입력해주세요" : null,
-                              style: style,
-                              decoration: const InputDecoration(prefixIcon: Icon(Icons.bluetooth), labelText: "UUID", border: OutlineInputBorder()), //클릭시 legend 효과
-                            ),
-                          );
-                        }
-                      }),
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Material(
-                      elevation: 5.0,
-                      borderRadius: BorderRadius.circular(30.0),
-                      color: Colors.red,
-                      child: MaterialButton(
-                        onPressed: () {
-                          setState(() {
-                            uuidContoroller = TextEditingController(text: Env.INITIAL_UUID);
-                            secureStorage.write(Env.KEY_SETTING_UUID, Env.INITIAL_UUID);
-                          });
-                        },
-                        child: Text(
-                          "초기값 세팅",
-                          style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                  //UUID 가져오기
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Material(
-                      elevation: 5.0,
-                      borderRadius: BorderRadius.circular(30.0),
-                      color: Colors.red,
-                      child: MaterialButton(
-                        onPressed: () {
-                          setState(() {
-                            //기능이 완성되면 이부분 수정해주세요
-                            Log.debug("65132132132123");
-                            uuidContoroller = TextEditingController(text: "123123123123123123123");
-                            secureStorage.write(Env.KEY_SETTING_UUID, "123123123123123123123");
-                          });
-                        },
-                        child: Text(
-                          "UUID 가져오기",
-                          style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ));
+                child: ListView(shrinkWrap: true, children: <Widget>[
+              _initPaddingBytextUUID(),
+              _initPaddingBySetUUID(),
+              Visibility(visible: false, child: _initPaddingByGetUUID()),
+            ])))));
   }
 
-  Future<String> setuuid() async {
-    String? saveuuid = await secureStorage.read(Env.KEY_SETTING_UUID);
-    uuidContoroller = TextEditingController(text: saveuuid);
-    if (initcheck) {
-      setState(() {
-        uuidContoroller = TextEditingController(text: saveuuid);
-        initcheck = false;
-      });
-    }
-    return "re";
+  // 하드웨어 적인 Back 버튼
+  WillPopScope _createWillPopScope(Widget widget) {
+    return WillPopScope(
+        onWillPop: () {
+          _saveValue();
+          Navigator.of(context).pop();
+          return Future(() => false);
+        },
+        child: widget);
+  }
+
+  // UUID text 작성
+  Padding _initPaddingBytextUUID() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: TextFormField(controller: uuidContoroller, validator: (value) => (value!.isEmpty) ? " UUID를 입력해주세요" : null, style: style, decoration: const InputDecoration(prefixIcon: Icon(Icons.bluetooth), labelText: "UUID", border: OutlineInputBorder())),
+    );
+  }
+
+  // 초기값 세팅
+  Padding _initPaddingBySetUUID() {
+    return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Material(
+            elevation: 5.0,
+            borderRadius: BorderRadius.circular(30.0),
+            color: Colors.red,
+            child: MaterialButton(
+                onPressed: () {
+                  setState(() {
+                    uuidContoroller = TextEditingController(text: Env.INITIAL_UUID);
+                  });
+                },
+                child: Text("초기값 세팅", style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold)))));
+  }
+
+  // UUID 가져오기
+  Padding _initPaddingByGetUUID() {
+    return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Material(
+            elevation: 5.0,
+            borderRadius: BorderRadius.circular(30.0),
+            color: Colors.red,
+            child: MaterialButton(
+                onPressed: () {
+                  setState(() {
+                    uuidContoroller = TextEditingController(text: "123123123123123123123");
+                  });
+                },
+                child: Text(
+                  "UUID 가져오기",
+                  style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                ))));
+  }
+
+  // 설정값 저장
+  void _saveValue() {
+    secureStorage.write(Env.KEY_SETTING_UUID, uuidContoroller.text);
   }
 }

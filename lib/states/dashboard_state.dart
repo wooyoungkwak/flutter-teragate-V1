@@ -17,7 +17,7 @@ import 'package:teragate_test/states/login_state.dart';
 import 'package:teragate_test/states/webview_state.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
 import 'package:teragate_test/utils/time_util.dart';
-import 'package:teragate_test/utils/debug_util.dart';
+import 'package:teragate_test/utils/Log_util.dart';
 
 //플러터 플로팅버튼용
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -207,7 +207,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
               child: const Icon(Icons.copy),
               label: '환경설정',
               onTap: () async {
-                _moveSetting(context);
+                await _moveSetting(context);
               })
         ],
       ),
@@ -248,8 +248,18 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(id!, pw!, null)));
   }
 
-  void _moveSetting(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const Setting(null)));
+  Future<void> _moveSetting(BuildContext context) async{
+    String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
+    String? getin = await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF);
+    String? getout = await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF);
+    String? alarm = await secureStorage.read(Env.KEY_SETTING_ALARM);
+
+    String beaconuuid = (uuid == null ? Env.UUID_DEFAULT : uuid);
+    bool switchGetIn = (getin == null ? false : (getin == "true" ? true : false));
+    bool switchGetOut = (getout == null ? false : (getout == "true" ? true : false));
+    bool switchAlarm = (alarm == null ? false : (alarm == "true" ? true : false));
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) => Setting(beaconuuid, switchGetIn, switchGetOut, switchAlarm, null)));
   }
 
   void _runToGetIn() async {
@@ -375,25 +385,25 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
     switch (getWeek()) {
       case 'Mon':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_MON_GI);
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_MON_GI_SWITCH);
         break;
       case 'Tue':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI);
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI_SWITCH);
         break;
       case 'Wed':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_WED_GI);
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_WED_GI_SWITCH);
         break;
       case 'Thu':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI);
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI_SWITCH);
         break;
       case 'Fri':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_FRI_GI);
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_FRI_GI_SWITCH);
         break;
       case 'Sat':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SAT_GI);
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SAT_GI_SWITCH);
         break;
       case 'Sun':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SUN_GI);
+        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SUN_GI_SWITCH);
         break;
     }
     alarmtime = gimap!["alarmtime"];
@@ -417,25 +427,25 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
     switch (getWeek()) {
       case 'Mon':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_MON_GO);
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_MON_GO_SWITCH);
         break;
       case 'Tue':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO);
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO_SWITCH);
         break;
       case 'Wed':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_WED_GO);
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_WED_GO_SWITCH);
         break;
       case 'Thu':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO);
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO_SWITCH);
         break;
       case 'Fri':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_FRI_GO);
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_FRI_GO_SWITCH);
         break;
       case 'Sat':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SAT_GO);
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SAT_GO_SWITCH);
         break;
       case 'Sun':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SUN_GO);
+        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SUN_GO_SWITCH);
         break;
     }
 
@@ -458,7 +468,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Duration diffTime = getToDateTime(texttime).difference(getNow());
     if (diffTime.inMinutes.toInt() == 0) {
       _showProgressDialog();
-      initBeacon(_setNotification, setForGetInOut, beaconStreamController, secureStorage);
+      initBeacon(_setNotification, _hideProgressDialog, setForGetInOut, beaconStreamController, secureStorage);
       startBeacon();
     }
   }

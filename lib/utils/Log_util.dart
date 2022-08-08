@@ -11,4 +11,8 @@ class Log {
     if(Env.isDebug) debugPrint(message);
   }
 
+  static void error(var message) {
+    debugPrint("error : $message");
+  }
+
 }

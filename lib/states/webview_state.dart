@@ -5,7 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:teragate_test/config/env.dart';
-import 'package:teragate_test/utils/debug_util.dart';
+import 'package:teragate_test/utils/Log_util.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,7 +78,6 @@ class WebViewState extends State<WebViews> {
 
   @override
   Widget build(BuildContext context) {
-    Log.debug("웹 실행");
     param = {
       "loginId": widget.id,
       "password": widget.pw,
