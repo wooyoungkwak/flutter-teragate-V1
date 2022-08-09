@@ -199,7 +199,7 @@ class SettingState extends State<Setting> {
             value: switchGetOut,
             onChanged: (newValue) {
               setState(() => switchGetOut = newValue);
-              secureStorage.write(Env.KEY_SETTING_GO_ON_OFF, newValue.toString());
+              secureStorage.write(Env.KEY_SETTING_GO_SWITCH, newValue.toString());
             }),
       ],
     ));
@@ -346,13 +346,13 @@ class SettingState extends State<Setting> {
     //3. 백버튼 사용은 막혀있으므로 처리할 필요가 없음
 
     secureStorage.deleteAll();
-    await Navigator.push(context, MaterialPageRoute(builder: (context) => const Login()));
+    await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
   }
 
   Future<void> _saveValue() async {
     secureStorage.write(Env.KEY_SETTING_UUID, uuidContoroller.text);
-    secureStorage.write(Env.KEY_SETTING_GI_ON_OFF, switchGetIn.toString());
-    secureStorage.write(Env.KEY_SETTING_GO_ON_OFF, switchGetOut.toString());
+    secureStorage.write(Env.KEY_SETTING_GI_SWITCH, switchGetIn.toString());
+    secureStorage.write(Env.KEY_SETTING_GO_SWITCH, switchGetOut.toString());
     secureStorage.write(Env.KEY_SETTING_ALARM, switchAlarm.toString());
     secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
     secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
@@ -365,3 +365,6 @@ class SettingState extends State<Setting> {
     switchAlarm = widget.switchAlarm!;
   }
 }
+
+
+

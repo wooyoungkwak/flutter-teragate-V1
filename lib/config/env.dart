@@ -23,8 +23,7 @@ class Env {
   static const String WORK_GET_OUT = "getout";
 
   static const String KEY_ID_CHECK = 'KEY_ID_CHECK';
-  static const String KEY_SUCCESS = "sucess";
-  static const String KEY_MESSAGE = "message";
+  static const String KEY_LOGIN_SUCCESS = "sucess";
   static const String KEY_ACCESS_TOKEN = "accessToken";
   static const String KEY_REFRESH_TOKEN = "refreshToken";
   static const String KEY_GET_IN_CHECK = "getInCheck";
@@ -66,8 +65,11 @@ class Env {
   static const String KEY_SETTING_VIBRATE = "VIBRATE";
   static const String KEY_SETTING_SOUND = "SOUND";
   static const String KEY_SETTING_ALARM = "ALARM";
-  static const String KEY_SETTING_GI_ON_OFF = "GIONOFF";
-  static const String KEY_SETTING_GO_ON_OFF = "GOONOFF";
+  static const String KEY_SETTING_GI_SWITCH = "GI_SWITCH";
+  static const String KEY_SETTING_GO_SWITCH = "GO_SWITCH";
+
+  static const String DEFAULT_GI_TIME = "09:00:00";
+  static const String DEFAULT_GO_TIME = "18:00:00";
 
   static const String MSG_NOT_TOKEN = "로그 아웃 후에 다시 로그인 해주세요.";
   static const String MSG_GET_IN_EXIST = "이미 출근 등록이 완료 되었습니다.";
@@ -81,7 +83,6 @@ class Env {
 
   static const String TITLE_PERMISSION = "권한 허용";
   static const String TITLE_DIALOG = "알림";
-  static const String TITLE_BEACON_NOTIFICATION = "비콘 설정";
   
   static const String UUID_DEFAULT = "74278BDB-B644-4520-8F0C-720EEAFFFFFF";
 

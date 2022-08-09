@@ -69,10 +69,10 @@ Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
 
   if (response.statusCode == 200) {
     Map<String, dynamic> data = json.decode(response.body);
-    if (data[Env.KEY_SUCCESS]) {
+    if (data[Env.KEY_LOGIN_SUCCESS]) {
       return TokenInfo(accessToken: data[Env.KEY_ACCESS_TOKEN], refreshToken: data[Env.KEY_REFRESH_TOKEN], isUpdated: true);
     } else {
-      return TokenInfo(accessToken: "", refreshToken: "", message: data[Env.KEY_SUCCESS], isUpdated: false);
+      return TokenInfo(accessToken: "", refreshToken: "", message: data[Env.KEY_LOGIN_SUCCESS], isUpdated: false);
     }
   } else {
     throw Exception(response.body);
@@ -95,7 +95,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
         // 정상 등록 된 경우
         tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
         _secureStorage.write(Env.KEY_GET_IN_CHECK, getDateToStringForYYYYMMDDInNow());
-        workInfo.message = Env.MSG_GET_OUT_SUCCESS;
+        workInfo.message = Env.MSG_GET_IN_SUCCESS;
       } else {
         if (workInfo.message == "expired") {
           // 만료 인 경우 재 요청 경우

@@ -60,7 +60,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     _initProgressDialog().then((_progressDialog) => progressDialog = _progressDialog);
 
     _initNotification();
-    
   }
 
   @override
@@ -88,7 +87,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return _createWillPopScope( _initScaffoldByMain());
+    return _createWillPopScope(_initScaffoldByMain());
   }
 
   WillPopScope _createWillPopScope(Widget widget) {
@@ -252,10 +251,10 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(id!, pw!, null)));
   }
 
-  Future<void> _moveSetting(BuildContext context) async{
+  Future<void> _moveSetting(BuildContext context) async {
     String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
-    String? getin = await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF);
-    String? getout = await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF);
+    String? getin = await secureStorage.read(Env.KEY_SETTING_GI_SWITCH);
+    String? getout = await secureStorage.read(Env.KEY_SETTING_GO_SWITCH);
     String? alarm = await secureStorage.read(Env.KEY_SETTING_ALARM);
 
     String beaconuuid = (uuid == null ? Env.UUID_DEFAULT : uuid);
@@ -314,156 +313,98 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     });
   }
 
-  Future<Map<String, dynamic>> _getTimeByGetIn(String key) async {
-    String? result;
-    bool alarmSwitch = false;
-    if (await secureStorage.read(key) == "true") {
-      switch (getWeek()) {
-        case 'Mon':
-          result = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
-          break;
-        case 'Tue':
-          result = await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME);
-          break;
-        case 'Wed':
-          result = await secureStorage.read(Env.KEY_SETTING_WED_GI_TIME);
-          break;
-        case 'Thu':
-          result = await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME);
-          break;
-        case 'Fri':
-          result = await secureStorage.read(Env.KEY_SETTING_FRI_GI_TIME);
-          break;
-        case 'Sat':
-          result = await secureStorage.read(Env.KEY_SETTING_SAT_GI_TIME);
-          break;
-        case 'Sun':
-          result = await secureStorage.read(Env.KEY_SETTING_SUN_GI_TIME);
-          break;
-      }
-      alarmSwitch = true;
-    }
-
-    return {"alarmtime": result, "alarmSwitch": alarmSwitch};
-  }
-
-  Future<Map<String, dynamic>> _getTimeByGetOut(String key) async {
-    String? result;
-    bool alarmSwitch = false;
-    String? value = await secureStorage.read(key);
-
-    if (value == "true") {
-      switch (getWeek()) {
-        case 'Mon':
-          result = await secureStorage.read(Env.KEY_SETTING_MON_GO_TIME);
-          break;
-        case 'Tue':
-          result = await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME);
-          break;
-        case 'Wed':
-          result = await secureStorage.read(Env.KEY_SETTING_WED_GO_TIME);
-          break;
-        case 'Thu':
-          result = await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME);
-          break;
-        case 'Fri':
-          result = await secureStorage.read(Env.KEY_SETTING_FRI_GO_TIME);
-          break;
-        case 'Sat':
-          result = await secureStorage.read(Env.KEY_SETTING_SAT_GO_TIME);
-          break;
-        case 'Sun':
-          result = await secureStorage.read(Env.KEY_SETTING_SUN_GO_TIME);
-          break;
-      }
-
-      alarmSwitch = true;
-    }
-    return {"alarmtime": result, "alarmSwitch": alarmSwitch};
-  }
-
   Future<void> _setWorkGetIn() async {
-    Map<String, dynamic>? gimap;
     String texttime;
     String? alarmtime;
+    String? alarmSwitch;
 
     switch (getWeek()) {
       case 'Mon':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_MON_GI_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_MON_GI_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_MON_GI_SWITCH);
         break;
       case 'Tue':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_TUE_GI_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_TUE_GI_SWITCH);
         break;
       case 'Wed':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_WED_GI_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_WED_GI_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_WED_GI_SWITCH);
         break;
       case 'Thu':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_THU_GI_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_THU_GI_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_THU_GI_SWITCH);
         break;
       case 'Fri':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_FRI_GI_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_FRI_GI_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_FRI_GI_SWITCH);
         break;
       case 'Sat':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SAT_GI_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_SAT_GI_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_SAT_GI_SWITCH);
         break;
       case 'Sun':
-        gimap = await _getTimeByGetIn(Env.KEY_SETTING_SUN_GI_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_SUN_GI_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_SUN_GI_SWITCH);
         break;
     }
-    alarmtime = gimap!["alarmtime"];
-    bool alarmSwitch = gimap["alarmSwitch"];
 
     // ignore: unrelated_type_equality_checks
-    if (alarmSwitch == true) {
+    if (alarmSwitch != null && alarmSwitch == "true") {
       if (alarmtime != null) {
         texttime = getDateToStringForYYYYMMDDInNow() + " " + alarmtime;
       } else {
-        texttime = getDateToStringForYYYYMMDDInNow() + " " + "08:30:00";
+        texttime = getDateToStringForYYYYMMDDInNow() + " " + Env.DEFAULT_GI_TIME;
       }
+      Log.log("GI : alarmtime = $alarmtime :: alarmSwitch = $alarmSwitch :: texttime = $texttime");
       _runToBeacon(_runToGetIn, texttime);
     }
   }
 
   Future<void> _setWorkGetOut() async {
-    Map<String, dynamic>? gimap;
     String texttime;
     String? alarmtime;
+    String? alarmSwitch;
 
     switch (getWeek()) {
       case 'Mon':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_MON_GO_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_MON_GO_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_MON_GO_SWITCH);
         break;
       case 'Tue':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_TUE_GO_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_TUE_GO_SWITCH);
         break;
       case 'Wed':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_WED_GO_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_WED_GO_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_WED_GO_SWITCH);
         break;
       case 'Thu':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_THU_GO_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_THU_GO_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_THU_GO_SWITCH);
         break;
       case 'Fri':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_FRI_GO_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_FRI_GO_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_FRI_GO_SWITCH);
         break;
       case 'Sat':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SAT_GO_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_SAT_GO_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_SAT_GO_SWITCH);
         break;
       case 'Sun':
-        gimap = await _getTimeByGetOut(Env.KEY_SETTING_SUN_GO_SWITCH);
+        alarmtime = await secureStorage.read(Env.KEY_SETTING_SUN_GO_TIME);
+        alarmSwitch = await secureStorage.read(Env.KEY_SETTING_SUN_GO_SWITCH);
         break;
     }
 
-    alarmtime = gimap!["alarmtime"];
-    bool alarmSwitch = gimap["alarmSwitch"];
-
     // ignore: unrelated_type_equality_checks
-    if (alarmSwitch == true) {
+    if (alarmSwitch != null && alarmSwitch == "true") {
       if (alarmtime != null) {
         texttime = getDateToStringForYYYYMMDDInNow() + " " + alarmtime;
       } else {
-        texttime = getDateToStringForYYYYMMDDInNow() + " " + "18:00:00";
+        texttime = getDateToStringForYYYYMMDDInNow() + " " + Env.DEFAULT_GO_TIME;
       }
-
+      Log.log("GO : alarmtime = $alarmtime :: alarmSwitch = $alarmSwitch :: texttime = $texttime");
       await _runToBeacon(_runToGetOut, texttime);
     }
   }
@@ -479,11 +420,11 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   Future<Timer> _runBackgroundTimer() async {
     Timer? timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
-      if (await secureStorage.read(Env.KEY_SETTING_GI_ON_OFF) == "true") {
+      if (await secureStorage.read(Env.KEY_SETTING_GI_SWITCH) == "true") {
         _setWorkGetIn();
       }
 
-      if (await secureStorage.read(Env.KEY_SETTING_GO_ON_OFF) == "true") {
+      if (await secureStorage.read(Env.KEY_SETTING_GO_SWITCH) == "true") {
         _setWorkGetOut();
       }
     });
@@ -495,20 +436,16 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     backgroundTimer!.cancel();
   }
 
-  Future<SimpleFontelicoProgressDialog> _initProgressDialog()  async {
+  Future<SimpleFontelicoProgressDialog> _initProgressDialog() async {
     SimpleFontelicoProgressDialog progressDialog = SimpleFontelicoProgressDialog(context: context, barrierDimisable: true);
     return progressDialog;
   }
 
   void _showProgressDialog() async {
-    progressDialog!.show(
-      message: Env.MSG_LODING,
-      width: 200
-    );
+    progressDialog!.show(message: Env.MSG_LODING, width: 200);
   }
 
   void _hideProgressDialog() async {
     progressDialog!.hide();
   }
-
 }

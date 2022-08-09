@@ -155,7 +155,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
   }
 
   Future<void> _initTimeByGetIN(int index) async {
-    String? check = widget.initTimeList[index];
+    String? check = widget.initTimeList[index]; 
     // ignore: prefer_if_null_operators, unnecessary_null_comparison
     initTimeGetIn[index] = check == null ? initTimeGetIn[index] : check;
   }
