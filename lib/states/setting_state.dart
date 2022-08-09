@@ -234,7 +234,7 @@ class SettingState extends State<Setting> {
           onChanged: (newValue) {
             setState(() => switchAlarm = newValue);
             secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
-            secureStorage.write(Env.KEY_SETTING_ALARM, switchAlarm.toString());
+            secureStorage.write(Env.KEY_SETTING_SOUND, switchAlarm.toString());
           },
         ),
       ],
@@ -355,7 +355,7 @@ class SettingState extends State<Setting> {
     secureStorage.write(Env.KEY_SETTING_GO_SWITCH, switchGetOut.toString());
     secureStorage.write(Env.KEY_SETTING_ALARM, switchAlarm.toString());
     secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
-    secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
+    secureStorage.write(Env.KEY_SETTING_SOUND, switchAlarm.toString());
 
   }
 

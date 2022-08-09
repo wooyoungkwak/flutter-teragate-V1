@@ -107,7 +107,7 @@ class SettingAlarmState extends State<SettingAlarm> {
                         value: switchSound,
                         onChanged: (newValue) {
                           setState(() => switchSound = newValue);
-                          secureStorage.write(Env.KEY_SETTING_ALARM, switchSound.toString());
+                          secureStorage.write(Env.KEY_SETTING_SOUND, switchSound.toString());
                         },
                       ),
                     ],
