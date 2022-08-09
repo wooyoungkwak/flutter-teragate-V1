@@ -80,6 +80,8 @@ class Env {
   static const String MSG_MINOR_FAIL = "비콘이 존재 하지 않습니다. 등록을 실패하였습니다.";
   static const String MSG_LODING = "등록중입니다 ....";
   static const String MSG_PERMISSON_LOCATION = "위치 권한을 항상 허용으로 변경해 주세요.";
+  static const String MSG_LOGIN_FAIL = "ID 또는 Passwoard 를 확인하세요.";
+
 
   static const String TITLE_PERMISSION = "권한 허용";
   static const String TITLE_DIALOG = "알림";

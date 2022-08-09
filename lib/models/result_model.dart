@@ -19,7 +19,7 @@ class LoginInfo {
     return LoginInfo(json["success"], json["data"], "", tokenInfo);
   }
 
-  static LoginInfo fromJsonByFail(Map<String, dynamic> json) => LoginInfo(json["success"], {}, "", null);
+  static LoginInfo fromJsonByFail(Map<String, dynamic> json) => LoginInfo(json["success"], {}, Env.MSG_LOGIN_FAIL, null);
 
   Map<String, dynamic> toJson() => {"success": success, "data": data};
 }
