@@ -1,5 +1,4 @@
 // ignore_for_file: constant_identifier_names
-
 class Env {
   static const String TEST_SERVER = "http://192.168.0.164";
   static const String REAL_SERVER = "http://teraenergy.iptime.org";
@@ -11,9 +10,9 @@ class Env {
 
   static const String INITIAL_UUID = '74278bdb-b644-4520-8f0c-720eeaffffff';
 
-  static const String SERVER_GROUPWARE_TEST = "$REAL_SERVER:8080";
-  static const String SERVER_GROUPWARE_REAL = "http://teragroupware.duckdns.org";
-  static const String SERVER_GROUPWARE_URL = '$SERVER_GROUPWARE_TEST/signInapp';
+  static const String SERVER_GROUPWARE_TEST = "$TEST_SERVER:8080/signInapp";
+  static const String SERVER_GROUPWARE_REAL = "http://teragroupware.duckdns.org/signIn";
+  static const String SERVER_GROUPWARE_URL = SERVER_GROUPWARE_REAL;
 
   static const String USER_NICK_NAME = 'USER_NICK_NAME';
   static const String LOGIN_ID = 'LOGIN_ID';
@@ -89,7 +88,9 @@ class Env {
   static const String UUID_DEFAULT = "74278BDB-B644-4520-8F0C-720EEAFFFFFF";
 
   static const String NOTIFICATION_CHANNEL_ID = "channelID";
+  static const String NOTIFICATION_CHANNEL_ID_NO_ALARM = "channelIDNoAlarm";
   static const String NOTIFICATION_CHANNEL_NAME = "channelName";
+  static const String NOTIFICATION_CHANNEL_NAME_NO_ALARM = "channelNameNoAlarm";
 
   static bool isDebug = true;
 }

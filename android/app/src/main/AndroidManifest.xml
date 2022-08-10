@@ -16,7 +16,7 @@
 
     <application
         android:usesCleartextTraffic="true"
-        android:label="tera_gate_app"
+        android:label="Groupware WorkOn"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
