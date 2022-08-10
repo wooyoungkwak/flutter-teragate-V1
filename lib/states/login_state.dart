@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:teragate_test/services/server_service.dart';
 import 'package:teragate_test/services/permission_service.dart';
 import 'package:teragate_test/utils/alarm_util.dart';
-import 'package:teragate_test/utils/Log_util.dart';
 import 'package:teragate_test/states/dashboard_state.dart';
 
 import 'package:teragate_test/config/env.dart';
@@ -18,11 +17,21 @@ class Login extends StatefulWidget {
 }
 
 class LoginState extends State<Login> {
-  TextStyle style = const TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   late TextEditingController _loginIdContoroller;
   late TextEditingController _passwordContorller;
   bool checkBoxValue = false;
   late bool initcheck;
+  Color boxColor = const Color(0xff27282E);
+  TextStyle textStyle = const TextStyle(
+      fontWeight: FontWeight.bold,
+      fontFamily: 'sunn',
+      color: Colors.white,
+      fontSize: 20);
+  TextStyle textFieldStyle = const TextStyle(
+      fontWeight: FontWeight.bold,
+      fontFamily: 'sunn',
+      color: Color(0xffA3A6B9),
+      fontSize: 20);
 
   final _formKey = GlobalKey<FormState>();
   late SecureStorage secureStorage;
@@ -49,8 +58,8 @@ class LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    //Widget 여기서 UI화면 작성
-    return _createWillPopScope(_initScaffoldByMain());
+    return _createContainerByBackground(
+        _createWillPopScope(_initPaddingByMain()));
   }
 
   WillPopScope _createWillPopScope(Widget widget) {
@@ -70,92 +79,163 @@ class LoginState extends State<Login> {
     return Padding(padding: EdgeInsets.all(size), child: widget);
   }
 
-  Padding _createPaddingBySementic(double vertical, double horizontal, Widget widget) {
-    return Padding(padding: EdgeInsets.symmetric(vertical: vertical, horizontal: horizontal), child: widget);
+  Padding _createPaddingBySementic(
+      double vertical, double horizontal, Widget widget) {
+    return Padding(
+        padding:
+            EdgeInsets.symmetric(vertical: vertical, horizontal: horizontal),
+        child: widget);
   }
 
-  Scaffold _initScaffoldByMain() {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('로그인'), //APP BAR 만들기
-        automaticallyImplyLeading: false,
-      ),
-      //body는 appbar아래 화면을 지정.
-      body: _createPadding(
-        8.0,
-        Form(
-          key: _formKey,
-          child: Center(
-            //가운데로 지정
-            child: _createListView(
-              <Widget>[
-                _createPadding(16.0, _initTextFormField(false, _loginIdContoroller, " 아이디를 입력해 주세요", style, "Id")),
-                _createPadding(16.0, _initTextFormField(true, _passwordContorller, " 패스워드를 입력해 주세요", style, "Password")),
-                FutureBuilder(
-                    future: _setsaveid(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData == false) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        return _createPadding(
-                          16.0,
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Checkbox(
-                                activeColor: Colors.white,
-                                checkColor: Colors.blue,
-                                value: checkBoxValue,
-                                onChanged: (value) {
-                                  setState(() {
-                                    checkBoxValue = value!;
-                                  });
-                                  secureStorage.write(Env.KEY_ID_CHECK, checkBoxValue.toString());
-                                },
-                              ),
-                              const Text('아이디 저장'),
-                              Transform.scale(scale: 1.5),
-                            ],
-                          ),
-                        );
-                      }
-                    }),
-                _createPaddingBySementic(
-                  0.0,
-                  16.0,
-                  Material(
-                    elevation: 5.0, //그림자효과
-                    borderRadius: BorderRadius.circular(30.0), //둥근효과
-                    color: Colors.red,
-                    child: MaterialButton(
-                      //child - 버튼을 생성
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) await _setLogin();
-                      },
-                      child: Text(
-                        "로그인",
-                        style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
+  Padding _initPaddingByMain() {
+    return _createPadding(
+      8.0,
+      Form(
+        key: _formKey,
+        child: Center(
+          child: _createListView(
+            <Widget>[
+              _createPaddingBySementic(
+                60.0,
+                15.0,
+                const Text(
+                  'Groupware WorkOn',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'sunn',
+                      color: Colors.white,
+                      fontSize: 30),
                 ),
-              ],
-            ),
+              ),
+              _createPadding(
+                  16.0,
+                  _initTextFormField(false, _loginIdContoroller,
+                      " 아이디를 입력해 주세요", textFieldStyle, "Id")),
+              _createPadding(
+                  16.0,
+                  _initTextFormField(true, _passwordContorller,
+                      " 패스워드를 입력해 주세요", textFieldStyle, "Password")),
+              FutureBuilder(
+                  future: _setsaveid(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData == false) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return _createPaddingBySementic(
+                          0.0,
+                          16.0,
+                          _createGestureDetector(
+                              setCheckbox,
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  _createContainerByCheckboxBackground(Checkbox(
+                                    activeColor: boxColor,
+                                    checkColor: Colors.white,
+                                    value: checkBoxValue,
+                                    onChanged: (value) {
+                                      setCheckbox();
+                                    },
+                                  )),
+                                  Text('아이디 저장',
+                                      style: textStyle.copyWith(fontSize: 16)),
+                                  Transform.scale(scale: 1.5),
+                                ],
+                              )));
+                    }
+                  }),
+              _createPaddingBySementic(
+                35.0,
+                16.0,
+                Material(
+                  elevation: 5.0,
+                  borderRadius: BorderRadius.circular(8.0),
+                  color: Color(0xff314CF8),
+                  child: MaterialButton(
+                      height: 0.0,
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate())
+                          await _setLogin();
+                      },
+                      child: Text("로그인", style: textStyle)),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  TextFormField _initTextFormField(bool isObscureText, TextEditingController controller, String message, TextStyle style, String decorationType) {
+  TextFormField _initTextFormField(
+      bool isObscureText,
+      TextEditingController controller,
+      String message,
+      TextStyle style,
+      String decorationType) {
     return TextFormField(
         obscureText: isObscureText,
         controller: controller,
         validator: (value) => (value!.isEmpty) ? message : null,
         style: style,
-        decoration: decorationType == "Id" ? const InputDecoration(prefixIcon: Icon(Icons.person), labelText: "Id", border: OutlineInputBorder()) : const InputDecoration(prefixIcon: Icon(Icons.lock), labelText: "Password", border: OutlineInputBorder()));
+        decoration: decorationType == "Id"
+            ? InputDecoration(
+                filled: true,
+                fillColor: boxColor,
+                prefixIcon: Image.asset('assets/person_outline_black_24dp.png',
+                    fit: BoxFit.scaleDown),
+                labelText: "아이디",
+                labelStyle: textFieldStyle,
+                border: const OutlineInputBorder())
+            : InputDecoration(
+                filled: true,
+                fillColor: boxColor,
+                prefixIcon: Image.asset('assets/lock_open_black_24dp.png',
+                    fit: BoxFit.scaleDown),
+                labelText: "비밀번호",
+                labelStyle: textFieldStyle,
+                border: const OutlineInputBorder()));
+  }
+
+  Container _createContainerByBackground(Widget widget) {
+    return Container(
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/background.png"), fit: BoxFit.fill)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: widget,
+      ),
+    );
+  }
+
+  GestureDetector _createGestureDetector(Function callback, Widget widget) {
+    return GestureDetector(
+        onTap: () {
+          callback();
+        },
+        child: widget);
+  }
+
+  Container _createContainerByCheckboxBackground(Widget widget) {
+    return Container(
+      height: 17.0,
+      width: 17.0,
+      alignment: Alignment.center,
+      color: boxColor,
+      margin: EdgeInsets.only(right: 5),
+      child: widget,
+    );
+  }
+
+  void setCheckbox() {
+    setState(() {
+      checkBoxValue = !checkBoxValue;
+    });
+    secureStorage.write(Env.KEY_ID_CHECK, checkBoxValue.toString());
   }
 
   Future<String> _setsaveid() async {
@@ -187,10 +267,15 @@ class LoginState extends State<Login> {
         secureStorage.write(Env.LOGIN_ID, _loginIdContoroller.text);
         secureStorage.write(Env.LOGIN_PW, _passwordContorller.text);
         secureStorage.write('krName', '${loginInfo.data?['krName']}');
-        secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
-        secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
+        secureStorage.write(
+            Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
+        secureStorage.write(
+            Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
         secureStorage.write(Env.KEY_LOGIN_STATE, "true");
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Dashboard()));
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) => const Dashboard()));
       } else {
         showSnackBar(context, loginInfo.message!);
       }
