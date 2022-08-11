@@ -79,6 +79,14 @@ class LoginState extends State<Login> {
     return Padding(padding: EdgeInsets.all(size), child: widget);
   }
 
+  Padding _createPaddingByOnly(
+      double top, double bottom, double left, double right, Widget widget) {
+    return Padding(
+        padding:
+            EdgeInsets.only(top: top, bottom: bottom, left: left, right: right),
+        child: widget);
+  }
+
   Padding _createPaddingBySementic(
       double vertical, double horizontal, Widget widget) {
     return Padding(
@@ -96,18 +104,25 @@ class LoginState extends State<Login> {
           child: _createListView(
             <Widget>[
               _createPaddingBySementic(
-                60.0,
+                0.0,
                 15.0,
-                const Text(
-                  'Groupware WorkOn',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'sunn',
-                      color: Colors.white,
-                      fontSize: 30),
-                ),
+                const Text('Groupware',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'sunn',
+                        color: Colors.white,
+                        fontSize: 20)),
               ),
+              _createPaddingByOnly(
+                  10.0,
+                  30.0,
+                  15.0,
+                  15.0,
+                  const Image(
+                      image: AssetImage(
+                    'assets/workon_logo.png',
+                  ))),
               _createPadding(
                   16.0,
                   _initTextFormField(false, _loginIdContoroller,
@@ -281,23 +296,4 @@ class LoginState extends State<Login> {
       }
     });
   }
-
-  // Future<void> _computeExcuteTest() async {
-  //   final respFromOtherIsolate = await compute(sum, [1, 2, 5]);
-  //   Log.debug(" *************** result = $respFromOtherIsolate");
-  // }
-
-  // Future<int> sum(List<int> params) async {
-  //   return params.reduce((a, b) => a + b);
-  // }
-
-  // Future<void> initIsolate() async {
-  //   Isolate.spawn(isolateTest, 1);
-  //   Isolate.spawn(isolateTest, 2);
-  //   Isolate.spawn(isolateTest, 3);
-  // }
-
-  // isolateTest(var m) {
-  //   Log.debug(" test = $m");
-  // }
 }
