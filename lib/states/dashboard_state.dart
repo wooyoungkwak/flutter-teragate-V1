@@ -37,8 +37,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   late SecureStorage secureStorage;
 
   String? name = "";
-  String? id = ""; //id
-  String? pw = ""; //pw
   String? deviceip = "";
   Timer? backgroundTimer;
   SimpleFontelicoProgressDialog? progressDialog;
@@ -200,7 +198,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
               child: const Icon(Icons.copy),
               label: '그룹웨어',
               onTap: () async {
-                _moveWebview(context, id!, pw!);
+                _moveWebview(context);
               }),
           SpeedDialChild(
               child: const Icon(Icons.copy),
@@ -247,8 +245,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Navigator.push(context, MaterialPageRoute(builder: (_) => const Login()));
   }
 
-  void _moveWebview(BuildContext context, String? id, String? pw) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(id!, pw!, null)));
+  void _moveWebview(BuildContext context) async{
+    String? userId = await secureStorage.read(Env.KEY_LOGIN_RETURN_ID);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(userId!, null)));
   }
 
   Future<void> _moveSetting(BuildContext context) async {

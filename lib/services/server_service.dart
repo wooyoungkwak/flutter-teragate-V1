@@ -19,7 +19,7 @@ Future<LoginInfo> login(String id, String pw) async {
   if (response.statusCode == 200) {
     String result = utf8.decode(response.bodyBytes);
     Map<String, dynamic> resultMap = jsonDecode(result);
-
+    
     LoginInfo loginInfo;
 
     if (resultMap.values.first) {
@@ -42,6 +42,7 @@ Future<WorkInfo> _getIn(String ip, String accessToken) async {
   var response = await http.post(Uri.parse(Env.SERVER_GET_IN_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
 
   if (response.statusCode == 200) {
+    Log.debug( " 100: 1111111111111111 ${response.body} ");
     return WorkInfo.fromJson(json.decode(response.body));
   } else {
     throw Exception(response.body);
@@ -66,7 +67,6 @@ Future<TokenInfo> getTokenByRefreshToken(String refreshToken) async {
   var data = {"refreshToken": refreshToken};
   var body = json.encode(data);
   var response = await http.post(Uri.parse(Env.SERVER_REFRESH_TOKEN_URL), headers: {"Content-Type": "application/json"}, body: body);
-
   if (response.statusCode == 200) {
     Map<String, dynamic> data = json.decode(response.body);
     if (data[Env.KEY_LOGIN_SUCCESS]) {
@@ -91,6 +91,7 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
       workInfo = WorkInfo(success: false, message: Env.MSG_GET_IN_EXIST);
     } else {
       workInfo = await _getIn(ip, accessToken);
+
       if (workInfo.success) {
         // 정상 등록 된 경우
         tokenInfo = TokenInfo(accessToken: accessToken, refreshToken: refreshToken, isUpdated: false);
@@ -100,15 +101,15 @@ Future<WorkInfo> processGetIn(String accessToken, String refreshToken, String ip
         if (workInfo.message == "expired") {
           // 만료 인 경우 재 요청 경우
           tokenInfo = await getTokenByRefreshToken(refreshToken);
-
           // Token 저장
           _secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getAccessToken());
           _secureStorage.write(Env.KEY_ACCESS_TOKEN, tokenInfo.getRefreshToken());
-
+          
           repeat++;
           if (repeat < 2) {
             return await processGetIn(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, _secureStorage, repeat);
           } else {
+            Log.log(" ********** token expired ");
             return WorkInfo(success: false, message: Env.MSG_GET_IN_FAIL);
           }
         }
@@ -145,6 +146,7 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
           if (repeat < 2) {
             return await processGetOut(tokenInfo.getAccessToken(), tokenInfo.getRefreshToken(), ip, _secureStorage, repeat);
           } else {
+            Log.log(" ********** token expired ");
             return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
           }
         }
@@ -152,7 +154,7 @@ Future<WorkInfo> processGetOut(String accessToken, String refreshToken, String i
     }
     return workInfo;
   } catch (err) {
-    Log.log(" 퇴근 요청 처리 오류 : ${err.toString()}");
+    Log.log(" processGetOut Exception : ${err.toString()}");
     return WorkInfo(success: false, message: Env.MSG_GET_OUT_FAIL);
   }
 }

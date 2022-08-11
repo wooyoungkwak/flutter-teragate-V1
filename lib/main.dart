@@ -74,6 +74,7 @@ class _SplashPageState extends State<SplashPage> {
           if (loginInfo.success!) {
             secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
             secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
+            secureStorage.write(Env.KEY_LOGIN_RETURN_ID, loginInfo.data!["userId"].toString());
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
           } else {
             showSnackBar(context, loginInfo.message!);

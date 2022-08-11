@@ -1,18 +1,22 @@
 // ignore_for_file: constant_identifier_names
 class Env {
-  static const String TEST_SERVER = "http://192.168.0.164";
-  static const String REAL_SERVER = "http://teraenergy.iptime.org";
+  // static const String TEST_SERVER = "http://192.168.0.247";  // local 테스트 서버 
+  static const String TEST_SERVER = "http://teraenergy.iptime.org"; // 개발 테스트 서버
+  static const String REAL_SERVER = "http://teragroupware.duckdns.org";
 
-  static const String SERVER_LOGIN_URL = '$REAL_SERVER:3000/login';
-  static const String SERVER_GET_IN_URL = '$REAL_SERVER:3000/teragate/goToWork';
-  static const String SERVER_GET_OUT_URL = '$REAL_SERVER:3000/teragate/leaveWork';
-  static const String SERVER_REFRESH_TOKEN_URL = '$REAL_SERVER:3000/teragate/refreshToken';
+  static const String SERVER_URL = TEST_SERVER;
+
+  static const String SERVER_LOGIN_URL = '$SERVER_URL:3000/login';
+  static const String SERVER_GET_IN_URL = '$SERVER_URL:3000/teragate/goToWork';
+  static const String SERVER_GET_OUT_URL = '$SERVER_URL:3000/teragate/leaveWork';
+  static const String SERVER_REFRESH_TOKEN_URL = '$SERVER_URL:3000/teragate/refreshToken';
 
   static const String INITIAL_UUID = '74278bdb-b644-4520-8f0c-720eeaffffff';
 
-  static const String SERVER_GROUPWARE_TEST = "$TEST_SERVER:8080/signInapp";
-  static const String SERVER_GROUPWARE_REAL = "http://teragroupware.duckdns.org/signIn";
-  static const String SERVER_GROUPWARE_URL = SERVER_GROUPWARE_REAL;
+  static const String SERVER_GROUPWARE_TEST = "$SERVER_URL:8060/pageLnk/Home";
+  static const String SERVER_GROUPWARE_REAL = "$SERVER_URL/signIn"; 
+
+  static const String SERVER_GROUPWARE_URL = SERVER_GROUPWARE_TEST;
 
   static const String USER_NICK_NAME = 'USER_NICK_NAME';
   static const String LOGIN_ID = 'LOGIN_ID';
@@ -22,12 +26,13 @@ class Env {
   static const String WORK_GET_OUT = "getout";
 
   static const String KEY_ID_CHECK = 'KEY_ID_CHECK';
-  static const String KEY_LOGIN_SUCCESS = "sucess";
+  static const String KEY_LOGIN_SUCCESS = "success";
   static const String KEY_ACCESS_TOKEN = "accessToken";
   static const String KEY_REFRESH_TOKEN = "refreshToken";
   static const String KEY_GET_IN_CHECK = "getInCheck";
   static const String KEY_GET_OUT_CHECK = "getOutCheck";
   static const String KEY_LOGIN_STATE = "loginState";
+  static const String KEY_LOGIN_RETURN_ID = "loginReturnID";
   static const String KEY_SETTING_WEEK_GI_SWITCH =  "WeekSwitchGi";
   static const String KEY_SETTING_MON_GI_SWITCH =   "MondaySwitchGi";
   static const String KEY_SETTING_TUE_GI_SWITCH =   "TuesdaySwitchGi";
