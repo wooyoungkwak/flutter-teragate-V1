@@ -104,7 +104,6 @@ class WebViewState extends State<WebViews> {
                   },
                   onLoadStart: (controller, url) {
                     setState(() {
-                      //검색창 text 변경
                       currentUrl = url.toString();
                       urlController.text = currentUrl;
                     });
@@ -138,6 +137,17 @@ class WebViewState extends State<WebViews> {
                     return NavigationActionPolicy.ALLOW;
                   },
                   onLoadStop: (controller, url) async {
+                    await controller.evaluateJavascript(source: """
+                        var id = document.getElementById("inputId");
+                        var password = document.getElementById("inputPassword");
+                        id.value = "${widget.id}";
+                        password.value = "${widget.pw}";
+                        var form = document.getElementsByClass("login-btn");
+                        form.click();
+                        """);
+                    // form.action(${Env.SERVER_GROUPWARE_URL});
+                    // form.method("POST");
+
                     pullToRefreshController.endRefreshing();
                     setState(() {
                       currentUrl = url.toString();
