@@ -42,19 +42,42 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-          child: Icon(
-        Icons.stream,
-        size: 80,
-        color: Colors.blue,
-      )),
+    return _createContainerByBackground(Center(
+        child: _createPaddingByOnly(
+            8.0,
+            30.0,
+            80.0,
+            80.0,
+            Image.asset(
+              'assets/workon_logo.png',
+              fit: BoxFit.fitWidth,
+            ))));
+  }
+
+  Container _createContainerByBackground(Widget widget) {
+    return Container(
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("assets/background.png"), fit: BoxFit.fill)),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: widget,
+      ),
     );
+  }
+
+  Padding _createPaddingByOnly(
+      double top, double bottom, double left, double right, Widget widget) {
+    return Padding(
+        padding:
+            EdgeInsets.only(top: top, bottom: bottom, left: left, right: right),
+        child: widget);
   }
 
   void initSet() async {
     secureStorage = SecureStorage();
-    await _checkUser(context).then((data) => move(data["loginId"], data["loginPw"]));
+    await _checkUser(context)
+        .then((data) => move(data["loginId"], data["loginPw"]));
   }
 
   Future<Map<String, String?>> _checkUser(context) async {
@@ -67,22 +90,29 @@ class _SplashPageState extends State<SplashPage> {
   void move(String? id, String? password) async {
     String? isLogin = await secureStorage.read(Env.KEY_LOGIN_STATE);
     if (isLogin == "true") {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const Dashboard()));
     } else {
       if (id != null && password != null) {
         login(id, password).then((loginInfo) {
           if (loginInfo.success!) {
-            secureStorage.write(Env.KEY_ACCESS_TOKEN, '${loginInfo.tokenInfo?.getAccessToken()}');
-            secureStorage.write(Env.KEY_REFRESH_TOKEN, '${loginInfo.tokenInfo?.getRefreshToken()}');
-            secureStorage.write(Env.KEY_LOGIN_RETURN_ID, loginInfo.data!["userId"].toString());
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Dashboard()));
+            secureStorage.write(Env.KEY_ACCESS_TOKEN,
+                '${loginInfo.tokenInfo?.getAccessToken()}');
+            secureStorage.write(Env.KEY_REFRESH_TOKEN,
+                '${loginInfo.tokenInfo?.getRefreshToken()}');
+            secureStorage.write(
+                Env.KEY_LOGIN_RETURN_ID, loginInfo.data!["userId"].toString());
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const Dashboard()));
           } else {
             showSnackBar(context, loginInfo.message!);
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const Login()));
           }
         });
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => const Login()));
       }
     }
   }
