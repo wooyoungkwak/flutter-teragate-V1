@@ -1,4 +1,4 @@
-# tera_gate_app
+# teragate
 
 A new Flutter project.
 

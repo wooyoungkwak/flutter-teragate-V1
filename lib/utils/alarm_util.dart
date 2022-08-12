@@ -106,7 +106,7 @@ Future<void> _showNotification(FlutterLocalNotificationsPlugin flutterLocalNotif
 
 // 진동, 소리 둘다 켜져있을때
 Future<void> showNotification(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, String tag, String subtitle) async {
-  const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(Env.NOTIFICATION_CHANNEL_ID, Env.NOTIFICATION_CHANNEL_NAME, playSound: false, enableVibration: false, enableLights: false, ongoing: true, importance: Importance.high, priority: Priority.high);
+  const AndroidNotificationDetails androidNotificationDetails = AndroidNotificationDetails(Env.NOTIFICATION_CHANNEL_ID, Env.NOTIFICATION_CHANNEL_NAME, playSound: true, enableVibration: true, enableLights: false, ongoing: true, importance: Importance.high, priority: Priority.high);
   const IOSNotificationDetails iOSNotificationDetails = IOSNotificationDetails(presentSound: true);
   _showNotification(flutterLocalNotificationsPlugin, tag, subtitle, androidNotificationDetails, iOSNotificationDetails);
 }

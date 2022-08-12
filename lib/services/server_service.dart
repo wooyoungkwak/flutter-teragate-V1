@@ -42,7 +42,6 @@ Future<WorkInfo> _getIn(String ip, String accessToken) async {
   var response = await http.post(Uri.parse(Env.SERVER_GET_IN_URL), headers: {"Content-Type": "application/json", "Authorization": accessToken}, body: body);
 
   if (response.statusCode == 200) {
-    Log.debug( " 100: 1111111111111111 ${response.body} ");
     return WorkInfo.fromJson(json.decode(response.body));
   } else {
     throw Exception(response.body);

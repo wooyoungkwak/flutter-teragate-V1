@@ -40,6 +40,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   String? deviceip = "";
   Timer? backgroundTimer;
   SimpleFontelicoProgressDialog? progressDialog;
+  bool isShowProcess = false;
 
   final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
 
@@ -279,12 +280,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     }
 
     processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
+      _hideProgressDialog();
       if (workInfo.success) {
         _setNotification(workInfo.message);
       } else {
         _setNotification(workInfo.message);
       }
-      _hideProgressDialog();
     });
   }
 
@@ -303,12 +304,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     }
 
     processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
+      _hideProgressDialog();
       if (workInfo.success) {
         _setNotification(workInfo.message);
       } else {
         _setNotification(workInfo.message);
       }
-      _hideProgressDialog();
     });
   }
 
@@ -404,14 +405,14 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         texttime = getDateToStringForYYYYMMDDInNow() + " " + Env.DEFAULT_GO_TIME;
       }
       Log.log("GO : alarmtime = $alarmtime :: alarmSwitch = $alarmSwitch :: texttime = $texttime");
-      await _runToBeacon(_runToGetOut, texttime);
+      _runToBeacon(_runToGetOut, texttime);
     }
   }
 
-  Future<void> _runToBeacon(Function setForGetInOut, String texttime) async {
+  void _runToBeacon(Function setForGetInOut, String texttime) {
     Duration diffTime = getToDateTime(texttime).difference(getNow());
     if (diffTime.inMinutes.toInt() == 0) {
-      _showProgressDialog();
+      if (!isShowProcess) _showProgressDialog();
       initBeacon(_setNotification, _hideProgressDialog, setForGetInOut, beaconStreamController, secureStorage);
       startBeacon();
     }
@@ -419,13 +420,21 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
   Future<Timer> _runBackgroundTimer() async {
     Timer? timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
-      if (await secureStorage.read(Env.KEY_SETTING_GI_SWITCH) == "true") {
-        _setWorkGetIn();
+      String? giSwitch = await secureStorage.read(Env.KEY_SETTING_GI_SWITCH);
+      String? goSwitch = await secureStorage.read(Env.KEY_SETTING_GO_SWITCH);
+
+      if ( giSwitch == "true" && goSwitch == "true") {
+        _setWorkGetIn().then((value) => _setWorkGetOut());
+      } else {
+        if (giSwitch == "true") {
+          _setWorkGetIn();
+        }
+
+        if (goSwitch == "true") {
+          _setWorkGetOut();
+        }
       }
 
-      if (await secureStorage.read(Env.KEY_SETTING_GO_SWITCH) == "true") {
-        _setWorkGetOut();
-      }
     });
 
     return timer;
@@ -436,15 +445,16 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   }
 
   Future<SimpleFontelicoProgressDialog> _initProgressDialog() async {
-    SimpleFontelicoProgressDialog progressDialog = SimpleFontelicoProgressDialog(context: context, barrierDimisable: true);
-    return progressDialog;
+    return SimpleFontelicoProgressDialog(context: context, barrierDimisable: true);
   }
 
   void _showProgressDialog() async {
     progressDialog!.show(message: Env.MSG_LODING, width: 200);
+    isShowProcess = true;
   }
 
   void _hideProgressDialog() async {
     progressDialog!.hide();
+    isShowProcess = false;
   }
 }
