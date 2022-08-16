@@ -83,7 +83,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
     Env.KEY_SETTING_SAT_GO_SWITCH,
     Env.KEY_SETTING_SUN_GO_SWITCH
   ];
-  List<bool> switchDay = [true, true, false, false, false, false, false];
+  List<bool> switchDay = [false, false, false, false, false, false, false];
   int colorvla = 0;
   List<String> colorChange = ["Colors.black", "Colors.white"];
   Color boxColor = const Color(0xff27282E);
