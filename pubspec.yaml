@@ -74,6 +74,7 @@ dependencies:
   
   #연결된 네트워크 장치 검색
   connectivity_plus: ^2.3.6+1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
