@@ -240,12 +240,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Connectivity().checkConnectivity().then((result) {
       if (result == ConnectivityResult.mobile) {
         getIPAddressByMobile().then((map) {
-          Log.debug(' mobile ip address = ${map["ip"]}');
+          Log.log(' mobile ip address = ${map["ip"]}');
           deviceip = map["ip"];
         });
       } else if (result == ConnectivityResult.wifi) {
         getIPAddressByWifi().then((map) {
-          Log.debug(' wifi ip address = ${map["ip"]}');
+          Log.log(' wifi ip address = ${map["ip"]}');
           deviceip = map["ip"];
         });
       }
@@ -254,12 +254,12 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     streamSubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       if (result == ConnectivityResult.mobile) {
         getIPAddressByMobile().then((map) {
-          Log.debug(' mobile ip address = ${map["ip"]}');
+          Log.log(' mobile ip address = ${map["ip"]}');
           deviceip = map["ip"];
         });
       } else if (result == ConnectivityResult.wifi) {
         getIPAddressByWifi().then((map) {
-          Log.debug(' wifi ip address = ${map["ip"]}');
+          Log.log(' wifi ip address = ${map["ip"]}');
           deviceip = map["ip"];
         });
       }
