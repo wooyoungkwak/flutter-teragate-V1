@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:simple_fontellico_progress_dialog/simple_fontico_loading.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 //현재시간
 import 'package:teragate_test/states/setting_state.dart';
@@ -41,7 +43,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   Timer? backgroundTimer;
   SimpleFontelicoProgressDialog? progressDialog;
   bool isShowProcess = false;
-
+  late StreamSubscription streamSubscription;
   final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
 
   @override
@@ -52,7 +54,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
 
     WidgetsBinding.instance.addObserver(this);
 
-    getIPAddress().then((map) => deviceip = map["ip"]);
+    _initIp();
 
     _runBackgroundTimer().then((_backgroundTimer) => backgroundTimer = _backgroundTimer);
 
@@ -81,6 +83,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   void dispose() {
     beaconStreamController.close();
     WidgetsBinding.instance.removeObserver(this);
+    streamSubscription.cancel();
     super.dispose();
   }
 
@@ -228,8 +231,39 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     flutterLocalNotificationsPlugin.initialize(initializationSettings, onSelectNotification: null);
   }
 
-  void _setNotification(String message) {
-    selectNotiType(flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
+  void _showNotification(String message) {
+    selectNotificationType(flutterLocalNotificationsPlugin, Env.TITLE_DIALOG, message);
+  }
+
+  // ip 설정 ( wifi or mobile (lte, 5G 등 ) )
+  void _initIp() {
+    Connectivity().checkConnectivity().then((result) {
+      if (result == ConnectivityResult.mobile) {
+        getIPAddressByMobile().then((map) {
+          Log.debug(' mobile ip address = ${map["ip"]}');
+          deviceip = map["ip"];
+        });
+      } else if (result == ConnectivityResult.wifi) {
+        getIPAddressByWifi().then((map) {
+          Log.debug(' wifi ip address = ${map["ip"]}');
+          deviceip = map["ip"];
+        });
+      }
+    });
+
+    streamSubscription = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result == ConnectivityResult.mobile) {
+        getIPAddressByMobile().then((map) {
+          Log.debug(' mobile ip address = ${map["ip"]}');
+          deviceip = map["ip"];
+        });
+      } else if (result == ConnectivityResult.wifi) {
+        getIPAddressByWifi().then((map) {
+          Log.debug(' wifi ip address = ${map["ip"]}');
+          deviceip = map["ip"];
+        });
+      }
+    });
   }
 
   void _moveLogin() async {
@@ -246,7 +280,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Navigator.push(context, MaterialPageRoute(builder: (_) => const Login()));
   }
 
-  void _moveWebview(BuildContext context) async{
+  void _moveWebview(BuildContext context) async {
     String? userId = await secureStorage.read(Env.KEY_LOGIN_RETURN_ID);
     Navigator.push(context, MaterialPageRoute(builder: (context) => WebViews(userId!, null)));
   }
@@ -270,21 +304,21 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
 
     if (accessToken == null) {
-      _setNotification(Env.MSG_NOT_TOKEN);
+      _showNotification(Env.MSG_NOT_TOKEN);
       return;
     }
 
     if (refreshToken == null) {
-      _setNotification(Env.MSG_NOT_TOKEN);
+      _showNotification(Env.MSG_NOT_TOKEN);
       return;
     }
 
     processGetIn(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       _hideProgressDialog();
       if (workInfo.success) {
-        _setNotification(workInfo.message);
+        _showNotification(workInfo.message);
       } else {
-        _setNotification(workInfo.message);
+        _showNotification(workInfo.message);
       }
     });
   }
@@ -294,21 +328,21 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     String? refreshToken = await secureStorage.read(Env.KEY_REFRESH_TOKEN);
 
     if (accessToken == null) {
-      _setNotification(Env.MSG_NOT_TOKEN);
+      _showNotification(Env.MSG_NOT_TOKEN);
       return;
     }
 
     if (refreshToken == null) {
-      _setNotification(Env.MSG_NOT_TOKEN);
+      _showNotification(Env.MSG_NOT_TOKEN);
       return;
     }
 
     processGetOut(accessToken, refreshToken, deviceip!, secureStorage, 0).then((workInfo) {
       _hideProgressDialog();
       if (workInfo.success) {
-        _setNotification(workInfo.message);
+        _showNotification(workInfo.message);
       } else {
-        _setNotification(workInfo.message);
+        _showNotification(workInfo.message);
       }
     });
   }
@@ -413,7 +447,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
     Duration diffTime = getToDateTime(texttime).difference(getNow());
     if (diffTime.inMinutes.toInt() == 0) {
       if (!isShowProcess) _showProgressDialog();
-      initBeacon(_setNotification, _hideProgressDialog, setForGetInOut, beaconStreamController, secureStorage);
+      initBeacon(_showNotification, _hideProgressDialog, setForGetInOut, beaconStreamController, secureStorage);
       startBeacon();
     }
   }
@@ -423,7 +457,7 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
       String? giSwitch = await secureStorage.read(Env.KEY_SETTING_GI_SWITCH);
       String? goSwitch = await secureStorage.read(Env.KEY_SETTING_GO_SWITCH);
 
-      if ( giSwitch == "true" && goSwitch == "true") {
+      if (giSwitch == "true" && goSwitch == "true") {
         _setWorkGetIn().then((value) => _setWorkGetOut());
       } else {
         if (giSwitch == "true") {
@@ -434,7 +468,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
           _setWorkGetOut();
         }
       }
-
     });
 
     return timer;

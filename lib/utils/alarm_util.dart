@@ -76,7 +76,7 @@ void showOkCancelDialog(BuildContext context, String title, String text, Functio
 }
 
 //노티알람 종류 선택, iOS같은 경우에는 사운드랑 진동이 하나로 묶여있다...
-Future<void> selectNotiType(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, String tag, String subtitle) async {
+Future<void> selectNotificationType(FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, String tag, String subtitle) async {
   late SecureStorage strage = SecureStorage();
 
   String? soundCheck = await strage.read(Env.KEY_SETTING_SOUND);

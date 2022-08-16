@@ -11,7 +11,7 @@ import 'package:teragate_test/utils/time_util.dart';
 import '../models/beacon_model.dart';
 
 // 비콘 초기화
-Future<void> initBeacon(Function setNotification, Function _hideProgressDialog, Function setForGetInOut, StreamController beaconStreamController, SecureStorage secureStorage) async {
+Future<void> initBeacon(Function _showNotification, Function _hideProgressDialog, Function setForGetInOut, StreamController beaconStreamController, SecureStorage secureStorage) async {
   
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
@@ -24,7 +24,7 @@ Future<void> initBeacon(Function setNotification, Function _hideProgressDialog, 
         await startBeacon();
       } else if (call.method == 'isPermissionDialogShown') {
         _hideProgressDialog();
-        setNotification("Beacon 을 검색 할 수 없습니다. 권한을 확인 하세요.");
+        _showNotification("Beacon 을 검색 할 수 없습니다. 권한을 확인 하세요.");
       }
     });
 
@@ -52,14 +52,14 @@ Future<void> initBeacon(Function setNotification, Function _hideProgressDialog, 
       var iBeacon = BeaconData.fromJson(userMap);
 
       if (iBeacon.uuid.toUpperCase() != uuid) {
-        setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+        _showNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
         return;
       }
 
       String beaconKey = iBeacon.minor; // 비콘의 key 값
 
       if (beaconKey != getMinorToDate()) {
-        setNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+        _showNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
       } else {
         setForGetInOut();
       }
