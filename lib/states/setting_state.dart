@@ -14,7 +14,9 @@ class Setting extends StatefulWidget {
   final bool? switchGetOut;
   final bool? switchAlarm;
 
-  const Setting(this.uuid, this.switchGetIn, this.switchGetOut, this.switchAlarm, Key? key) : super(key: key);
+  const Setting(this.uuid, this.switchGetIn, this.switchGetOut,
+      this.switchAlarm, Key? key)
+      : super(key: key);
 
   @override
   // ignore: no_logic_in_create_state
@@ -31,6 +33,12 @@ class SettingState extends State<Setting> {
   late TextEditingController uuidContoroller;
   TextStyle style = const TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
+  TextStyle textStyle = const TextStyle(
+      fontWeight: FontWeight.w700,
+      fontFamily: 'suit',
+      color: Colors.white,
+      fontSize: 20);
+
   bool switchAlarm = false;
 
   @override
@@ -43,7 +51,16 @@ class SettingState extends State<Setting> {
 
   @override
   Widget build(BuildContext context) {
-    return _createWillPopScope(_initScaffold());
+    return _createContainerByBackground(_initScaffoldByAppbar(
+        _createWillPopScope(_initContainerByRadius(30.0))));
+  }
+
+  Container _createContainerByBackground(Widget widget) {
+    return Container(
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("assets/background.png"), fit: BoxFit.fill)),
+        child: widget);
   }
 
   WillPopScope _createWillPopScope(Widget widget) {
@@ -58,13 +75,12 @@ class SettingState extends State<Setting> {
 
   Container _createContainer(Widget widget) {
     return Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         margin: const EdgeInsets.all(8.0),
-        decoration: const BoxDecoration(
-          color: Color(0xFFEEEEEE),
-        ),
-        child: widget
-      );
+        decoration: BoxDecoration(
+            color: const Color(0xff17171C),
+            borderRadius: BorderRadius.circular(10.0)),
+        child: widget);
   }
 
   GestureDetector _createGestureDetector(Function callback, Widget widget) {
@@ -79,53 +95,142 @@ class SettingState extends State<Setting> {
     return Visibility(visible: Platform.isIOS, child: widget);
   }
 
-  FutureBuilder _createFutureBuilder(Future callback, Widget widget) {
-    return FutureBuilder(
-        future: callback,
-        builder: (context, snapshot) {
-          return widget;
-        });
-  }
+  // FutureBuilder _createFutureBuilder(Future callback, Widget widget) {
+  //   return FutureBuilder(
+  //       future: callback,
+  //       builder: (context, snapshot) {
+  //         return widget;
+  //       });
+  // }
 
-  Scaffold _initScaffold() {
+  Scaffold _initScaffoldByAppbar(Widget widget) {
     return Scaffold(
-      key: scaffoldKey,
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const ImageIcon(
+            AssetImage("assets/arrow_back_white_24dp.png"),
+            color: Colors.white,
+          ),
           onPressed: () async {
             await _saveValue();
-            Navigator.of(context).pop();
+            Navigator.pop(context);
           },
         ),
-        backgroundColor: const Color(0x0fff5f5f),
+        backgroundColor: Colors.transparent,
         automaticallyImplyLeading: true,
-        title: const Text('환경 설정', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
+        title: Text("Setting",
+            style:
+                textStyle.copyWith(fontWeight: FontWeight.w600, fontSize: 20)),
         actions: const [],
         centerTitle: true,
         elevation: 4,
       ),
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            _initContainerByUuid(),
-            _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
-            _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
-            _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
-            _createVisibility(_createGestureDetector(onTapInit, _initContainerByInitIos()))
-          ],
-        ),
+      backgroundColor: Colors.transparent,
+      body: widget,
+    );
+  }
+
+  Container _initContainerByRadius(double radius) {
+    return Container(
+      padding: EdgeInsets.only(top: 15),
+      decoration: BoxDecoration(
+          color: const Color(0xff27282E),
+          borderRadius: BorderRadius.circular(radius)),
+      child: Column(
+        children: <Widget>[
+          _initContainerByUuid(),
+          _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
+          _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
+          _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
+          _createVisibility(
+              _createGestureDetector(onTapInit, _initContainerByInitIos()))
+        ],
       ),
     );
   }
 
+  Container _initRowByTitle() {
+    return Container(
+        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+      Container(
+        padding: const EdgeInsets.all(12),
+        color: const Color(0xff314CF8),
+        child: const ImageIcon(
+          AssetImage("assets/bluetooth_white_24dp.png"),
+          color: Colors.white,
+        ),
+      ),
+      RichText(
+        text: TextSpan(children: [
+          TextSpan(
+              text: 'UUID',
+              recognizer: TapGestureRecognizer()
+                ..onTapDown = (details) async {},
+              style: textStyle.copyWith(
+                  fontSize: 18, fontWeight: FontWeight.w700)),
+        ]),
+      ),
+    ]));
+  }
+
+  // Scaffold _initScaffold() {
+  //   return Scaffold(
+  //     key: scaffoldKey,
+  //     appBar: AppBar(
+  //       leading: IconButton(
+  //         icon: const Icon(Icons.arrow_back, color: Colors.black),
+  //         onPressed: () async {
+  //           await _saveValue();
+  //           Navigator.of(context).pop();
+  //         },
+  //       ),
+  //       backgroundColor: const Color(0x0fff5f5f),
+  //       automaticallyImplyLeading: true,
+  //       title: const Text('환경 설정',
+  //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
+  //       actions: const [],
+  //       centerTitle: true,
+  //       elevation: 4,
+  //     ),
+  //     backgroundColor: const Color(0xFFF5F5F5),
+  //     body: SafeArea(
+  //       child: Column(
+  //         children: <Widget>[
+  //           _initContainerByUuid(),
+  //           _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
+  //           _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
+  //           _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
+  //           _createVisibility(
+  //               _createGestureDetector(onTapInit, _initContainerByInitIos()))
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // SafeArea _initSafeArea() {
+  //   return SafeArea(
+  //       child: Column(
+  //     children: <Widget>[
+  //       _initContainerByUuid(),
+  //       _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
+  //       _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
+  //       _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
+  //       _createVisibility(
+  //           _createGestureDetector(onTapInit, _initContainerByInitIos()))
+  //     ],
+  //   ));
+  // }
+
   // UUID text 작성
-  Padding _initPaddingBytextUUID() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: TextFormField(controller: uuidContoroller, validator: (value) => (value!.isEmpty) ? " UUID를 입력해주세요" : null, style: style, decoration: const InputDecoration(prefixIcon: Icon(Icons.bluetooth), labelText: "UUID", border: OutlineInputBorder())),
-    );
+  TextFormField _initTextFormFieldBytextUUID() {
+    return TextFormField(
+        controller: uuidContoroller,
+        validator: (value) => (value!.isEmpty) ? " UUID를 입력해주세요" : null,
+        style: textStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w400),
+        decoration: const InputDecoration(
+            //labelText: "UUID",
+            border: OutlineInputBorder()));
   }
 
   // 초기값 세팅
@@ -134,15 +239,20 @@ class SettingState extends State<Setting> {
         padding: const EdgeInsets.all(16.0),
         child: Material(
             elevation: 5.0,
-            borderRadius: BorderRadius.circular(30.0),
-            color: Colors.red,
+            borderRadius: BorderRadius.circular(8.0),
+            color: const Color(0xff444653),
             child: MaterialButton(
                 onPressed: () {
                   setState(() {
-                    uuidContoroller = TextEditingController(text: Env.INITIAL_UUID);
+                    uuidContoroller =
+                        TextEditingController(text: Env.INITIAL_UUID);
                   });
                 },
-                child: Text("초기값 세팅", style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold)))));
+                child: Text("초기값 세팅",
+                    style: textStyle.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15)))));
   }
 
   // UUID 가져오기
@@ -156,33 +266,65 @@ class SettingState extends State<Setting> {
             child: MaterialButton(
                 onPressed: () {
                   setState(() {
-                    uuidContoroller = TextEditingController(text: "123123123123123123123");
+                    uuidContoroller =
+                        TextEditingController(text: "123123123123123123123");
                   });
                 },
-                child: Text(
-                  "UUID 가져오기",
-                  style: style.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
-                ))));
+                child: Text("UUID 가져오기",
+                    style: textStyle.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15)))));
   }
 
   Container _initContainerByUuid() {
     return _createContainer(Column(
-      children: [_initPaddingBytextUUID(), _initPaddingBySetUUID(), Visibility(visible: false, child: _initPaddingByGetUUID())],
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        _initRowByTitle(),
+        Text("현재 설정된 UUID:",
+            style: textStyle.copyWith(
+                color: const Color(0xff9093A5),
+                fontWeight: FontWeight.w400,
+                fontSize: 14)),
+        _initTextFormFieldBytextUUID(),
+        _initPaddingBySetUUID(),
+        Visibility(visible: false, child: _initPaddingByGetUUID())
+      ],
     ));
   }
 
   Container _initContainerByGetIn() {
-    return _createContainer(Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      RichText(
-        text: TextSpan(children: [
-          TextSpan(text: '출근 일정', recognizer: TapGestureRecognizer()..onTapDown = (details) async {}, style: const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
-        ]),
+    return _createContainer(
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Container(
+        padding: const EdgeInsets.all(12),
+        color: const Color(0xff314CF8),
+        child: const ImageIcon(
+          AssetImage("assets/getin_white_24dp.png"),
+          color: Colors.white,
+        ),
       ),
-      Switch(
-          value: switchGetIn,
-          onChanged: (newValue) {
-            setState(() => switchGetIn = newValue);
-          })
+      Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text("출근 일정",
+            style:
+                textStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w700)),
+        Text("출근 알람을 설정하세요",
+            style: textStyle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xff7B7D8E))),
+      ]),
+      FittedBox(
+          fit: BoxFit.fill,
+          child: Switch(
+              value: switchGetIn,
+              activeColor: Colors.white,
+              activeTrackColor: const Color(0xff26C145),
+              inactiveTrackColor: const Color(0xff444653),
+              onChanged: (newValue) {
+                setState(() => switchGetIn = newValue);
+              }))
     ]));
   }
 
@@ -190,29 +332,34 @@ class SettingState extends State<Setting> {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        RichText(
-          text: TextSpan(children: [
-            TextSpan(text: '퇴근 일정', recognizer: TapGestureRecognizer()..onTapDown = (details) async {}, style: const TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
-          ]),
+        Container(
+          padding: const EdgeInsets.all(12),
+          color: const Color(0xff314CF8),
+          child: const ImageIcon(
+            AssetImage("assets/getout_white_24dp.png"),
+            color: Colors.white,
+          ),
         ),
-        Switch(
-            value: switchGetOut,
-            onChanged: (newValue) {
-              setState(() => switchGetOut = newValue);
-              secureStorage.write(Env.KEY_SETTING_GO_SWITCH, newValue.toString());
-            }),
-      ],
-    ));
-  }
-
-  Container _initContainerByInitIos() {
-    return _createContainer(Row(
-      children: [
-        RichText(
-          text: const TextSpan(children: [
-            TextSpan(text: '초기화', style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400)),
-          ]),
-        ),
+        Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text("퇴근 일정",
+              style: textStyle.copyWith(
+                  fontSize: 18, fontWeight: FontWeight.w700)),
+          Text("퇴근 알람을 설정하세요",
+              style: textStyle.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xff7B7D8E))),
+        ]),
+        FittedBox(
+            fit: BoxFit.fill,
+            child: Switch(
+                value: switchGetOut,
+                activeColor: Colors.white,
+                activeTrackColor: const Color(0xff26C145),
+                inactiveTrackColor: const Color(0xff444653),
+                onChanged: (newValue) {
+                  setState(() => switchGetOut = newValue);
+                }))
       ],
     ));
   }
@@ -221,24 +368,48 @@ class SettingState extends State<Setting> {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        RichText(
-          text: const TextSpan(children: [
-            TextSpan(
-              text: '알람 설정',
-              style: TextStyle(color: Colors.red, fontSize: 20, fontWeight: FontWeight.w400),
-            ),
-          ]),
+        Container(
+          padding: const EdgeInsets.all(12),
+          color: const Color(0xff314CF8),
+          child: const ImageIcon(
+            AssetImage("assets/volume_up_white_24dp.png"),
+            color: Colors.white,
+          ),
         ),
-        Switch(
-          value: switchAlarm,
-          onChanged: (newValue) {
-            setState(() => switchAlarm = newValue);
-            secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
-            secureStorage.write(Env.KEY_SETTING_SOUND, switchAlarm.toString());
-          },
+        Text("알람 설정",
+            style:
+                textStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w700)),
+        FittedBox(
+            fit: BoxFit.fill,
+            child: Switch(
+                value: switchAlarm,
+                activeColor: Colors.white,
+                activeTrackColor: const Color(0xff26C145),
+                inactiveTrackColor: const Color(0xff444653),
+                onChanged: (newValue) {
+                  setState(() => switchAlarm = newValue);
+                }))
+      ],
+    ));
+  }
+
+  Container _initContainerByInitIos() {
+    return _createContainer(Row(
+      children: [
+        RichText(
+          text: TextSpan(children: [
+            TextSpan(
+                text: '초기화',
+                style: textStyle.copyWith(
+                    fontSize: 18, fontWeight: FontWeight.w700)),
+          ]),
         ),
       ],
     ));
+  }
+
+  Column _createColumnBy(Widget) {
+    return Column();
   }
 
   void onTapWorkIn() async {
@@ -258,10 +429,30 @@ class SettingState extends State<Setting> {
     String? switchSat = await secureStorage.read(Env.KEY_SETTING_SAT_GI_SWITCH);
     String? switchSun = await secureStorage.read(Env.KEY_SETTING_SUN_GI_SWITCH);
 
-    List<String?> initTimeList = [timeMon, timeTue, timeWed, timeThu, timeFri, timeSat, timeSun];
-    List<String?> initSwitchList = [switchMon, switchTue, switchWed, switchThu, switchFri, switchSat, switchSun];
+    List<String?> initTimeList = [
+      timeMon,
+      timeTue,
+      timeWed,
+      timeThu,
+      timeFri,
+      timeSat,
+      timeSun
+    ];
+    List<String?> initSwitchList = [
+      switchMon,
+      switchTue,
+      switchWed,
+      switchThu,
+      switchFri,
+      switchSat,
+      switchSun
+    ];
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingWorkTime(Env.WORK_GET_IN, initSwitchList, initTimeList, null)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SettingWorkTime(
+                Env.WORK_GET_IN, initSwitchList, initTimeList, null)));
   }
 
   void onTapWorkOut() async {
@@ -281,10 +472,30 @@ class SettingState extends State<Setting> {
     String? switchSat = await secureStorage.read(Env.KEY_SETTING_SAT_GO_SWITCH);
     String? switchSun = await secureStorage.read(Env.KEY_SETTING_SUN_GO_SWITCH);
 
-    List<String?> initTimeList = [timeMon, timeTue, timeWed, timeThu, timeFri, timeSat, timeSun];
-    List<String?> initSwitchList = [switchMon, switchTue, switchWed, switchThu, switchFri, switchSat, switchSun];
+    List<String?> initTimeList = [
+      timeMon,
+      timeTue,
+      timeWed,
+      timeThu,
+      timeFri,
+      timeSat,
+      timeSun
+    ];
+    List<String?> initSwitchList = [
+      switchMon,
+      switchTue,
+      switchWed,
+      switchThu,
+      switchFri,
+      switchSat,
+      switchSun
+    ];
 
-    Navigator.push(context, MaterialPageRoute(builder: (context) => SettingWorkTime(Env.WORK_GET_OUT, initSwitchList, initTimeList, null)));
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => SettingWorkTime(
+                Env.WORK_GET_OUT, initSwitchList, initTimeList, null)));
   }
 
   void onTapAlarm() {
@@ -303,7 +514,8 @@ class SettingState extends State<Setting> {
         builder: (BuildContext context) {
           return AlertDialog(
             // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
             //Dialog Main Title
             title: Column(
               children: const <Widget>[
@@ -346,7 +558,8 @@ class SettingState extends State<Setting> {
     //3. 백버튼 사용은 막혀있으므로 처리할 필요가 없음
 
     secureStorage.deleteAll();
-    await Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Login()));
+    await Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const Login()));
   }
 
   Future<void> _saveValue() async {
@@ -356,7 +569,6 @@ class SettingState extends State<Setting> {
     secureStorage.write(Env.KEY_SETTING_ALARM, switchAlarm.toString());
     secureStorage.write(Env.KEY_SETTING_VIBRATE, switchAlarm.toString());
     secureStorage.write(Env.KEY_SETTING_SOUND, switchAlarm.toString());
-
   }
 
   void _initValue() {
@@ -365,6 +577,3 @@ class SettingState extends State<Setting> {
     switchAlarm = widget.switchAlarm!;
   }
 }
-
-
-

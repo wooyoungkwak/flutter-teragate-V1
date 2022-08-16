@@ -10,7 +10,9 @@ class SettingWorkTime extends StatefulWidget {
   final List<String?> initSwitchList;
   final List<String?> initTimeList;
 
-  const SettingWorkTime(this.getstate, this.initSwitchList, this.initTimeList, Key? key) : super(key: key);
+  const SettingWorkTime(
+      this.getstate, this.initSwitchList, this.initTimeList, Key? key)
+      : super(key: key);
 
   @override
   SettingWorkTimeState createState() => SettingWorkTimeState();
@@ -19,17 +21,72 @@ class SettingWorkTime extends StatefulWidget {
 class SettingWorkTimeState extends State<SettingWorkTime> {
   late SecureStorage secureStorage;
 
-  List<String> initTimeGetIn = ["08:30", "08:30", "08:30", "08:30", "08:30", "08:30", "08:30"];
-  List<String> initTimeGetOut = ["18:00", "18:00", "18:00", "18:00", "18:00", "18:00", "18:00"];
+  TextStyle textStyle = const TextStyle(
+      fontWeight: FontWeight.w700,
+      fontFamily: 'suit',
+      color: Colors.white,
+      fontSize: 20);
+
+  List<String> initTimeGetIn = [
+    "08:30",
+    "08:30",
+    "08:30",
+    "08:30",
+    "08:30",
+    "08:30",
+    "08:30"
+  ];
+  List<String> initTimeGetOut = [
+    "18:00",
+    "18:00",
+    "18:00",
+    "18:00",
+    "18:00",
+    "18:00",
+    "18:00"
+  ];
   List<String> weekKR = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-  List<String> weekAlarmGITime = [Env.KEY_SETTING_MON_GI_TIME, Env.KEY_SETTING_TUE_GI_TIME, Env.KEY_SETTING_WED_GI_TIME, Env.KEY_SETTING_THU_GI_TIME, Env.KEY_SETTING_FRI_GI_TIME, Env.KEY_SETTING_SAT_GI_TIME, Env.KEY_SETTING_SUN_GI_TIME];
-  List<String> weekAlarmGOTime = [Env.KEY_SETTING_MON_GO_TIME, Env.KEY_SETTING_TUE_GO_TIME, Env.KEY_SETTING_WED_GO_TIME, Env.KEY_SETTING_THU_GO_TIME, Env.KEY_SETTING_FRI_GO_TIME, Env.KEY_SETTING_SAT_GO_TIME, Env.KEY_SETTING_SUN_GO_TIME];
-  List<String> weekAlarmGI = [Env.KEY_SETTING_MON_GI_SWITCH, Env.KEY_SETTING_TUE_GI_SWITCH, Env.KEY_SETTING_WED_GI_SWITCH, Env.KEY_SETTING_THU_GI_SWITCH, Env.KEY_SETTING_FRI_GI_SWITCH, Env.KEY_SETTING_SAT_GI_SWITCH, Env.KEY_SETTING_SUN_GI_SWITCH];
-  List<String> weekAlarmGO = [Env.KEY_SETTING_MON_GO_SWITCH, Env.KEY_SETTING_TUE_GO_SWITCH, Env.KEY_SETTING_WED_GO_SWITCH, Env.KEY_SETTING_THU_GO_SWITCH, Env.KEY_SETTING_FRI_GO_SWITCH, Env.KEY_SETTING_SAT_GO_SWITCH, Env.KEY_SETTING_SUN_GO_SWITCH];
-  List<bool> switchDay = [true, true, true, true, true, false, false]; //스위치 true/false
-  List<String> title = ["출근 알람", "퇴근 알람"];
+  List<String> weekEn = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  List<String> weekAlarmGITime = [
+    Env.KEY_SETTING_MON_GI_TIME,
+    Env.KEY_SETTING_TUE_GI_TIME,
+    Env.KEY_SETTING_WED_GI_TIME,
+    Env.KEY_SETTING_THU_GI_TIME,
+    Env.KEY_SETTING_FRI_GI_TIME,
+    Env.KEY_SETTING_SAT_GI_TIME,
+    Env.KEY_SETTING_SUN_GI_TIME
+  ];
+  List<String> weekAlarmGOTime = [
+    Env.KEY_SETTING_MON_GO_TIME,
+    Env.KEY_SETTING_TUE_GO_TIME,
+    Env.KEY_SETTING_WED_GO_TIME,
+    Env.KEY_SETTING_THU_GO_TIME,
+    Env.KEY_SETTING_FRI_GO_TIME,
+    Env.KEY_SETTING_SAT_GO_TIME,
+    Env.KEY_SETTING_SUN_GO_TIME
+  ];
+  List<String> weekAlarmGI = [
+    Env.KEY_SETTING_MON_GI_SWITCH,
+    Env.KEY_SETTING_TUE_GI_SWITCH,
+    Env.KEY_SETTING_WED_GI_SWITCH,
+    Env.KEY_SETTING_THU_GI_SWITCH,
+    Env.KEY_SETTING_FRI_GI_SWITCH,
+    Env.KEY_SETTING_SAT_GI_SWITCH,
+    Env.KEY_SETTING_SUN_GI_SWITCH
+  ];
+  List<String> weekAlarmGO = [
+    Env.KEY_SETTING_MON_GO_SWITCH,
+    Env.KEY_SETTING_TUE_GO_SWITCH,
+    Env.KEY_SETTING_WED_GO_SWITCH,
+    Env.KEY_SETTING_THU_GO_SWITCH,
+    Env.KEY_SETTING_FRI_GO_SWITCH,
+    Env.KEY_SETTING_SAT_GO_SWITCH,
+    Env.KEY_SETTING_SUN_GO_SWITCH
+  ];
+  List<bool> switchDay = [true, true, false, false, false, false, false];
   int colorvla = 0;
-  List<String> colorChange = [" Colors.black", "Colors.white"];
+  List<String> colorChange = ["Colors.black", "Colors.white"];
+  Color boxColor = const Color(0xff27282E);
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -41,15 +98,42 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
 
   @override
   Widget build(BuildContext context) {
-    return _createWillPopScope(_initScaffold());
+    return _createContainerByBackground(_initScaffoldByAppbar(
+        _createWillPopScope(_initContainerByRadius(30.0)), widget.getstate));
   }
 
-  IgnorePointer _createContainerByIgnore(Widget widget) {
-    return IgnorePointer(ignoring: false, ignoringSemantics: false, child: widget);
+  // IgnorePointer _createContainerByIgnore(Widget widget) {
+  //   return IgnorePointer(
+  //       ignoring: false, ignoringSemantics: false, child: widget);
+  // }
+
+  Container _createContainer(Widget widget, int index) {
+    return Container(
+        margin: const EdgeInsets.all(8),
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        decoration: BoxDecoration(
+            color: switchDay[index] == true
+                ? const Color(0xFF17171C)
+                : const Color(0xFF222229),
+            borderRadius: BorderRadius.circular(10.0)),
+        child: widget);
   }
 
-  Container _createContainer(Widget widget) {
-    return Container(color: const Color(0xffF6F2F2), width: double.infinity, child: widget);
+  Container _initContainerByRadius(double radius) {
+    return Container(
+        padding: const EdgeInsets.only(top: 15),
+        decoration: BoxDecoration(
+            color: const Color(0xff27282E),
+            borderRadius: BorderRadius.circular(radius)),
+        child: _initListView());
+  }
+
+  Container _createContainerByBackground(Widget widget) {
+    return Container(
+        decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("assets/background.png"), fit: BoxFit.fill)),
+        child: widget);
   }
 
   WillPopScope _createWillPopScope(Widget widget) {
@@ -62,69 +146,110 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
         child: widget);
   }
 
-  Scaffold _initScaffold() {
+  Scaffold _initScaffoldByAppbar(Widget widget, getstate) {
     return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () async {
-              await _saveValue();
-              Navigator.pop(context);
-            },
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const ImageIcon(
+            AssetImage("assets/arrow_back_white_24dp.png"),
+            color: Colors.white,
           ),
-          backgroundColor: const Color(0x0fff5f5f),
-          automaticallyImplyLeading: true,
-          title: Text(widget.getstate == Env.WORK_GET_IN ? "출근 설정" : "퇴근 설정", style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
-          actions: const [],
-          centerTitle: true,
-          elevation: 4,
+          onPressed: () async {
+            await _saveValue();
+            Navigator.pop(context);
+          },
         ),
-        backgroundColor: const Color(0xFFF5F5F5),
-        body: ListView(children: <Widget>[_initListView()]));
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: true,
+        title: Text(
+            getstate == Env.WORK_GET_IN ? "WorkIn Alarm" : "WorkOut Alarm",
+            style:
+                textStyle.copyWith(fontWeight: FontWeight.w600, fontSize: 30)),
+        actions: const [],
+        centerTitle: true,
+        elevation: 4,
+      ),
+      backgroundColor: Colors.transparent,
+      body: widget,
+    );
   }
 
   ListView _initListView() {
     return ListView.separated(
         shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: 30),
-        itemCount: weekKR.length,
-        separatorBuilder: (BuildContext context, int index) => const Divider(thickness: 3),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        itemCount: weekEn.length,
+        separatorBuilder: (BuildContext context, int index) =>
+            const Divider(thickness: 0),
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
               onTap: () {
                 _initBottomPicker(context, index);
               },
-              child: _createContainer(_initRowByWeek(index)));
+              child: _createContainer(_initRowByWeek(index), index));
         });
   }
 
   Row _initRowByWeek(index) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        if (widget.getstate == Env.WORK_GET_IN) Text(initTimeGetIn[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)) 
-        else if (widget.getstate == Env.WORK_GET_OUT) Text(initTimeGetOut[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-        Text(weekKR[index], style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-        Align(
-          child: Switch(
-              value: switchDay[index],
-              onChanged: (newValue) {
-                if (widget.getstate == Env.WORK_GET_IN) {
-                  setState(() => switchDay[index] = newValue);
-                } else if (widget.getstate == Env.WORK_GET_OUT) {
-                  setState(() => switchDay[index] = newValue);
-                }
-              }),
-        ),
+        Container(
+            height: 70,
+            width: 60,
+            alignment: Alignment.center,
+            child: Text(weekEn[index],
+                style: textStyle.copyWith(
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xff9093A5),
+                    fontSize: 18))),
+        if (widget.getstate == Env.WORK_GET_IN)
+          Text(initTimeGetIn[index],
+              style: textStyle.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xffE8EBFF),
+                  fontSize: 28))
+        else if (widget.getstate == Env.WORK_GET_OUT)
+          Text(initTimeGetOut[index],
+              style: textStyle.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xffE8EBFF),
+                  fontSize: 28)),
+        SizedBox(
+            width: 80,
+            height: 80,
+            child: FittedBox(
+                fit: BoxFit.fill,
+                child: Switch(
+                    value: switchDay[index],
+                    activeColor: Colors.white,
+                    activeTrackColor: const Color(0xff26C145),
+                    inactiveTrackColor: const Color(0xff444653),
+                    onChanged: (newValue) {
+                      if (widget.getstate == Env.WORK_GET_IN) {
+                        setState(
+                          () => switchDay[index] = newValue,
+                        );
+                      } else if (widget.getstate == Env.WORK_GET_OUT) {
+                        setState(() => switchDay[index] = newValue);
+                      }
+                    })))
       ],
     );
   }
 
   void _initBottomPicker(BuildContext context, int index) async {
     BottomPicker.time(
-            title: "Set your next meeting time",
-            titleStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.orange),
+            title: weekEn[index],
+            titleStyle: textStyle,
+            backgroundColor: const Color(0xff27282E),
+            pickerTextStyle: textStyle,
+            buttonText: "Save",
+            buttonTextStyle: textStyle,
+            buttonSingleColor: const Color(0xff314CF8),
+            displayButtonIcon: false,
+            closeIconColor: Colors.white,
             onSubmit: (dateTime) async {
               String formattedDate = getPickerTime(dateTime);
               setState(() {
@@ -140,7 +265,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
         .show(context);
   }
 
-  void _initValue() {  
+  void _initValue() {
     if (widget.getstate == Env.WORK_GET_IN) {
       for (int i = 0; i < weekAlarmGI.length; i++) {
         _initTimeByGetIN(i);
@@ -155,7 +280,7 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
   }
 
   Future<void> _initTimeByGetIN(int index) async {
-    String? check = widget.initTimeList[index]; 
+    String? check = widget.initTimeList[index];
     // ignore: prefer_if_null_operators, unnecessary_null_comparison
     initTimeGetIn[index] = check == null ? initTimeGetIn[index] : check;
   }
@@ -169,7 +294,8 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
   Future<void> _initSwitch(int index) async {
     String? change = widget.initSwitchList[index];
     // ignore: prefer_if_null_operators, unnecessary_null_comparison
-    switchDay[index] = (change == null ? switchDay[index] : (change == "true" ? true : false));
+    switchDay[index] =
+        (change == null ? switchDay[index] : (change == "true" ? true : false));
   }
 
   Future<void> _saveValue() async {
