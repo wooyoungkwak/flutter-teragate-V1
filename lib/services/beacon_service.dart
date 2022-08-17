@@ -42,8 +42,13 @@ Future<void> initBeacon(Function _showNotification, Function _hideProgressDialog
     }); //Send 'true' to run in background
   }
 
+  beaconStreamController.stream.listen((event) {
+    if ( event.isNotEmpty) {
+
+    }
+  });
+
   beaconStreamController.stream.first.then((data) async {
-    //리슨타면 일단 스캔멈추기.
     if (data.isNotEmpty) {
       String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
       uuid = uuid!.toUpperCase();
@@ -52,14 +57,14 @@ Future<void> initBeacon(Function _showNotification, Function _hideProgressDialog
       var iBeacon = BeaconData.fromJson(userMap);
 
       if (iBeacon.uuid.toUpperCase() != uuid) {
-        _showNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+        _showNotification(Env.MSG_MINOR_FAIL);
         return;
       }
 
-      String beaconKey = iBeacon.minor; // 비콘의 key 값
+      String beaconKey = iBeacon.minor;
 
       if (beaconKey != getMinorToDate()) {
-        _showNotification(Env.MSG_MINOR_FAIL); // 다이얼로그창
+        _showNotification(Env.MSG_MINOR_FAIL);
       } else {
         setForGetInOut();
       }
