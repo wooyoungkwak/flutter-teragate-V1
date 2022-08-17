@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:teragate_test/models/storage_model.dart';
 import 'package:teragate_test/states/settingbeacon_state.dart';
 import 'package:teragate_test/states/settingwork_state.dart';
@@ -52,7 +53,13 @@ class SettingState extends State<Setting> {
   @override
   Widget build(BuildContext context) {
     return _createContainerByBackground(_initScaffoldByAppbar(
-        _createWillPopScope(_initContainerByRadius(30.0))));
+        _createWillPopScope(_createListView(_initContainerByRadius()))));
+  }
+
+  ListView _createListView(Widget widget) {
+    return ListView(
+      children: [widget],
+    );
   }
 
   Container _createContainerByBackground(Widget widget) {
@@ -75,11 +82,12 @@ class SettingState extends State<Setting> {
 
   Container _createContainer(Widget widget) {
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding:
+            const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 40),
         margin: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
             color: const Color(0xff17171C),
-            borderRadius: BorderRadius.circular(10.0)),
+            borderRadius: BorderRadius.circular(10)),
         child: widget);
   }
 
@@ -92,16 +100,59 @@ class SettingState extends State<Setting> {
   }
 
   Visibility _createVisibility(Widget widget) {
-    return Visibility(visible: Platform.isIOS, child: widget);
+    //return Visibility(visible: Platform.isIOS, child: widget);
+    return Visibility(visible: true, child: widget); // 테스트
   }
 
-  // FutureBuilder _createFutureBuilder(Future callback, Widget widget) {
-  //   return FutureBuilder(
-  //       future: callback,
-  //       builder: (context, snapshot) {
-  //         return widget;
-  //       });
-  // }
+  SizedBox _initSizedBoxByicon_2Text(
+      AssetImage image, String mainText, String subText) {
+    return SizedBox(
+        child: Row(children: [
+      Container(
+        margin: const EdgeInsets.only(right: 15),
+        padding: const EdgeInsets.all(12),
+        color: const Color(0xff314CF8),
+        child: ImageIcon(
+          image,
+          color: Colors.white,
+        ),
+      ),
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            child: Text(mainText,
+                style: textStyle.copyWith(
+                    fontSize: 18, fontWeight: FontWeight.w700))),
+        Text(subText,
+            style: textStyle.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xff7B7D8E))),
+      ])
+    ]));
+  }
+
+  SizedBox _initSizedBoxByicon_1Text(AssetImage image, String mainText) {
+    return SizedBox(
+        child: Row(children: [
+      Container(
+        margin: const EdgeInsets.only(right: 15),
+        padding: const EdgeInsets.all(12),
+        color: const Color(0xff314CF8),
+        child: ImageIcon(
+          image,
+          color: Colors.white,
+        ),
+      ),
+      Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Container(
+            margin: const EdgeInsets.only(bottom: 6),
+            child: Text(mainText,
+                style: textStyle.copyWith(
+                    fontSize: 18, fontWeight: FontWeight.w700))),
+      ])
+    ]));
+  }
 
   Scaffold _initScaffoldByAppbar(Widget widget) {
     return Scaffold(
@@ -130,12 +181,13 @@ class SettingState extends State<Setting> {
     );
   }
 
-  Container _initContainerByRadius(double radius) {
+  Container _initContainerByRadius() {
     return Container(
-      padding: EdgeInsets.only(top: 15),
-      decoration: BoxDecoration(
-          color: const Color(0xff27282E),
-          borderRadius: BorderRadius.circular(radius)),
+      padding: const EdgeInsets.only(top: 15),
+      decoration: const BoxDecoration(
+          color: Color(0xff27282E),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0), topRight: Radius.circular(30.0))),
       child: Column(
         children: <Widget>[
           _initContainerByUuid(),
@@ -149,10 +201,10 @@ class SettingState extends State<Setting> {
     );
   }
 
-  Container _initRowByTitle() {
-    return Container(
-        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+  Row _initRowByTitle() {
+    return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
       Container(
+        margin: const EdgeInsets.only(right: 15),
         padding: const EdgeInsets.all(12),
         color: const Color(0xff314CF8),
         child: const ImageIcon(
@@ -163,80 +215,28 @@ class SettingState extends State<Setting> {
       RichText(
         text: TextSpan(children: [
           TextSpan(
-              text: 'UUID',
+              text: Env.TITLE_SETTING_UUID,
               recognizer: TapGestureRecognizer()
                 ..onTapDown = (details) async {},
               style: textStyle.copyWith(
                   fontSize: 18, fontWeight: FontWeight.w700)),
         ]),
       ),
-    ]));
+    ]);
   }
 
-  // Scaffold _initScaffold() {
-  //   return Scaffold(
-  //     key: scaffoldKey,
-  //     appBar: AppBar(
-  //       leading: IconButton(
-  //         icon: const Icon(Icons.arrow_back, color: Colors.black),
-  //         onPressed: () async {
-  //           await _saveValue();
-  //           Navigator.of(context).pop();
-  //         },
-  //       ),
-  //       backgroundColor: const Color(0x0fff5f5f),
-  //       automaticallyImplyLeading: true,
-  //       title: const Text('환경 설정',
-  //           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400)),
-  //       actions: const [],
-  //       centerTitle: true,
-  //       elevation: 4,
-  //     ),
-  //     backgroundColor: const Color(0xFFF5F5F5),
-  //     body: SafeArea(
-  //       child: Column(
-  //         children: <Widget>[
-  //           _initContainerByUuid(),
-  //           _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
-  //           _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
-  //           _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
-  //           _createVisibility(
-  //               _createGestureDetector(onTapInit, _initContainerByInitIos()))
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-  // SafeArea _initSafeArea() {
-  //   return SafeArea(
-  //       child: Column(
-  //     children: <Widget>[
-  //       _initContainerByUuid(),
-  //       _createGestureDetector(onTapWorkIn, _initContainerByGetIn()),
-  //       _createGestureDetector(onTapWorkOut, _initContainerByGetOut()),
-  //       _createGestureDetector(onTapAlarm, _initContainerByAlarm()),
-  //       _createVisibility(
-  //           _createGestureDetector(onTapInit, _initContainerByInitIos()))
-  //     ],
-  //   ));
-  // }
-
-  // UUID text 작성
   TextFormField _initTextFormFieldBytextUUID() {
     return TextFormField(
         controller: uuidContoroller,
-        validator: (value) => (value!.isEmpty) ? " UUID를 입력해주세요" : null,
-        style: textStyle.copyWith(fontSize: 16, fontWeight: FontWeight.w400),
-        decoration: const InputDecoration(
-            //labelText: "UUID",
-            border: OutlineInputBorder()));
+        validator: (value) =>
+            (value!.isEmpty) ? Env.TITLE_SETTING_UUID_SUB : null,
+        style: textStyle.copyWith(fontSize: 14, fontWeight: FontWeight.w400),
+        decoration: const InputDecoration(border: OutlineInputBorder()));
   }
 
-  // 초기값 세팅
-  Padding _initPaddingBySetUUID() {
+  Padding _initPaddingByButton(String text) {
     return Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: Material(
             elevation: 5.0,
             borderRadius: BorderRadius.circular(8.0),
@@ -248,48 +248,41 @@ class SettingState extends State<Setting> {
                         TextEditingController(text: Env.INITIAL_UUID);
                   });
                 },
-                child: Text("초기값 세팅",
+                child: Text(text,
                     style: textStyle.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
-                        fontSize: 15)))));
-  }
-
-  // UUID 가져오기
-  Padding _initPaddingByGetUUID() {
-    return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.circular(30.0),
-            color: Colors.red,
-            child: MaterialButton(
-                onPressed: () {
-                  setState(() {
-                    uuidContoroller =
-                        TextEditingController(text: "123123123123123123123");
-                  });
-                },
-                child: Text("UUID 가져오기",
-                    style: textStyle.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15)))));
+                        fontSize: 14)))));
   }
 
   Container _initContainerByUuid() {
     return _createContainer(Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        _initRowByTitle(),
-        Text("현재 설정된 UUID:",
-            style: textStyle.copyWith(
-                color: const Color(0xff9093A5),
-                fontWeight: FontWeight.w400,
-                fontSize: 14)),
-        _initTextFormFieldBytextUUID(),
-        _initPaddingBySetUUID(),
-        Visibility(visible: false, child: _initPaddingByGetUUID())
+        // _initRowByTitle(),
+        _initSizedBoxByicon_1Text(AssetImage("assets/bluetooth_white_24dp.png"),
+            Env.TITLE_SETTING_UUID),
+        Container(
+          margin: const EdgeInsets.only(top: 18, bottom: 10),
+          alignment: Alignment.centerLeft,
+          child: Text(Env.TITLE_SETTING_UUID_SUB,
+              style: textStyle.copyWith(
+                  color: const Color(0xff9093A5),
+                  fontWeight: FontWeight.w400,
+                  fontSize: 14)),
+        ),
+        Container(
+            margin: const EdgeInsets.only(top: 10, bottom: 20),
+            color: const Color(0xff27282E),
+            child: _initTextFormFieldBytextUUID()),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          _initPaddingByButton(Env.TITLE_SETTING_UUID_DEFAULT_BUTTON),
+          //Visibility(visible: false, child: _initPaddingByGetUUID())
+          Visibility(
+              visible: true,
+              child: _initPaddingByButton(Env.TITLE_SETTING_UUID_GET_BUTTON))
+        ])
+        // 테스트
       ],
     ));
   }
@@ -297,24 +290,8 @@ class SettingState extends State<Setting> {
   Container _initContainerByGetIn() {
     return _createContainer(
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Container(
-        padding: const EdgeInsets.all(12),
-        color: const Color(0xff314CF8),
-        child: const ImageIcon(
-          AssetImage("assets/getin_white_24dp.png"),
-          color: Colors.white,
-        ),
-      ),
-      Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        Text("출근 일정",
-            style:
-                textStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w700)),
-        Text("출근 알람을 설정하세요",
-            style: textStyle.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xff7B7D8E))),
-      ]),
+      _initSizedBoxByicon_2Text(const AssetImage("assets/getin_white_24dp.png"),
+          Env.TITLE_SETTING_GET_IN, Env.TITLE_SETTING_GET_IN_SUB),
       FittedBox(
           fit: BoxFit.fill,
           child: Switch(
@@ -332,24 +309,10 @@ class SettingState extends State<Setting> {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          color: const Color(0xff314CF8),
-          child: const ImageIcon(
-            AssetImage("assets/getout_white_24dp.png"),
-            color: Colors.white,
-          ),
-        ),
-        Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text("퇴근 일정",
-              style: textStyle.copyWith(
-                  fontSize: 18, fontWeight: FontWeight.w700)),
-          Text("퇴근 알람을 설정하세요",
-              style: textStyle.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xff7B7D8E))),
-        ]),
+        _initSizedBoxByicon_2Text(
+            const AssetImage("assets/getout_white_24dp.png"),
+            Env.TITLE_SETTING_GET_OFF,
+            Env.TITLE_SETTING_GET_OFF_SUB),
         FittedBox(
             fit: BoxFit.fill,
             child: Switch(
@@ -368,17 +331,9 @@ class SettingState extends State<Setting> {
     return _createContainer(Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          color: const Color(0xff314CF8),
-          child: const ImageIcon(
-            AssetImage("assets/volume_up_white_24dp.png"),
-            color: Colors.white,
-          ),
-        ),
-        Text("알람 설정",
-            style:
-                textStyle.copyWith(fontSize: 18, fontWeight: FontWeight.w700)),
+        _initSizedBoxByicon_1Text(
+            const AssetImage("assets/volume_up_white_24dp.png"),
+            Env.TITLE_SETTING_ALARM),
         FittedBox(
             fit: BoxFit.fill,
             child: Switch(
@@ -395,21 +350,13 @@ class SettingState extends State<Setting> {
 
   Container _initContainerByInitIos() {
     return _createContainer(Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        RichText(
-          text: TextSpan(children: [
-            TextSpan(
-                text: '초기화',
-                style: textStyle.copyWith(
-                    fontSize: 18, fontWeight: FontWeight.w700)),
-          ]),
-        ),
+        _initSizedBoxByicon_1Text(
+            const AssetImage("assets/restart_alt_white_24dp.png"),
+            Env.TITLE_SETTING_INITIALIZATION),
       ],
     ));
-  }
-
-  Column _createColumnBy(Widget) {
-    return Column();
   }
 
   void onTapWorkIn() async {
@@ -503,6 +450,8 @@ class SettingState extends State<Setting> {
     // if (Platform.isAndroid) {
     //   Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingAlarm(null)));
     // }
+
+    setState(() => switchAlarm = !switchAlarm);
   }
 
   void onTapInit() {

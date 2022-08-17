@@ -99,18 +99,13 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
   @override
   Widget build(BuildContext context) {
     return _createContainerByBackground(_initScaffoldByAppbar(
-        _createWillPopScope(_initContainerByRadius(30.0)), widget.getstate));
+        _createWillPopScope(_initContainerByRadius()), widget.getstate));
   }
-
-  // IgnorePointer _createContainerByIgnore(Widget widget) {
-  //   return IgnorePointer(
-  //       ignoring: false, ignoringSemantics: false, child: widget);
-  // }
 
   Container _createContainer(Widget widget, int index) {
     return Container(
-        margin: const EdgeInsets.all(8),
-        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        margin: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
             color: switchDay[index] == true
                 ? const Color(0xFF17171C)
@@ -119,12 +114,14 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
         child: widget);
   }
 
-  Container _initContainerByRadius(double radius) {
+  Container _initContainerByRadius() {
     return Container(
         padding: const EdgeInsets.only(top: 15),
-        decoration: BoxDecoration(
-            color: const Color(0xff27282E),
-            borderRadius: BorderRadius.circular(radius)),
+        decoration: const BoxDecoration(
+            color: Color(0xff27282E),
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30.0),
+                topRight: Radius.circular(30.0))),
         child: _initListView());
   }
 
@@ -175,12 +172,10 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
   }
 
   ListView _initListView() {
-    return ListView.separated(
+    return ListView.builder(
         shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        padding: const EdgeInsets.only(top: 18, bottom: 50),
         itemCount: weekEn.length,
-        separatorBuilder: (BuildContext context, int index) =>
-            const Divider(thickness: 0),
         itemBuilder: (BuildContext context, int index) {
           return GestureDetector(
               onTap: () {
@@ -196,8 +191,6 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-            height: 70,
-            width: 60,
             alignment: Alignment.center,
             child: Text(weekEn[index],
                 style: textStyle.copyWith(
@@ -217,8 +210,6 @@ class SettingWorkTimeState extends State<SettingWorkTime> {
                   color: const Color(0xffE8EBFF),
                   fontSize: 28)),
         SizedBox(
-            width: 80,
-            height: 80,
             child: FittedBox(
                 fit: BoxFit.fill,
                 child: Switch(
