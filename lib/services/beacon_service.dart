@@ -12,7 +12,8 @@ import '../models/beacon_model.dart';
 
 // 비콘 초기화
 Future<void> initBeacon(Function _showNotification, Function _hideProgressDialog, Function setForGetInOut, StreamController beaconStreamController, SecureStorage secureStorage) async {
-  
+
+  int index = 0;  
   if (Platform.isAndroid) {
     await BeaconsPlugin.setDisclosureDialogMessage(title: "Need Location Permission", message: "This app collects location data to work with beacons.");
 
@@ -42,38 +43,42 @@ Future<void> initBeacon(Function _showNotification, Function _hideProgressDialog
     }); //Send 'true' to run in background
   }
 
-  beaconStreamController.stream.listen((event) {
-    if ( event.isNotEmpty) {
-
-    }
-  });
-
-  beaconStreamController.stream.first.then((data) async {
-    if (data.isNotEmpty) {
-      String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
-      uuid = uuid!.toUpperCase();
+  // beaconStreamController.stream.first.then((data) async {
+  //   if (data.isNotEmpty) {
+  //     String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
+  //     uuid = uuid!.toUpperCase();
       
-      Map<String, dynamic> userMap = jsonDecode(data);
+  //     Map<String, dynamic> userMap = jsonDecode(data);
+  //     var iBeacon = BeaconData.fromJson(userMap);
+
+  //     if (iBeacon.uuid.toUpperCase() != uuid) {
+  //       _showNotification(Env.MSG_MINOR_FAIL);
+  //       return;
+  //     }
+
+  //     String beaconKey = iBeacon.minor;
+
+  //     if (beaconKey != getMinorToDate()) {
+  //       _showNotification(Env.MSG_MINOR_FAIL);
+  //     } else {
+  //       setForGetInOut();
+  //     }
+
+  //     BeaconsPlugin.stopMonitoring();
+  //   } else {
+  //     BeaconsPlugin.stopMonitoring();
+  //   }
+  // });
+
+  beaconStreamController.stream.listen((event) {
+    if (event.isNotEmpty) {
+      Map<String, dynamic> userMap = jsonDecode(event);
       var iBeacon = BeaconData.fromJson(userMap);
-
-      if (iBeacon.uuid.toUpperCase() != uuid) {
-        _showNotification(Env.MSG_MINOR_FAIL);
-        return;
-      }
-
-      String beaconKey = iBeacon.minor;
-
-      if (beaconKey != getMinorToDate()) {
-        _showNotification(Env.MSG_MINOR_FAIL);
-      } else {
-        setForGetInOut();
-      }
-
-      BeaconsPlugin.stopMonitoring();
-    } else {
-      BeaconsPlugin.stopMonitoring();
+      index ++;
+      Log.debug(" (index = $index) **************** ${iBeacon.uuid}");
     }
   });
+
 }
 
 Future<void> _setBeacon() async {
