@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+// import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +44,9 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
   SimpleFontelicoProgressDialog? progressDialog;
   bool isShowProcess = false;
   late StreamSubscription streamSubscription;
-  final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
+
+  // final StreamController<String> beaconStreamController = StreamController<String>.broadcast();
+  late StreamController<String> beaconStreamController;
 
   @override
   void initState() {
@@ -183,6 +185,21 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
         overlayOpacity: 0.5,
         closeManually: true,
         children: [
+          SpeedDialChild(
+              child: const Icon(Icons.copy),
+              label: '시작',
+              onTap: () async {
+                beaconStreamController = StreamController<String>.broadcast();
+                initBeacon(_showNotification, _hideProgressDialog, _setWorkGetIn, beaconStreamController, secureStorage);
+                startBeacon();
+              }),
+          SpeedDialChild(
+              child: const Icon(Icons.copy),
+              label: '정지',
+              onTap: () async {
+                stopBeacon();
+                beaconStreamController.close();
+              }),
           SpeedDialChild(
               child: const Icon(Icons.copy),
               label: '출근',

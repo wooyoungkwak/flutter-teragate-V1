@@ -1,4 +1,4 @@
-// ignore_for_file: constant_identifier_names
+// ignore_for_file: constant_identifier_names, non_constant_identifier_names
 class Env {
   // static const String TEST_SERVER = "http://192.168.0.247";  // local 테스트 서버
   static const String TEST_SERVER = "http://teraenergy.iptime.org"; // 개발 테스트 서버
@@ -8,10 +8,8 @@ class Env {
 
   static const String SERVER_LOGIN_URL = '$SERVER_URL:3000/login';
   static const String SERVER_GET_IN_URL = '$SERVER_URL:3000/teragate/goToWork';
-  static const String SERVER_GET_OUT_URL =
-      '$SERVER_URL:3000/teragate/leaveWork';
-  static const String SERVER_REFRESH_TOKEN_URL =
-      '$SERVER_URL:3000/teragate/refreshToken';
+  static const String SERVER_GET_OUT_URL = '$SERVER_URL:3000/teragate/leaveWork';
+  static const String SERVER_REFRESH_TOKEN_URL = '$SERVER_URL:3000/teragate/refreshToken';
 
   static const String INITIAL_UUID = '74278bdb-b644-4520-8f0c-720eeaffffff';
 
@@ -111,7 +109,7 @@ class Env {
   static String TITLE_SETTING_UUID_DEFAULT_BUTTON = "Default Value Setting";
   static String TITLE_SETTING_UUID_GET_BUTTON = "Get UUID";
 
-  UUID_SUBtKR() {
+  void UUID_SUBtKR() {
     TITLE_SETTING_GET_IN = "출근";
     TITLE_SETTING_GET_IN_SUB = "출근 일정을 설정하세요";
     TITLE_SETTING_GET_OFF = "퇴근";

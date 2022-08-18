@@ -50,3 +50,4 @@ pubspec.lock
 ios/Runner.xcodeproj/project.pbxproj
 ios/Podfile.lock
 .vscode/launch.json
+pubspec.lock
