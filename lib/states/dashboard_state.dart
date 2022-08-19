@@ -191,7 +191,6 @@ class DashboardState extends State<Dashboard> with WidgetsBindingObserver {
               onTap: () async {
                 beaconStreamController = StreamController<String>.broadcast();
                 initBeacon(_showNotification, _hideProgressDialog, _setWorkGetIn, beaconStreamController, secureStorage);
-                startBeacon();
               }),
           SpeedDialChild(
               child: const Icon(Icons.copy),
