@@ -29,10 +29,8 @@ Future<void> initBeacon(Function _showNotification, Function _hideProgressDialog
       }
     });
 
-    // BeaconsPlugin.listenToBeacons(beaconStreamController);
   } else if (Platform.isIOS) {
     BeaconsPlugin.setDebugLevel(2);
-    // BeaconsPlugin.listenToBeacons(beaconStreamController);
     Future.delayed(const Duration(milliseconds: 3000), () async {
       _setBeacon();
       await startBeacon();
@@ -44,7 +42,7 @@ Future<void> initBeacon(Function _showNotification, Function _hideProgressDialog
   }
 
   BeaconsPlugin.listenToBeacons(beaconStreamController);
-  
+
   // beaconStreamController.stream.first.then((data) async {
   //   if (data.isNotEmpty) {
   //     String? uuid = await secureStorage.read(Env.KEY_SETTING_UUID);
